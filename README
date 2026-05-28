@@ -1,0 +1,46 @@
+
+Passo A Passo
+
+Abra o PowerShell.
+
+Entre na pasta do sistema:
+
+cd C:\Users\IIGD_Engenho_Novo\pizzaria_chef
+
+Abra o sistema em uma porta nova, por exemplo 5174:
+
+npm run dev -- --host 0.0.0.0 --port 5174
+
+Se a porta 5174 já estiver ocupada, use outra:
+
+npm run dev -- --host 0.0.0.0 --port 5175
+
+No mesmo computador, abra no navegador:
+
+http://127.0.0.1:5174/
+
+Para abrir em outro celular ou computador no mesmo Wi-Fi, descubra o IP do computador. Em outro PowerShell, rode:
+
+ipconfig
+
+Procure por Endereço IPv4. Vai aparecer algo parecido com:
+192.168.1.25
+
+No outro aparelho conectado no mesmo Wi-Fi, abra no navegador usando esse IP e a porta:
+http://192.168.1.25:5174/
+
+Se o Windows pedir permissão de firewall, clique em permitir para rede privada.
+Resumo
+
+Use sempre este modelo:
+
+npm run dev -- --host 0.0.0.0 --port NUMERO_DA_PORTA
+Exemplo:
+
+npm run dev -- --host 0.0.0.0 --port 5174
+
+Cada sistema deve usar uma porta diferente:
+
+5173 - Bom Samaritano
+5174 - Pizzaria Chef
+5175 - outro sistema

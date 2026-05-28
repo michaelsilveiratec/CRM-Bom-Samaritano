@@ -1,0 +1,1452 @@
+{
+  "journeys": [
+    {
+      "id": "integracao",
+      "name": "Integração & Fundamentos",
+      "description": "Jornada inicial de 8 lições fundamentais para consolidação, firmeza espiritual e os primeiros passos na caminhada com Cristo.",
+      "lessons": [
+        {
+          "num": 1,
+          "title": "Salvação",
+          "subtitle": "A Graça que nos Encontra",
+          "base": "Efésios 2:8",
+          "baseText": "\"Porque pela graça sois salvos, mediante a fé; e isto não vem de vós; é dom de Deus.\"",
+          "objective": "Ensinar que a salvação é um presente da graça de Deus recebido pela fé em Jesus Cristo.",
+          "color": "from-purple-600/20 to-indigo-600/10",
+          "border": "border-purple-500/30",
+          "icon": "✝️",
+          "sections": [
+            {
+              "title": "O Que é Salvação?",
+              "items": [
+                "Libertação do poder do pecado",
+                "Reconciliação com Deus",
+                "Perdão completo",
+                "Nova vida em Cristo",
+                "Vida eterna"
+              ]
+            },
+            {
+              "title": "O Problema do Pecado",
+              "body": "O pecado não é apenas fazer coisas erradas. É viver longe de Deus e colocar outras coisas no centro da vida.",
+              "items": [
+                "Culpa",
+                "Medo",
+                "Vazio",
+                "Separação de Deus"
+              ]
+            },
+            {
+              "title": "O Que Jesus Fez por Nós?",
+              "body": "Jesus viveu a vida perfeita que não conseguimos viver e morreu a morte que merecíamos.",
+              "items": [
+                "Ele carregou nossos pecados",
+                "Recebeu nossa condenação",
+                "Nos ofereceu perdão e adoção"
+              ]
+            },
+            {
+              "title": "Como Receber a Salvação?",
+              "items": [
+                "1. Arrependa-se — Reconheça seu pecado e volte-se para Deus",
+                "2. Creia em Jesus — Confie que somente Cristo pode salvar",
+                "3. Confesse Jesus como Senhor — Entregue sua vida ao governo de Cristo"
+              ]
+            }
+          ],
+          "memory": "\"Se com tua boca confessares Jesus como Senhor e em teu coração creres que Deus o ressuscitou dentre os mortos, serás salvo.\" — Romanos 10:9",
+          "application": [
+            "Você já entregou sua vida a Cristo?",
+            "Em que você tem colocado sua confiança?",
+            "Ore hoje recebendo a graça de Deus."
+          ]
+        },
+        {
+          "num": 2,
+          "title": "Oração",
+          "subtitle": "Vivendo em Comunhão com Deus",
+          "base": "1 Tessalonicenses 5:17",
+          "baseText": "\"Orai sem cessar.\"",
+          "objective": "Ensinar que oração é relacionamento com Deus e não apenas um ritual religioso.",
+          "color": "from-blue-600/20 to-cyan-600/10",
+          "border": "border-blue-500/30",
+          "icon": "🙏",
+          "sections": [
+            {
+              "title": "O Que é Oração?",
+              "items": [
+                "Conversar com Deus",
+                "Desfrutar da presença do Pai",
+                "Abrir o coração",
+                "Depender do Senhor"
+              ]
+            },
+            {
+              "title": "Por Que Orar?",
+              "items": [
+                "Porque Deus nos ama",
+                "Porque precisamos dEle",
+                "Porque crescemos espiritualmente",
+                "Porque a oração transforma nosso coração"
+              ]
+            },
+            {
+              "title": "Como Devemos Orar?",
+              "items": [
+                "Com sinceridade — Deus vê o coração",
+                "Com fé — Confiando na bondade do Pai",
+                "Com perseverança — Sem desistir",
+                "Com humildade — Reconhecendo nossa dependência"
+              ]
+            },
+            {
+              "title": "Tipos de Oração",
+              "items": [
+                "Adoração",
+                "Gratidão",
+                "Confissão",
+                "Intercessão",
+                "Clamor"
+              ]
+            }
+          ],
+          "memory": "\"Lancem sobre ele toda a sua ansiedade, porque ele tem cuidado de vocês.\" — 1 Pedro 5:7",
+          "application": [
+            "Separe diariamente um tempo com Deus.",
+            "Comece com poucos minutos, mas seja constante.",
+            "Fale com Deus como um filho fala com o Pai."
+          ]
+        },
+        {
+          "num": 3,
+          "title": "A Palavra",
+          "subtitle": "Deus Fala Conosco",
+          "base": "Salmo 119:105",
+          "baseText": "\"Lâmpada para os meus pés é a tua palavra.\"",
+          "objective": "Mostrar que a Bíblia é a Palavra de Deus e o alimento espiritual do cristão.",
+          "color": "from-amber-600/20 to-yellow-600/10",
+          "border": "border-amber-500/30",
+          "icon": "📖",
+          "sections": [
+            {
+              "title": "O Que é a Bíblia?",
+              "items": [
+                "Palavra inspirada por Deus",
+                "Revelação do caráter de Deus",
+                "Guia para a vida",
+                "Fonte de verdade"
+              ]
+            },
+            {
+              "title": "Por Que Ler a Bíblia?",
+              "items": [
+                "Fortalece a fé",
+                "Renova a mente",
+                "Corrige o coração",
+                "Produz maturidade espiritual"
+              ]
+            },
+            {
+              "title": "Como Ler a Bíblia?",
+              "items": [
+                "1. Ore antes de ler — Peça entendimento",
+                "2. Leia diariamente — A constância é mais importante que quantidade",
+                "3. Medite — Pergunte: O que ensina sobre Deus? O que revela sobre mim?",
+                "4. Pratique — A Palavra transforma quando é obedecida"
+              ]
+            }
+          ],
+          "memory": "\"Toda Escritura é inspirada por Deus.\" — 2 Timóteo 3:16",
+          "application": [
+            "Crie o hábito diário de leitura bíblica.",
+            "Comece pelos Evangelhos.",
+            "Anote o que Deus falar ao seu coração."
+          ]
+        },
+        {
+          "num": 4,
+          "title": "Fé",
+          "subtitle": "Confiando em Deus",
+          "base": "Hebreus 11:1",
+          "baseText": "\"Ora, a fé é a certeza das coisas que se esperam.\"",
+          "objective": "Ensinar que a fé cristã é confiança em Deus e em Suas promessas.",
+          "color": "from-emerald-600/20 to-teal-600/10",
+          "border": "border-emerald-500/30",
+          "icon": "⚓",
+          "sections": [
+            {
+              "title": "O Que é Fé?",
+              "items": [
+                "Confiar em Deus",
+                "Descansar em Sua graça",
+                "Crer mesmo sem ver",
+                "Depender de Cristo"
+              ]
+            },
+            {
+              "title": "Como a Fé Cresce?",
+              "items": [
+                "Pela Palavra",
+                "Pela oração",
+                "Pela comunhão",
+                "Pela prática da obediência"
+              ]
+            },
+            {
+              "title": "Inimigos da Fé",
+              "items": [
+                "Medo",
+                "Ansiedade",
+                "Autossuficiência",
+                "Dúvida alimentada pela incredulidade"
+              ]
+            },
+            {
+              "title": "Exemplos Bíblicos",
+              "items": [
+                "Abraão",
+                "Davi",
+                "Daniel",
+                "Maria",
+                "Paulo"
+              ]
+            }
+          ],
+          "memory": "\"O justo viverá pela fé.\" — Romanos 1:17",
+          "application": [
+            "Entregue suas preocupações a Deus.",
+            "Confie no Senhor mesmo quando não entender tudo.",
+            "Caminhe pela fé diariamente."
+          ]
+        },
+        {
+          "num": 5,
+          "title": "Igreja",
+          "subtitle": "A Família de Deus",
+          "base": "Hebreus 10:25",
+          "baseText": "\"Não deixemos de congregar-nos.\"",
+          "objective": "Ensinar a importância da comunhão cristã e da vida em igreja.",
+          "color": "from-rose-600/20 to-pink-600/10",
+          "border": "border-rose-500/30",
+          "icon": "⛪",
+          "sections": [
+            {
+              "title": "O Que é a Igreja?",
+              "items": [
+                "Corpo de Cristo",
+                "Família espiritual",
+                "Comunidade da graça",
+                "Povo de Deus"
+              ]
+            },
+            {
+              "title": "Por Que Precisamos da Igreja?",
+              "items": [
+                "Crescemos juntos",
+                "Somos encorajados",
+                "Aprendemos a amar",
+                "Servimos uns aos outros"
+              ]
+            },
+            {
+              "title": "O Que um Cristão Deve Fazer?",
+              "items": [
+                "Participar",
+                "Servir",
+                "Amar",
+                "Perdoar",
+                "Caminhar em unidade"
+              ]
+            },
+            {
+              "title": "A Igreja Não é Perfeita",
+              "body": "A igreja é formada por pecadores alcançados pela graça. Por isso aprendemos humildade, perdão e reconciliação.",
+              "items": []
+            }
+          ],
+          "memory": "\"Vós sois o corpo de Cristo.\" — 1 Coríntios 12:27",
+          "application": [
+            "Participe fielmente da comunhão.",
+            "Desenvolva relacionamentos espirituais.",
+            "Descubra maneiras de servir."
+          ]
+        },
+        {
+          "num": 6,
+          "title": "Generosidade",
+          "subtitle": "Honrando a Deus com os Recursos",
+          "base": "2 Coríntios 9:7",
+          "baseText": "\"Cada um contribua segundo propôs no coração.\"",
+          "objective": "Ensinar que generosidade é fruto da graça de Deus no coração.",
+          "color": "from-orange-600/20 to-amber-600/10",
+          "border": "border-orange-500/30",
+          "icon": "🌱",
+          "sections": [
+            {
+              "title": "O Que é Generosidade?",
+              "items": [
+                "Gratidão prática",
+                "Confiança em Deus",
+                "Amor em ação",
+                "Desapego do materialismo"
+              ]
+            },
+            {
+              "title": "Tudo Pertence a Deus",
+              "body": "Somos administradores e não donos absolutos. Deus nos dá recursos para suprir necessidades, abençoar pessoas e expandir o Reino.",
+              "items": []
+            },
+            {
+              "title": "Por Que Contribuímos?",
+              "items": [
+                "Porque Deus foi generoso conosco",
+                "Porque Cristo se entregou por nós",
+                "Porque queremos participar da missão de Deus"
+              ]
+            }
+          ],
+          "memory": "\"Mais bem-aventurado é dar do que receber.\" — Atos 20:35",
+          "application": [
+            "Desenvolva um coração generoso.",
+            "Seja fiel e intencional.",
+            "Use seus recursos para glorificar a Deus."
+          ]
+        },
+        {
+          "num": 7,
+          "title": "Santidade",
+          "subtitle": "Uma Nova Vida em Cristo",
+          "base": "1 Pedro 1:16",
+          "baseText": "\"Sede santos, porque eu sou santo.\"",
+          "objective": "Ensinar que o cristão é chamado para uma vida transformada pelo Espírito Santo.",
+          "color": "from-violet-600/20 to-purple-600/10",
+          "border": "border-violet-500/30",
+          "icon": "🕊️",
+          "sections": [
+            {
+              "title": "O Que é Santidade?",
+              "body": "Santidade não é perfeccionismo religioso. É viver para Deus, afastar-se do pecado e tornar-se semelhante a Cristo.",
+              "items": []
+            },
+            {
+              "title": "Como Somos Transformados?",
+              "items": [
+                "Pela graça",
+                "Pela Palavra",
+                "Pelo Espírito Santo",
+                "Pelo arrependimento contínuo"
+              ]
+            },
+            {
+              "title": "Fruto do Espírito",
+              "items": [
+                "Amor",
+                "Alegria",
+                "Paz",
+                "Paciência",
+                "Bondade",
+                "Domínio próprio"
+              ]
+            }
+          ],
+          "memory": "\"Se alguém está em Cristo, nova criatura é.\" — 2 Coríntios 5:17",
+          "application": [
+            "Abandone práticas pecaminosas.",
+            "Busque uma vida íntegra.",
+            "Peça diariamente ajuda ao Espírito Santo."
+          ]
+        },
+        {
+          "num": 8,
+          "title": "Missão",
+          "subtitle": "Vivendo para a Glória de Deus",
+          "base": "Marcos 16:15",
+          "baseText": "\"Ide por todo o mundo e pregai o evangelho.\"",
+          "objective": "Ensinar que todo cristão foi chamado para testemunhar de Jesus.",
+          "color": "from-sky-600/20 to-blue-600/10",
+          "border": "border-sky-500/30",
+          "icon": "🌍",
+          "sections": [
+            {
+              "title": "O Que é Missão?",
+              "body": "Missão é participar da obra de Deus no mundo. Todo cristão é chamado para anunciar o evangelho, amar pessoas, servir e refletir Cristo.",
+              "items": []
+            },
+            {
+              "title": "Como Testemunhar?",
+              "items": [
+                "Com palavras — Compartilhando o evangelho",
+                "Com atitudes — Demonstrando amor e graça",
+                "Com serviço — Ajudando pessoas em necessidade"
+              ]
+            },
+            {
+              "title": "Jesus é o Centro da Missão",
+              "body": "Não anunciamos religião. Anunciamos Cristo crucificado e ressurreto.",
+              "items": []
+            }
+          ],
+          "memory": "\"Vós sois a luz do mundo.\" — Mateus 5:14",
+          "application": [
+            "Ore por pessoas que não conhecem Jesus.",
+            "Compartilhe seu testemunho.",
+            "Viva de forma que glorifique a Cristo."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vida_vitoriosa",
+      "name": "Vida Vitoriosa",
+      "description": "Esforce-se para participar destas 12 lições que, sem dúvida, farão de você uma bênção. Permita que o Senhor seja glorificado com a vida abundante que você desfrutará. É isto que Ele espera de você.",
+      "lessons": [
+        {
+          "num": 1,
+          "title": "Determinação",
+          "subtitle": "O caminho para se tomar posse da bênção",
+          "base": "João 14:13",
+          "baseText": "\"E tudo quanto pedirdes em meu nome, eu o farei, para que o Pai seja glorificado no Filho.\"",
+          "objective": "O objetivo deste curso é ajudar o nosso povo a compreender o mistério da fé e a praticar a fé real, deixando a fé da sorte para viver a fé real.",
+          "color": "from-purple-600/20 to-indigo-600/10",
+          "border": "border-purple-500/30",
+          "icon": "🎯",
+          "sections": [
+            {
+              "title": "Introdução — Fé Real vs Fé da Sorte",
+              "body": "Durante os últimos anos, temos ministrado o Curso Fé para milhares de pessoas. Não são poucas as vezes em que pessoas vêm até nós para agradecer, afirmando que estes ensinamentos mudaram a sua maneira de crer. Sou grato a Deus que nos permitiu conhecer os princípios que davam ao Ministério do Senhor Jesus e dos apóstolos o sucesso descrito amplamente nas páginas das Escrituras. Creio que estes mesmos princípios, se aplicados hoje, darão, também, idêntico sucesso ao povo de Deus.\n\nNão devemos aceitar que o Evangelho — o Poder de Deus — seja igualado às religiões, obras dos homens ou, em alguns casos, dos demônios. O Evangelho é diferente; Ele é o próprio Deus em ação, curando os enfermos, expulsando os demônios, levantando os caídos e revestindo o povo dEle de santidade e de poder.\n\nHá de se levantar um grupo de pessoas conscientes de seus direitos e princípios em Cristo, que mostrarão ao mundo que há uma diferença entre o que serve ao Senhor e o ímpio. Creio que isto já está acontecendo; o entendimento do que somos e temos é o sinal de que o verdadeiro exército de novas criaturas já se ergue para a glória do Senhor.\n\nEsforce-se para participar destas 12 lições que, sem dúvida, farão de você uma bênção. Permita que o Senhor seja glorificado com a vida abundante que você desfrutará. É isto que Ele espera de você.\n\nEm Cristo,\nR. R. Soares",
+              "items": []
+            },
+            {
+              "title": "O Objetivo deste Curso",
+              "body": "O objetivo deste curso é ajudar o nosso povo a compreender este assunto que para muitos é mistério — o mistério da fé. Seria bom que aqueles que possuem algum conhecimento sobre a fé deixassem de lado o que sabem e, numa atitude sem preconceitos, examinassem conosco as Escrituras como se estivessem iniciando esta caminhada. Não devemos tentar misturar este ensinamento com outro que nos tenha sido ministrado em qualquer outra parte. Isto, além de não ajudar em nada, irá complicar as coisas. Coloque de lado o que você sabe sobre a fé e, no final do curso, faça uma avaliação; se aquilo que você aprendeu neste curso for considerado como bom, jogue fora, então, a velha bagagem. Se o que ministramos você considerar como ineficaz ou como de pouco valor, desconsidere-o e volte a praticar o que antes conhecia.\n\nNa verdade, nós vamos aprender algo novo: Deixar de praticar a fé da sorte para praticar a fé real. Vamos entender o que realmente significa crer em Deus, como enfrentar as situações e sair vencedor, como ter, usar e desfrutar tudo o que Cristo conquistou para nós.",
+              "items": []
+            },
+            {
+              "title": "Uma Autovalorização",
+              "body": "Primeiro de tudo, é preciso que você tenha uma autovalorização da sua pessoa. É ensinado em todas as partes que nós não valemos nada para Deus, que somos seres sem a mínima expressão diante dEle, e que somente por misericórdia é que Ele nos salva. Veja bem: todos crêem que Jesus pagou um alto preço para nos resgatar, o que é verdade. Mas, se o preço pago foi alto, é porque temos um alto valor para o Senhor Deus. Não se paga tanto por aquilo que tem pouco valor.",
+              "items": []
+            },
+            {
+              "title": "Primeira Lição",
+              "body": "Nesta nossa primeira lição sobre a fé vamos aprender o que é determinação. Em João 14.13, temos a seguinte promessa do Senhor Jesus: E tudo quanto pedirdes em meu nome, eu o farei, para que o Pai seja glorificado no Filho. Segundo os entendidos na língua grega esta palavra pedirdes está mal traduzida. Teria sido melhor determinardes. Então, aqui está a primeira lição. Não precisamos pedir a bênção e sim determinar, exigir, mandar, ou seja: tomar posse daquilo que aprendemos pela Palavra que nos pertence. Há muita coisa nova que vamos aprender nestas lições sobre a fé, e sempre que aprendemos algo, devemos colocar logo em prática. Não devemos ser lerdos em tomar posse daquilo que é nosso. Quando o Senhor nos dá uma revelação, junto a ela Ele nos dá a bênção.",
+              "items": []
+            },
+            {
+              "title": "Com Você Também",
+              "body": "A partir de agora, não precisamos mais orar pedindo a cura, a prosperidade ou a vitória sobre as tentações. Mas, determinar ou exigir que o mal saia da nossa vida. Na cidade de Catanduva, no interior de São Paulo, um senhor me procurou para contar o que lhe aconteceu com a sua criação de porcos e galinhas, que estava morrendo. Disse-me que todos os dias tinha que enterrar pelo menos uma criação. Segundo o seu relato, ele já havia feito tudo o que sabia para tentar salvar a sua criação, que era o seu ganha-pão. Aí, numa manhã, ele ligou a televisão e ouviu-me falar sobre a determinação. E, mesmo sem muita orientação, o que na verdade é desnecessário, abriu a porta da cozinha e foi ao quintal, onde gritou com a mão levantada: 'Aqui não vai morrer mais nem porco nem galinha, em Nome de Jesus.' Três meses depois desta sua determinação, ele veio a uma reunião que realizei naquela cidade e contou-me com lágrimas a rolar pela face que nenhuma criação havia morrido mais no seu sítio. É fácil. Pode e deve ocorrer também com você. Quem nos garante é o próprio Senhor Jesus (João 14.13).",
+              "items": []
+            },
+            {
+              "title": "Aprendendo a Determinar",
+              "body": "Determinar é marcar tempo, fixar, definir, prescrever, ordenar, estabelecer, decretar e decidir. Quantas pessoas passam o tempo todo sofrendo, enquanto oram pedindo a Deus que as cure, solucione os seus problemas, salve os pecadores e faça uma porção de coisas? Não sabem que na verdade é o Senhor que tem estado o tempo todo esperando que elas determinassem para que Ele pudesse fazer a obra.",
+              "items": []
+            },
+            {
+              "title": "Determinar é Exigir de Quem?",
+              "body": "É claro que não podemos exigir de Deus. Não podemos mandar que Deus faça isto ou aquilo. Ele é o Senhor e nós servos. Mas, determinar não é ordenar a Deus e sim ao diabo que tire de nós suas garras e desapareça de nossas vidas, de nosso dinheiro e de nossas famílias. Determinar é obedecer ao Senhor. Quando agimos assim, descobrimos que este é o modo de fazer o inimigo nos obedecer. Quando determinamos em o Nome de Jesus, o poder de Deus entra em ação realizando aquilo que queremos.",
+              "items": []
+            },
+            {
+              "title": "A Simplicidade das Coisas de Deus",
+              "body": "Pode parecer simples, mas este é o meio mais rápido e seguro de recebermos as bênçãos do Senhor. Quando começamos a agir por este método de Deus, não somente obedecemos ao Senhor, mas aprendemos que ele realmente funciona. Eu creio que Deus não fez nada complicado. Os homens, sim, é que complicam o que fazem e tentam complicar também as coisas de Deus. Deus na realidade quis que as coisas espirituais fossem assim para que até as crianças, os débeis mentais e gente com raciocínio difícil pudessem receber as Suas bênçãos. As coisas de Deus são sempre simples e descomplicadas.",
+              "items": []
+            },
+            {
+              "title": "Um Desafio para Quem Crê",
+              "body": "Se você determinar em o Nome de Jesus, você pode estar certo de que a sua ordem não falhará. As palavras de Jesus não poderão passar, ainda que o céu e a terra passem. Veja Mateus 24.35. Quando agimos sobre a Palavra de Jesus, podemos ter certeza da vitória. Por mais difícil e desanimadora que a situação possa parecer, usemos a nossa fé e soltemos a declaração do que cremos, determinando o que quisermos. Após termos determinado, podemos descansar, mesmo que os sintomas permaneçam e tudo pareça atestar que não conseguiremos.",
+              "items": []
+            },
+            {
+              "title": "Você é Quem Realiza a Obra de Deus",
+              "body": "Agora que você sabe que é você quem determina, quem fixa os limites, quem diz o que terá ou não, pare de orar chorando, de se lamentar, suplicando que Deus, na Sua bondade, lembre-se de você. Comece a se alegrar na presença do Altíssimo. Ore, sim, não para mendigar a bênção, mas para agradecer por ela, para dizer ao Senhor quão feliz você se encontra ao saber que tudo o que você determinar Ele mesmo fará por você. Agora é como se Deus estivesse lhe mostrando as suas reais possibilidades nEle. É exatamente isto que Ele está fazendo. Você é de Deus, recriado em Cristo Jesus para o sucesso, para uma vida plena, para determinar o que quiser e vencer. Confesse: Posso todas as coisas naquele que me fortalece (Fp 4.13).",
+              "items": []
+            },
+            {
+              "title": "Exemplos de Pessoas que Determinaram",
+              "body": "Na Bíblia encontramos inúmeros exemplos de pessoas que determinaram, se bem que talvez pouco conhecessem este termo, e foram bem sucedidas. Podemos destacar o caso do apóstolo Paulo na cidade de Listra: E estava assentado em Listra certo varão leso dos pés, coxo desde o ventre de sua mãe, o qual nunca tinha andado. Este ouviu falar Paulo, que, fixando nele os olhos, e vendo que tinha fé para ser curado. Disse em voz alta: Levanta-te direito sobre teus pés. E ele saltou e andou (At 14.8-10). Como podemos observar, Paulo não orou para que este cidadão fosse curado. Ele determinou a sua cura. Podemos citar ainda o caso de Josué ordenando que o sol e a lua se detivessem, fazendo com que aquele dia se espichasse por quase mais um dia (Js 10.12).",
+              "items": []
+            }
+          ],
+          "memory": "\"E tudo quanto pedirdes em meu nome, eu o farei, para que o Pai seja glorificado no Filho.\" — João 14:13",
+          "application": [
+            "Tenha uma autovalorização reconhecendo o seu valor em Cristo.",
+            "Determine em Nome de Jesus a saída de todo mal da sua vida.",
+            "Mesmo que os sintomas persistam, não leve-os em consideração e descanse."
+          ]
+        },
+        {
+          "num": 2,
+          "title": "Os Cinco Passos da Vitória",
+          "subtitle": "Princípios para Vencer em Cristo",
+          "base": "1 Coríntios 15:57",
+          "baseText": "\"Mas graças a Deus, que nos dá a vitória por intermédio de nosso Senhor Jesus Cristo.\"",
+          "objective": "Compreender os passos espirituais necessários para desfrutar da vitória que Cristo conquistou.",
+          "color": "from-blue-600/20 to-cyan-600/10",
+          "border": "border-blue-500/30",
+          "icon": "👣",
+          "sections": [
+            {
+              "title": "Os 5 Passos Práticos",
+              "items": [
+                "1. Aceitar a vitória de Cristo",
+                "2. Viver em obediência ativa",
+                "3. Declarar a Palavra com fé",
+                "4. Vigiar e orar continuamente",
+                "5. Permanecer firme em comunidade"
+              ]
+            }
+          ],
+          "memory": "\"Graças a Deus, que nos dá a vitória por intermédio de nosso Senhor Jesus Cristo.\" — 1 Coríntios 15:57",
+          "application": [
+            "Aplique o primeiro passo hoje mesmo.",
+            "Agradeça a Deus pela vitória antecipada.",
+            "Fale das promessas com autoridade."
+          ]
+        },
+        {
+          "num": 3,
+          "title": "Os Nossos Direitos às Bênçãos",
+          "subtitle": "A Herança Legal do Crente",
+          "base": "Gálatas 3:29",
+          "baseText": "\"E, se sois de Cristo, também sois descendentes de Abraão e herdeiros segundo a promessa.\"",
+          "objective": "Conhecer as promessas da Nova Aliança e tomar posse delas pela fé.",
+          "color": "from-amber-600/20 to-yellow-600/10",
+          "border": "border-amber-500/30",
+          "icon": "📜",
+          "sections": [
+            {
+              "title": "Qual é a Nossa Herança?",
+              "items": [
+                "Adoção como filhos e herdeiros",
+                "Acesso direto ao Trono da Graça",
+                "Provisão e cuidado em todas as áreas",
+                "Paz que excede todo o entendimento"
+              ]
+            }
+          ],
+          "memory": "\"E, se sois de Cristo, também sois descendentes de Abraão e herdeiros...\" — Gálatas 3:29",
+          "application": [
+            "Estude as promessas de Abraão na Bíblia.",
+            "Aproprie-se dos seus direitos em Cristo.",
+            "Rejeite o sentimento de rejeição."
+          ]
+        },
+        {
+          "num": 4,
+          "title": "O Nome de Jesus",
+          "subtitle": "Autoridade e Poder",
+          "base": "Filipenses 2:9",
+          "baseText": "\"Pelo que também Deus o exaltou sobremaneira e lhe deu o nome que está acima de todo nome.\"",
+          "objective": "Reconhecer a autoridade do nome de Jesus e aprender a usá-lo na oração e na batalha espiritual.",
+          "color": "from-emerald-600/20 to-teal-600/10",
+          "border": "border-emerald-500/30",
+          "icon": "👑",
+          "sections": [
+            {
+              "title": "O Poder do Nome",
+              "items": [
+                "Salvação de pecadores",
+                "Poder para expulsar o mal",
+                "Autoridade diante das enfermidades",
+                "Resposta do Pai aos nossos pedidos"
+              ]
+            }
+          ],
+          "memory": "\"E tudo quanto pedirdes em meu nome, isso farei, a fim de que o Pai seja glorificado no Filho.\" — João 14:13",
+          "application": [
+            "Ore especificamente usando o nome de Jesus com fé.",
+            "Reconheça a soberania de Cristo.",
+            "Compartilhe o nome dEle hoje."
+          ]
+        },
+        {
+          "num": 5,
+          "title": "A Fórmula da Oração",
+          "subtitle": "Orando Conforme a Vontade de Deus",
+          "base": "Mateus 6:9",
+          "baseText": "\"Portanto, vós orareis assim: Pai nosso, que estás nos céus, santificado seja o teu nome.\"",
+          "objective": "Aprender o padrão de oração ensinado por Jesus e como orar com eficácia.",
+          "color": "from-rose-600/20 to-pink-600/10",
+          "border": "border-rose-500/30",
+          "icon": "🧮",
+          "sections": [
+            {
+              "title": "Elementos da Oração Eficaz",
+              "items": [
+                "Adoração e reconhecimento da paternidade divina",
+                "Alinhamento com a vontade do Reino",
+                "Pedido de provisão diária (pão nosso)",
+                "Pedido de perdão e coração perdoador",
+                "Proteção e livramento do mal"
+              ]
+            }
+          ],
+          "memory": "\"E esta é a confiança que temos para com ele: que, se pedirmos alguma coisa segundo a sua vontade, ele nos ouve.\" — 1 João 5:14",
+          "application": [
+            "Use o 'Pai Nosso' como base estrutural.",
+            "Evite orar apenas por si mesmo.",
+            "Agradeça pelas orações respondidas."
+          ]
+        },
+        {
+          "num": 6,
+          "title": "A Derrota de Satanás",
+          "subtitle": "Triunfo Consumado na Cruz",
+          "base": "Colossenses 2:15",
+          "baseText": "\"E, despojando os principados e as potestades, publicamente os expôs ao desprezo, triunfando deles na cruz.\"",
+          "objective": "Compreender que o inimigo já está derrotado e que o cristão caminha em vitória.",
+          "color": "from-orange-600/20 to-amber-600/10",
+          "border": "border-orange-500/30",
+          "icon": "🛡️",
+          "sections": [
+            {
+              "title": "A Realidade do Triunfo",
+              "items": [
+                "A cruz esmagou a cabeça da serpente",
+                "Fomos libertos do império das trevas",
+                "A culpa que nos acusava foi cancelada na cruz",
+                "Temos autoridade em Jesus para resistir"
+              ]
+            }
+          ],
+          "memory": "\"O qual nos libertou do império das trevas e nos transportou para o Reino do Filho do seu amor.\" — Colossenses 1:13",
+          "application": [
+            "Rejeite mentiras ou acusações do inimigo.",
+            "Declare que você pertence ao Reino da Luz.",
+            "Ande de cabeça erguida em Cristo."
+          ]
+        },
+        {
+          "num": 7,
+          "title": "Resistir",
+          "subtitle": "Firmeza Contra as Investidas do Mal",
+          "base": "Tiago 4:7",
+          "baseText": "\"Sujeitai-vos, portanto, a Deus; mas resisti ao diabo, e ele fugirá de vós.\"",
+          "objective": "Aprender a se submeter à vontade de Deus para ter autoridade espiritual para resistir.",
+          "color": "from-violet-600/20 to-purple-600/10",
+          "border": "border-violet-500/30",
+          "icon": "🧱",
+          "sections": [
+            {
+              "title": "Como Resistir?",
+              "items": [
+                "1. Submissão total a Deus em primeiro lugar",
+                "2. Rejeição ativa e verbal do mal",
+                "3. Uso do escudo da fé e espada do Espírito",
+                "4. Vigiar as brechas e pensamentos negativos"
+              ]
+            }
+          ],
+          "memory": "\"Sujeitai-vos, portanto, a Deus; mas resisti ao diabo, e ele fugirá de vós.\" — Tiago 4:7",
+          "application": [
+            "Coloque uma área da sua vida sob submissão a Deus.",
+            "Feche as brechas da tentação.",
+            "Reaja imediatamente aos maus pensamentos com a Bíblia."
+          ]
+        },
+        {
+          "num": 8,
+          "title": "Mais que Vencedores",
+          "subtitle": "Identidade Inabalável em Cristo",
+          "base": "Romanos 8:37",
+          "baseText": "\"Em todas estas coisas, porém, somos mais que vencedores, por meio daquele que nos amou.\"",
+          "objective": "Apropriar-se do amor incondicional de Deus que garante nossa vitória contínua.",
+          "color": "from-sky-600/20 to-blue-600/10",
+          "border": "border-sky-500/30",
+          "icon": "🏆",
+          "sections": [
+            {
+              "title": "Identidade Inabalável",
+              "items": [
+                "Não somos definidos pelas circunstâncias",
+                "O amor de Deus nos sustenta nas tribulações",
+                "A vitória já foi selada pelo sacrifício de Cristo",
+                "Nada pode nos separar do amor de Deus"
+              ]
+            }
+          ],
+          "memory": "\"Quem nos separará do amor de Cristo? Será tribulação, ou angústia, ou perseguição...?\" — Romanos 8:35",
+          "application": [
+            "Agradeça pelo amor incondicional de Deus.",
+            "Encare as dificuldades sabendo que a vitória é certa.",
+            "Declare sua real identidade em Cristo."
+          ]
+        },
+        {
+          "num": 9,
+          "title": "As Palavras",
+          "subtitle": "O Poder do que Falamos",
+          "base": "Provérbios 18:21",
+          "baseText": "\"A morte e a vida estão no poder da língua; o que bem a utiliza come do seu fruto.\"",
+          "objective": "Reconhecer que nossas palavras devem ser usadas para abençoar e confessar a verdade.",
+          "color": "from-purple-600/20 to-pink-600/10",
+          "border": "border-purple-500/30",
+          "icon": "🗣️",
+          "sections": [
+            {
+              "title": "A Língua e Seus Frutos",
+              "items": [
+                "Palavras de bênção edificam vidas",
+                "Palavras negativas geram morte e desânimo",
+                "A boca fala do que o coração está cheio",
+                "Devemos profetizar vida sobre as situações"
+              ]
+            }
+          ],
+          "memory": "\"A morte e a vida estão no poder da língua; o que bem a utiliza come do seu fruto.\" — Provérbios 18:21",
+          "application": [
+            "Policie seu vocabulário hoje contra murmurações.",
+            "Fale palavras de incentivo e bênção para alguém.",
+            "Submeta sua fala ao Espírito Santo."
+          ]
+        },
+        {
+          "num": 10,
+          "title": "Confissão",
+          "subtitle": "Declarando as Promessas e a Verdade",
+          "base": "Hebreus 10:23",
+          "baseText": "\"Guardemos firme a confissão da nossa esperança, sem vacilar, pois quem fez a promessa é fiel.\"",
+          "objective": "Aprender a alinha nossa confissão verbal com as Escrituras Sagradas.",
+          "color": "from-teal-600/20 to-emerald-600/10",
+          "border": "border-teal-500/30",
+          "icon": "📢",
+          "sections": [
+            {
+              "title": "O Que Confessar?",
+              "items": [
+                "A fidelidade de Deus e Suas promessas",
+                "Nossa dependência e amor pelo Senhor",
+                "O arrependimento dos pecados para purificação",
+                "A vitória sobre o mal e a cura divina"
+              ]
+            }
+          ],
+          "memory": "\"Guardemos firme a confissão da nossa esperança, sem vacilar, pois quem fez a promessa é fiel.\" — Hebreus 10:23",
+          "application": [
+            "Confesse uma promessa bíblica em voz alta hoje.",
+            "Alinhe seus pensamentos e palavras com a Palavra.",
+            "Não vacile diante de sentimentos opostos."
+          ]
+        },
+        {
+          "num": 11,
+          "title": "Vãs Repetições",
+          "subtitle": "A Oração Sincera vs. Religiosidade",
+          "base": "Mateus 6:7",
+          "baseText": "\"E, orando, não useis de vãs repetições, como os gentios; porque presumem que pelo seu muito falar serão ouvidos.\"",
+          "objective": "Evitar a religiosidade mecânica na oração e buscar um relacionamento real de filiação com o Pai.",
+          "color": "from-rose-600/20 to-orange-600/10",
+          "border": "border-rose-500/30",
+          "icon": "🔄",
+          "sections": [
+            {
+              "title": "Relacionamento vs. Ritual",
+              "items": [
+                "A oração não é um amuleto ou repetição de palavras",
+                "Deus deseja intimidade e diálogo sincero",
+                "Falar de coração aberto, com sinceridade",
+                "O Pai conhece nossas necessidades de antemão"
+              ]
+            }
+          ],
+          "memory": "\"Não sejais, pois, semelhantes a eles; porque o vosso Pai sabe o de que tendes necessidade, antes que lho peçais.\" — Mateus 6:8",
+          "application": [
+            "Ore com suas próprias palavras de forma transparente.",
+            "Dedique tempo para silenciar e ouvir a Deus.",
+            "Abandone orações automáticas."
+          ]
+        },
+        {
+          "num": 12,
+          "title": "Realizando a Obra de Deus",
+          "subtitle": "O Chamado para o Serviço",
+          "base": "1 Coríntios 15:58",
+          "baseText": "\"Portanto, meus amados irmãos, sede firmes, inabaláveis e sempre abundantes na obra do Senhor.\"",
+          "objective": "Inspirar o novo discípulo a servir ativamente na edificação do Reino de Deus e assistência ao próximo.",
+          "color": "from-purple-600/20 to-blue-600/10",
+          "border": "border-purple-500/30",
+          "icon": "🛠️",
+          "sections": [
+            {
+              "title": "Servindo ao Senhor",
+              "items": [
+                "Todo crente tem dons espirituais para cooperar",
+                "O trabalho feito com amor nunca é em vão",
+                "Evangelizar e consolar são partes essenciais da obra",
+                "Ser as mãos e os pés de Jesus na terra"
+              ]
+            }
+          ],
+          "memory": "\"Portanto, meus amados irmãos, sede firmes, inabaláveis e sempre abundantes na obra do Senhor...\" — 1 Coríntios 15:58",
+          "application": [
+            "Identifique um talento ou dom que você possa colocar a serviço da igreja.",
+            "Apoie voluntariamente uma ação ministerial esta semana.",
+            "Faça tudo como para o Senhor."
+          ]
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "id": 1779848177128,
+      "mentor": "Sandra",
+      "disciple": "lima",
+      "completedLessons": 8,
+      "totalLessons": 8,
+      "lastMeeting": "2026-05-27",
+      "status": "Concluído",
+      "journeyId": "integracao"
+    }
+  ],
+  "activeJourneyId": "vida_vitoriosa",
+  "updatedAt": "2026-05-27T22:45:14.105Z",
+  "enrollments": [
+    {
+      "id": 1779921913714,
+      "token": "3e32ccee2e7dff72f015c179",
+      "pairId": null,
+      "memberName": "Chirlles",
+      "memberPhone": "11946017530",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.715Z",
+      "updatedAt": "2026-05-27T22:45:13.715Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913740,
+      "token": "92836e8fbc9e5910581abc07",
+      "pairId": null,
+      "memberName": "Thamires Viana",
+      "memberPhone": "11999991020",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.740Z",
+      "updatedAt": "2026-05-27T22:45:13.740Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913753,
+      "token": "5aa3f1a46072fba4a9106050",
+      "pairId": null,
+      "memberName": "Dayane da Hora de Araújo",
+      "memberPhone": "11994810670",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.753Z",
+      "updatedAt": "2026-05-27T22:45:13.753Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913766,
+      "token": "8ba9cf53a84a7bf0f9152066",
+      "pairId": null,
+      "memberName": "Renê Gonçalves silva",
+      "memberPhone": "11960907219",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.766Z",
+      "updatedAt": "2026-05-27T22:45:13.766Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913780,
+      "token": "86f3e41ba1e06a76c3f52e31",
+      "pairId": null,
+      "memberName": "Antonio Carlos Gonçalves",
+      "memberPhone": "11970915090",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.780Z",
+      "updatedAt": "2026-05-27T22:45:13.780Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913791,
+      "token": "06758e86ec1c17fe2f4aa262",
+      "pairId": null,
+      "memberName": "Cristina Maria da Silva",
+      "memberPhone": "11968754845",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.791Z",
+      "updatedAt": "2026-05-27T22:45:13.791Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913805,
+      "token": "6dc9e61c9d2c7ec09d06030e",
+      "pairId": null,
+      "memberName": "Danielle",
+      "memberPhone": "11956075872",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.805Z",
+      "updatedAt": "2026-05-27T22:45:13.805Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913822,
+      "token": "9e773ba9a0d4a51a50bd3f42",
+      "pairId": null,
+      "memberName": "Silvana Queila da Silva",
+      "memberPhone": "11968991416",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.822Z",
+      "updatedAt": "2026-05-27T22:45:13.822Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913839,
+      "token": "795765b76260af2375805650",
+      "pairId": null,
+      "memberName": "Samara de Araújo Brito",
+      "memberPhone": "11985837808",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.839Z",
+      "updatedAt": "2026-05-27T22:45:13.839Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913854,
+      "token": "e05415f8c66212f6c8bb4348",
+      "pairId": null,
+      "memberName": "Ana Clara Rodrigues lima",
+      "memberPhone": "5511961986568",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.854Z",
+      "updatedAt": "2026-05-27T22:45:13.854Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913866,
+      "token": "6a00a135c6b9d5556a8a20e4",
+      "pairId": null,
+      "memberName": "Jéssica Gonçalves  silva",
+      "memberPhone": "11977271093",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.867Z",
+      "updatedAt": "2026-05-27T22:45:13.867Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913881,
+      "token": "e5cfad98872d342e5cbc53f1",
+      "pairId": null,
+      "memberName": "Guiomar Adolpho de Moraes",
+      "memberPhone": "11972664558",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.881Z",
+      "updatedAt": "2026-05-27T22:45:13.881Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913894,
+      "token": "d65f14731e621cc0540b3510",
+      "pairId": null,
+      "memberName": "Luiza Lino Gonzaga",
+      "memberPhone": "11982257358",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.894Z",
+      "updatedAt": "2026-05-27T22:45:13.894Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913907,
+      "token": "c64737170585c3b9b41bcb0a",
+      "pairId": null,
+      "memberName": "Eduarda Vieira de Jesus",
+      "memberPhone": "11959939046",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.907Z",
+      "updatedAt": "2026-05-27T22:45:13.907Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913920,
+      "token": "19518caade29453bbed03819",
+      "pairId": null,
+      "memberName": "Rosângela Freitas de Matos Araújo",
+      "memberPhone": "11972966614",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.920Z",
+      "updatedAt": "2026-05-27T22:45:13.920Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913935,
+      "token": "0dfcc7837fb4408bec40e0d5",
+      "pairId": null,
+      "memberName": "Ana Maria da Silva Ferreira",
+      "memberPhone": "11984320527",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.935Z",
+      "updatedAt": "2026-05-27T22:45:13.935Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913948,
+      "token": "cff4458222e2ba8bfc86fa20",
+      "pairId": null,
+      "memberName": "Thiago Vieira da Silva",
+      "memberPhone": "11968807625",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.948Z",
+      "updatedAt": "2026-05-27T22:45:13.948Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913965,
+      "token": "7d08bde4e707b0811d3ed29e",
+      "pairId": null,
+      "memberName": "Matheus Matos Araujo",
+      "memberPhone": "11941776344",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.966Z",
+      "updatedAt": "2026-05-27T22:45:13.966Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913978,
+      "token": "7540deea56f3c88a604ac2f3",
+      "pairId": null,
+      "memberName": "Alonson Alves Correia",
+      "memberPhone": "11997724865",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.978Z",
+      "updatedAt": "2026-05-27T22:45:13.978Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921913991,
+      "token": "abd11bf3dc7dcb87d5bf3140",
+      "pairId": null,
+      "memberName": "Davi Lima Carvalho",
+      "memberPhone": "11918950910",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:13.991Z",
+      "updatedAt": "2026-05-27T22:45:13.991Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921914007,
+      "token": "305a9e34c5a636666b39d042",
+      "pairId": null,
+      "memberName": "Gregory Soares Pereira",
+      "memberPhone": "11969453698",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:14.007Z",
+      "updatedAt": "2026-05-27T22:45:14.007Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921914023,
+      "token": "485ddb9b7d6e986f2cffdc95",
+      "pairId": null,
+      "memberName": "Fernanda Santana Soares",
+      "memberPhone": "11959795984",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:14.023Z",
+      "updatedAt": "2026-05-27T22:45:14.023Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921914040,
+      "token": "04c42ab1c23e28df258b0c2f",
+      "pairId": null,
+      "memberName": "Quitéria Josefa da Silva",
+      "memberPhone": "11949218541",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:14.040Z",
+      "updatedAt": "2026-05-27T22:45:14.040Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921914055,
+      "token": "f813b53eccaa1fd5eede41ab",
+      "pairId": null,
+      "memberName": "Maria Patrícia Gomes Maia",
+      "memberPhone": "11974838174",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:14.055Z",
+      "updatedAt": "2026-05-27T22:45:14.055Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779921914069,
+      "token": "867243714deb53ab341dbcd6",
+      "pairId": null,
+      "memberName": "Carlos Alberto das Graças",
+      "memberPhone": "11995717136",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T22:45:14.069Z",
+      "updatedAt": "2026-05-27T22:45:14.069Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779900797934,
+      "token": "049d4241291ce71a6bca92d9",
+      "pairId": null,
+      "memberName": "Michael Lucas Ramos",
+      "memberPhone": "11993470407",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 5,
+      "lessonTitle": "A Fórmula da Oração",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T16:53:17.934Z",
+      "updatedAt": "2026-05-27T16:53:17.934Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779900797947,
+      "token": "23842a04ca2ae734506b73e4",
+      "pairId": null,
+      "memberName": "Renê Gonçalves silva",
+      "memberPhone": "11960907219",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 5,
+      "lessonTitle": "A Fórmula da Oração",
+      "courseImageUrl": "",
+      "status": "Preparado",
+      "attendance": "Pendente",
+      "score": 0,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T16:53:17.947Z",
+      "updatedAt": "2026-05-27T16:53:17.947Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12
+    },
+    {
+      "id": 1779900699325,
+      "token": "c5b75796d0fe96a999e53c6b",
+      "pairId": null,
+      "memberName": "Michael",
+      "memberPhone": "11993470407",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 4,
+      "lessonTitle": "O Nome de Jesus",
+      "courseImageUrl": "",
+      "status": "Concluido",
+      "attendance": "Presente",
+      "score": 2,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T16:51:39.325Z",
+      "updatedAt": "2026-05-27T16:52:06.251Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12,
+      "sentAt": "2026-05-27T16:51:43.668Z",
+      "lastAccessAt": "2026-05-27T16:51:52.728Z",
+      "answers": [
+        0,
+        0
+      ],
+      "completedAt": "2026-05-27T16:52:06.250Z"
+    },
+    {
+      "id": 1779900654052,
+      "token": "f0bd1fe4a8ccff10cc51c711",
+      "pairId": null,
+      "memberName": "Michael",
+      "memberPhone": "11993470407",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 3,
+      "lessonTitle": "Os Nossos Direitos às Bênçãos",
+      "courseImageUrl": "",
+      "status": "Concluido",
+      "attendance": "Presente",
+      "score": 2,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T16:50:54.052Z",
+      "updatedAt": "2026-05-27T16:51:21.120Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12,
+      "answers": [
+        0,
+        0
+      ],
+      "completedAt": "2026-05-27T16:51:21.120Z"
+    },
+    {
+      "id": 1779900130539,
+      "token": "93f25c275a6a5a91ed823676",
+      "pairId": null,
+      "memberName": "Michael",
+      "memberPhone": "11993470407",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 2,
+      "lessonTitle": "Os Cinco Passos da Vitória",
+      "courseImageUrl": "data:image/webp;base64,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",
+      "status": "Concluido",
+      "attendance": "Presente",
+      "score": 2,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T16:42:10.539Z",
+      "updatedAt": "2026-05-27T16:50:27.943Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12,
+      "sentAt": "2026-05-27T16:49:42.633Z",
+      "lastAccessAt": "2026-05-27T16:50:19.005Z",
+      "answers": [
+        0,
+        0
+      ],
+      "completedAt": "2026-05-27T16:50:27.943Z"
+    },
+    {
+      "id": 1779899985977,
+      "token": "1d5ef98e1317f91c2237bb79",
+      "pairId": null,
+      "memberName": "Michael",
+      "memberPhone": "11993470407",
+      "journeyId": "vida_vitoriosa",
+      "journeyName": "Vida Vitoriosa",
+      "lessonNum": 1,
+      "lessonTitle": "Determinação",
+      "courseImageUrl": "data:image/webp;base64,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",
+      "status": "Concluido",
+      "attendance": "Presente",
+      "score": 2,
+      "totalQuestions": 2,
+      "createdAt": "2026-05-27T16:39:45.977Z",
+      "updatedAt": "2026-05-27T16:41:34.503Z",
+      "courseMessage": "Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]",
+      "totalLessons": 12,
+      "sentAt": "2026-05-27T16:40:07.718Z",
+      "lastAccessAt": "2026-05-27T16:41:16.131Z",
+      "answers": [
+        0,
+        0
+      ],
+      "completedAt": "2026-05-27T16:41:34.503Z"
+    }
+  ]
+}

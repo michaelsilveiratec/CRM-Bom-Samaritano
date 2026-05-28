@@ -1,8 +1,14 @@
 import { Outlet } from "react-router-dom";
+import { useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 
 export default function MainLayout() {
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("crm_theme") || "dark";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  }, []);
+
   return (
     <div className="flex h-screen bg-black text-white font-sans antialiased overflow-hidden">
       <Sidebar />

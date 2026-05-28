@@ -1,76 +1,159 @@
 import { useState, useRef } from "react";
-import { X, CheckCircle, XCircle, Award, Star, Printer, RotateCcw, ChevronRight } from "lucide-react";
+import { X, CheckCircle, XCircle, Star, Printer, RotateCcw, ChevronRight } from "lucide-react";
 
-const QUESTIONS = [
-  {
-    q: "Segundo Efésios 2:8, como somos salvos?",
-    options: ["Pelas boas obras", "Pela graça mediante a fé", "Pela religião e rituais", "Pelo esforço próprio"],
-    correct: 1, lesson: "Lição 1 — Salvação"
-  },
-  {
-    q: "O que o pecado produz no coração humano?",
-    options: ["Alegria e paz", "Prosperidade e saúde", "Culpa, medo e separação de Deus", "Força e coragem"],
-    correct: 2, lesson: "Lição 1 — Salvação"
-  },
-  {
-    q: "Em qual livro está escrito 'Orai sem cessar'?",
-    options: ["Romanos 8:28", "João 3:16", "Salmo 23:1", "1 Tessalonicenses 5:17"],
-    correct: 3, lesson: "Lição 2 — Oração"
-  },
-  {
-    q: "Quais são os tipos de oração ensinados na lição?",
-    options: ["Adoração, gratidão, confissão e intercessão", "Apenas louvor e adoração", "Jejum, vigília e culto", "Pedido e agradecimento apenas"],
-    correct: 0, lesson: "Lição 2 — Oração"
-  },
-  {
-    q: "Como a Bíblia é descrita no Salmo 119:105?",
-    options: ["Uma coleção de histórias antigas", "Lâmpada para os meus pés", "Um livro de filosofia religiosa", "Manual de regras religiosas"],
-    correct: 1, lesson: "Lição 3 — A Palavra"
-  },
-  {
-    q: "Qual a ordem correta para ler a Bíblia segundo a lição?",
-    options: ["Ler rápido, memorizar tudo", "Ler só os Salmos e Provérbios", "Orar, ler diariamente, meditar e praticar", "Assistir sermões e anotar"],
-    correct: 2, lesson: "Lição 3 — A Palavra"
-  },
-  {
-    q: "O que é a fé cristã segundo a lição?",
-    options: ["Pensamento positivo e otimismo", "Confiança em Deus e em Suas promessas", "Crença sem nenhuma base", "Força de vontade humana"],
-    correct: 1, lesson: "Lição 4 — Fé"
-  },
-  {
-    q: "O que é a Igreja segundo a lição?",
-    options: ["Apenas um prédio religioso", "Um clube de pessoas boas", "O corpo de Cristo e família espiritual", "Uma organização política"],
-    correct: 2, lesson: "Lição 5 — Igreja"
-  },
-  {
-    q: "Segundo Atos 20:35, o que é mais bem-aventurado?",
-    options: ["Guardar e economizar", "Dar do que receber", "Receber e agradecer", "Poupar para o futuro"],
-    correct: 1, lesson: "Lição 6 — Generosidade"
-  },
-  {
-    q: "Como a lição descreve nossa relação com os recursos de Deus?",
-    options: ["Somos donos absolutos", "Somos independentes de Deus", "Somos administradores dos recursos de Deus", "Somos credores de Deus"],
-    correct: 2, lesson: "Lição 6 — Generosidade"
-  },
-  {
-    q: "O que inclui o Fruto do Espírito segundo a lição 7?",
-    options: ["Riqueza, saúde e prosperidade", "Amor, alegria, paz, paciência e bondade", "Poder, autoridade e milagres", "Sabedoria e conhecimento apenas"],
-    correct: 1, lesson: "Lição 7 — Santidade"
-  },
-  {
-    q: "Para que todo cristão é chamado segundo Marcos 16:15?",
-    options: ["Ficar apenas dentro da igreja", "Estudar teologia avançada", "Anunciar o evangelho, amar e servir", "Liderar grupos e organizações"],
-    correct: 2, lesson: "Lição 8 — Missão"
-  }
-];
+const JOURNEY_QUESTIONS: Record<string, { q: string; options: string[]; correct: number; lesson: string }[]> = {
+  integracao: [
+    {
+      q: "Segundo Efésios 2:8, como somos salvos?",
+      options: ["Pelas boas obras", "Pela graça mediante a fé", "Pela religião e rituais", "Pelo esforço próprio"],
+      correct: 1, lesson: "Lição 1 — Salvação"
+    },
+    {
+      q: "O que o pecado produz no coração humano?",
+      options: ["Alegria e paz", "Prosperidade e saúde", "Culpa, medo e separação de Deus", "Força e coragem"],
+      correct: 2, lesson: "Lição 1 — Salvação"
+    },
+    {
+      q: "Em qual livro está escrito 'Orai sem cessar'?",
+      options: ["Romanos 8:28", "João 3:16", "Salmo 23:1", "1 Tessalonicenses 5:17"],
+      correct: 3, lesson: "Lição 2 — Oração"
+    },
+    {
+      q: "Quais são os tipos de oração ensinados na lição?",
+      options: ["Adoração, gratidão, confissão e intercessão", "Apenas louvor e adoração", "Jejum, vigília e culto", "Pedido e agradecimento apenas"],
+      correct: 0, lesson: "Lição 2 — Oração"
+    },
+    {
+      q: "Como a Bíblia é descrita no Salmo 119:105?",
+      options: ["Uma coleção de histórias antigas", "Lâmpada para os meus pés", "Um livro de filosofia religiosa", "Manual de regras religiosas"],
+      correct: 1, lesson: "Lição 3 — A Palavra"
+    },
+    {
+      q: "Qual a ordem correta para ler a Bíblia segundo a lição?",
+      options: ["Ler rápido, memorizar tudo", "Ler só os Salmos e Provérbios", "Orar, ler diariamente, meditar e praticar", "Assistir sermões e anotar"],
+      correct: 2, lesson: "Lição 3 — A Palavra"
+    },
+    {
+      q: "O que é a fé cristã segundo a lição?",
+      options: ["Pensamento positivo e otimismo", "Confiança em Deus e em Suas promessas", "Crença sem nenhuma base", "Força de vontade humana"],
+      correct: 1, lesson: "Lição 4 — Fé"
+    },
+    {
+      q: "O que é a Igreja segundo a lição?",
+      options: ["Apenas um prédio religioso", "Um clube de pessoas boas", "O corpo de Cristo e família espiritual", "Uma organização política"],
+      correct: 2, lesson: "Lição 5 — Igreja"
+    },
+    {
+      q: "Segundo Atos 20:35, o que é mais bem-aventurado?",
+      options: ["Guardar e economizar", "Dar do que receber", "Receber e agradecer", "Poupar para o futuro"],
+      correct: 1, lesson: "Lição 6 — Generosidade"
+    },
+    {
+      q: "Como a lição descreve nossa relação com os recursos de Deus?",
+      options: ["Somos donos absolutos", "Somos independentes de Deus", "Somos administradores dos recursos de Deus", "Somos credores de Deus"],
+      correct: 2, lesson: "Lição 6 — Generosidade"
+    },
+    {
+      q: "O que inclui o Fruto do Espírito segundo a lição 7?",
+      options: ["Riqueza, saúde e prosperidade", "Amor, alegria, paz, paciência e bondade", "Poder, autoridade e milagres", "Sabedoria e conhecimento apenas"],
+      correct: 1, lesson: "Lição 7 — Santidade"
+    },
+    {
+      q: "Para que todo cristão é chamado segundo Marcos 16:15?",
+      options: ["Ficar apenas dentro da igreja", "Estudar teologia avançada", "Anunciar o evangelho, amar e servir", "Liderar grupos e organizações"],
+      correct: 2, lesson: "Lição 8 — Missão"
+    }
+  ],
+  vida_vitoriosa: [
+    {
+      q: "Qual o melhor significado para o verbo pedir, de acordo com João 14.13?",
+      options: ["Pedir", "Determinar", "Rogar"],
+      correct: 1, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Há necessidade do cristão orar pedindo a cura?",
+      options: ["Não", "Depende", "Sim"],
+      correct: 0, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Sempre que aprendemos algo, o que devemos fazer?",
+      options: ["Colocar logo em prática", "Esperar um pouco para praticar", "Não nos preocupar muito com o que aprendemos"],
+      correct: 0, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Podemos exigir algo de Deus?",
+      options: ["Sim", "Não", "Depende"],
+      correct: 1, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Quando determinamos algo, a quem ordenamos?",
+      options: ["A Deus", "Ao diabo", "A nós mesmos"],
+      correct: 1, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Que poder entra em ação quando determinamos?",
+      options: ["O de Deus", "O da fé", "O do diabo"],
+      correct: 0, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Ao praticarmos o método da determinação, o que acontece?",
+      options: ["Estamos obedecendo a Deus", "Estamos agindo por conta própria", "Deus está nos obedecendo"],
+      correct: 0, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Quando determinamos, quem nos obedece?",
+      options: ["Deus", "Os homens", "O diabo"],
+      correct: 2, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Como são as coisas de Deus?",
+      options: ["Difíceis de entender", "Fáceis para os teólogos", "Simples e descomplicadas"],
+      correct: 2, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Quando determinamos alguma coisa, nós o fazemos:",
+      options: ["Em nome de Deus", "Em nome de Jesus", "Em nosso nome"],
+      correct: 1, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Como devemos orar a Deus?",
+      options: ["Implorando a bênção", "Pedindo segundo a Sua vontade", "Agradecendo"],
+      correct: 2, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Se cremos, podemos determinar:",
+      options: ["O que quisermos", "O que a Igreja promete", "O que estiver ao nosso alcance"],
+      correct: 0, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Se determinarmos uma cura e os sintomas persistirem, o que fazer?",
+      options: ["Orar mais vezes determinando até a cura acontecer", "Apelar para os remédios", "Não levar os sintomas em consideração"],
+      correct: 2, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "Quando Paulo curou um coxo (Atos 14.8-10), como ele agiu?",
+      options: ["Suplicou a Deus a sua cura", "Determinou que ele ficasse curado", "Mandou que ele rezasse 20 Pai-Nossos"],
+      correct: 1, lesson: "Lição 1 — Determinação"
+    },
+    {
+      q: "O que foi importante no coxo para a sua cura?",
+      options: ["A sua fé", "Ser amigo de Paulo", "Ser religioso"],
+      correct: 0, lesson: "Lição 1 — Determinação"
+    }
+  ]
+};
 
 interface Props {
   discipleName: string;
   mentorName: string;
+  journeyId?: string;
   onClose: () => void;
 }
 
-export default function DiscipleshipQuiz({ discipleName, mentorName, onClose }: Props) {
+export default function DiscipleshipQuiz({ discipleName, mentorName, journeyId, onClose }: Props) {
+  const QUESTIONS = JOURNEY_QUESTIONS[journeyId || "integracao"] || JOURNEY_QUESTIONS.integracao;
+  const passThreshold = Math.ceil(QUESTIONS.length * 0.8);
+
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
@@ -79,7 +162,7 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, onClose }: 
   const certRef = useRef<HTMLDivElement>(null);
 
   const score = answers.filter((a, i) => a === QUESTIONS[i].correct).length;
-  const passed = score >= 10;
+  const passed = score >= passThreshold;
   const today = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
 
   const handleConfirm = () => {
@@ -315,7 +398,7 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, onClose }: 
             <div class="student-name">${discipleName}</div>
             
             <div class="description">
-              pela conclusão do <strong>Programa de Discipulado Cristão</strong>, 
+              pela conclusão da jornada <strong>${journeyId === "vida_vitoriosa" ? "Vida Vitoriosa" : "Fundamentos da Fé"}</strong> do <strong>Programa de Discipulado Cristão</strong>, 
               demonstrando dedicação, crescimento espiritual e 
               compromisso com os ensinamentos de Cristo.
             </div>
@@ -361,7 +444,6 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, onClose }: 
   if (!finished) {
     const q = QUESTIONS[current];
     const isCorrect = confirmed && selected === q.correct;
-    const isWrong = confirmed && selected !== q.correct;
 
     return (
       <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -459,7 +541,7 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, onClose }: 
             {score} / {QUESTIONS.length}
           </div>
           <p className="text-sm text-zinc-400 mt-1">
-            {passed ? "✅ Mínimo de 10 atingido — Certificado disponível!" : `❌ Precisa de ${10 - score} acerto(s) a mais. Tente novamente!`}
+            {passed ? `✅ Mínimo de ${passThreshold} acertos atingido — Certificado disponível!` : `❌ Precisa de ${passThreshold - score} acerto(s) a mais. Tente novamente!`}
           </p>
         </div>
 
@@ -487,11 +569,11 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, onClose }: 
               <div className="text-4xl mb-2">✝️</div>
               <p className="text-[10px] font-bold text-purple-400 uppercase tracking-[0.3em] mb-1">Igreja Bom Samaritano</p>
               <h1 className="text-2xl font-extrabold text-white mb-1">Certificado de Discipulado</h1>
-              <p className="text-sm text-zinc-400 mb-4">Nível 1 — Fundamentos da Fé</p>
+              <p className="text-sm text-zinc-400 mb-4">{journeyId === "vida_vitoriosa" ? "Vida Vitoriosa" : "Fundamentos da Fé"}</p>
               <p className="text-xs text-zinc-400">Certificamos que</p>
               <h2 className="text-xl font-extrabold text-purple-300 my-2">{discipleName}</h2>
               <p className="text-xs text-zinc-400 leading-relaxed max-w-sm mx-auto">
-                concluiu com êxito as 8 lições fundamentais do Programa de Discipulado,
+                concluiu com êxito as {QUESTIONS.length} lições do Programa de Discipulado,
                 obtendo <span className="text-emerald-400 font-bold">{score} de {QUESTIONS.length}</span> pontos na avaliação final.
               </p>
               <div className="flex items-center gap-1 justify-center my-4">

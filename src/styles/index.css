@@ -8,9 +8,704 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+html[data-theme="professional"] body {
+  --primary: #00A884;
+  --primary-dark: #017561;
+  --bg: #E7F7F1;
+  --white: #FFFFFF;
+  --surface-soft: #F5F7F8;
+  --text: #111B21;
+  --text-secondary: #667781;
+  --border: #D1D7DB;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
 .glass-card {
   background: rgba(25, 25, 25, 0.94);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1rem;
+}
+
+html[data-theme="professional"] .glass-card {
+  background: var(--white);
+  border-color: var(--border);
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+html[data-theme="professional"] .bg-black,
+html[data-theme="professional"] .bg-zinc-950,
+html[data-theme="professional"] .bg-zinc-900,
+html[data-theme="professional"] [class~="bg-zinc-950/40"],
+html[data-theme="professional"] [class~="bg-zinc-950/50"],
+html[data-theme="professional"] [class~="bg-zinc-900/50"],
+html[data-theme="professional"] [class~="bg-zinc-900/60"],
+html[data-theme="professional"] [class~="bg-zinc-950/60"],
+html[data-theme="professional"] [class~="bg-zinc-950/80"] {
+  background-color: var(--white) !important;
+}
+
+html[data-theme="professional"] .from-zinc-950,
+html[data-theme="professional"] .to-black,
+html[data-theme="professional"] .to-zinc-950,
+html[data-theme="professional"] .from-zinc-900,
+html[data-theme="professional"] .to-zinc-900 {
+  --tw-gradient-from: #E7F7F1 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #E7F7F1 var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+html[data-theme="professional"] [class~="bg-white/5"],
+html[data-theme="professional"] [class~="bg-white/10"],
+html[data-theme="professional"] [class~="bg-white/[0.03]"] {
+  background-color: var(--surface-soft) !important;
+}
+
+html[data-theme="professional"] [class~="border-white/5"],
+html[data-theme="professional"] [class~="border-white/10"],
+html[data-theme="professional"] [class~="border-white/15"] {
+  border-color: var(--border) !important;
+}
+
+html[data-theme="professional"] .text-white,
+html[data-theme="professional"] .text-zinc-100,
+html[data-theme="professional"] .text-zinc-200,
+html[data-theme="professional"] .text-zinc-300 {
+  color: var(--text) !important;
+}
+
+html[data-theme="professional"] .text-zinc-400,
+html[data-theme="professional"] .text-zinc-500,
+html[data-theme="professional"] .text-zinc-600 {
+  color: var(--text-secondary) !important;
+}
+
+html[data-theme="professional"] .placeholder-zinc-500::placeholder,
+html[data-theme="professional"] .placeholder\:text-zinc-600::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+html[data-theme="professional"] input,
+html[data-theme="professional"] select,
+html[data-theme="professional"] textarea {
+  color: var(--text) !important;
+}
+
+html[data-theme="professional"] option {
+  background-color: var(--white) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="professional"] .bg-purple-600,
+html[data-theme="professional"] .from-purple-600,
+html[data-theme="professional"] .to-indigo-600 {
+  background-color: var(--primary) !important;
+  --tw-gradient-from: #00A884 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #00A884 var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="professional"] .hover\:bg-purple-500:hover,
+html[data-theme="professional"] .hover\:bg-emerald-500:hover,
+html[data-theme="professional"] .hover\:bg-blue-500:hover {
+  background-color: var(--primary-dark) !important;
+}
+
+html[data-theme="professional"] .text-purple-100,
+html[data-theme="professional"] .text-purple-200,
+html[data-theme="professional"] .text-purple-300,
+html[data-theme="professional"] .text-purple-400,
+html[data-theme="professional"] .from-purple-400,
+html[data-theme="professional"] .to-indigo-400 {
+  color: var(--primary-dark) !important;
+}
+
+html[data-theme="professional"] .bg-emerald-600 {
+  background-color: var(--primary) !important;
+}
+
+html[data-theme="professional"] .text-emerald-200,
+html[data-theme="professional"] .text-emerald-300,
+html[data-theme="professional"] .text-emerald-400 {
+  color: var(--primary-dark) !important;
+}
+
+html[data-theme="professional"] .bg-blue-600 {
+  background-color: var(--primary) !important;
+}
+
+html[data-theme="professional"] .text-blue-200,
+html[data-theme="professional"] .text-blue-300,
+html[data-theme="professional"] .text-blue-400 {
+  color: var(--primary-dark) !important;
+}
+
+html[data-theme="professional"] .border-purple-500\/20,
+html[data-theme="professional"] .border-purple-500\/30,
+html[data-theme="professional"] .border-purple-400\/30,
+html[data-theme="professional"] .border-blue-500\/30,
+html[data-theme="professional"] .border-emerald-500\/30,
+html[data-theme="professional"] .hover\:border-purple-500\/30:hover,
+html[data-theme="professional"] .hover\:border-blue-500\/30:hover,
+html[data-theme="professional"] .hover\:border-emerald-500\/30:hover {
+  border-color: rgba(0, 168, 132, 0.38) !important;
+}
+
+html[data-theme="professional"] .bg-purple-500\/10,
+html[data-theme="professional"] .bg-purple-600\/20,
+html[data-theme="professional"] .bg-blue-500\/10,
+html[data-theme="professional"] .bg-emerald-500\/10,
+html[data-theme="professional"] .hover\:bg-purple-500\/20:hover,
+html[data-theme="professional"] .hover\:bg-blue-500\/20:hover,
+html[data-theme="professional"] .hover\:bg-emerald-500\/20:hover {
+  background-color: rgba(0, 168, 132, 0.15) !important;
+}
+
+html[data-theme="professional"] .bg-rose-600,
+html[data-theme="professional"] .hover\:bg-rose-500:hover {
+  background-color: #be123c !important;
+}
+
+html[data-theme="professional"] .text-rose-200,
+html[data-theme="professional"] .text-rose-300,
+html[data-theme="professional"] .text-rose-400 {
+  color: #be123c !important;
+}
+
+html[data-theme="professional"] .bg-amber-500,
+html[data-theme="professional"] .hover\:bg-amber-400:hover {
+  background-color: #d49b2a !important;
+}
+
+html[data-theme="professional"] .text-amber-200,
+html[data-theme="professional"] .text-amber-300,
+html[data-theme="professional"] .text-amber-400 {
+  color: #a56b00 !important;
+}
+
+html[data-theme="professional"] .bg-purple-600,
+html[data-theme="professional"] .bg-emerald-600,
+html[data-theme="professional"] .bg-blue-600,
+html[data-theme="professional"] .bg-rose-600,
+html[data-theme="professional"] .bg-amber-500 {
+  color: #ffffff !important;
+}
+
+html[data-theme="professional"] .logo-led {
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="professional"] .logo-led::after {
+  background: #ffffff;
+}
+
+html[data-theme="professional"] aside,
+html[data-theme="professional"] aside.bg-zinc-950,
+html[data-theme="professional"] aside[class*="bg-zinc-950"] {
+  background: #00A884 !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  box-shadow: 18px 0 45px rgba(1, 117, 97, 0.18);
+}
+
+html[data-theme="professional"] aside .text-white,
+html[data-theme="professional"] aside .text-zinc-100,
+html[data-theme="professional"] aside .text-zinc-200,
+html[data-theme="professional"] aside .text-zinc-300,
+html[data-theme="professional"] aside .text-zinc-400 {
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+
+html[data-theme="professional"] aside .text-zinc-500,
+html[data-theme="professional"] aside .text-zinc-600 {
+  color: rgba(255, 255, 255, 0.68) !important;
+}
+
+html[data-theme="professional"] aside [class~="bg-white/5"],
+html[data-theme="professional"] aside [class~="bg-white/10"] {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="professional"] aside [class~="border-white/5"],
+html[data-theme="professional"] aside [class~="border-white/10"] {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+html[data-theme="professional"] aside [class~="bg-purple-600/20"],
+html[data-theme="professional"] aside a[aria-current="page"] {
+  background: #017561 !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 28px rgba(1, 117, 97, 0.22);
+}
+
+html[data-theme="professional"] aside nav a:not([aria-current="page"]) {
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+
+html[data-theme="professional"] aside nav a:not([aria-current="page"]):hover {
+  background: #017561 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="professional"] aside nav a:not([aria-current="page"]) svg {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+html[data-theme="professional"] aside a[aria-current="page"] svg,
+html[data-theme="professional"] aside .text-purple-400 {
+  color: #ffffff !important;
+}
+
+html[data-theme="professional"] aside .logo-led {
+  background: #ffffff !important;
+  border-radius: 0.85rem;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+html[data-theme="professional"] aside .logo-led::after {
+  background: #ffffff !important;
+}
+
+html[data-theme="professional"] aside > div:last-child {
+  background: rgba(1, 117, 97, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+html[data-theme="professional"] header {
+  background: #ffffff !important;
+  border-color: #D1D7DB !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+html[data-theme="professional"] header input {
+  background: #F5F7F8 !important;
+  border-color: #D1D7DB !important;
+}
+
+html[data-theme="professional"] header button,
+html[data-theme="professional"] header [class~="bg-white/5"] {
+  background-color: #ffffff !important;
+  border-color: #D1D7DB !important;
+}
+
+html[data-theme="professional"] header [class*="from-purple-600"],
+html[data-theme="professional"] header [class*="to-indigo-600"] {
+  background: #00A884 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+html[data-theme="professional"] main {
+  background: #E7F7F1 !important;
+}
+
+html[data-theme="professional"] main .bg-gradient-to-r.from-zinc-950,
+html[data-theme="professional"] main .bg-gradient-to-r.from-zinc-950.via-zinc-900,
+html[data-theme="professional"] main .bg-gradient-to-r.from-rose-950\/20,
+html[data-theme="professional"] main .bg-gradient-to-br.from-zinc-900\/60,
+html[data-theme="professional"] main .bg-gradient-to-br.from-zinc-900\/60.to-zinc-950\/80 {
+  background: #ffffff !important;
+}
+
+html[data-theme="professional"] main .bg-clip-text.text-transparent {
+  background: none !important;
+  color: #111B21 !important;
+  -webkit-text-fill-color: #111B21 !important;
+}
+
+html[data-theme="professional"] main .bg-purple-500\/5,
+html[data-theme="professional"] main .bg-blue-500\/5 {
+  background-color: rgba(0, 168, 132, 0.08) !important;
+}
+
+html[data-theme="professional"] main .text-pink-400,
+html[data-theme="professional"] main .text-yellow-400,
+html[data-theme="professional"] main .text-cyan-400,
+html[data-theme="professional"] main .text-indigo-400 {
+  color: #017561 !important;
+}
+
+html[data-theme="professional"] main .border-pink-500\/30,
+html[data-theme="professional"] main .hover\:border-pink-500\/30:hover,
+html[data-theme="professional"] main .border-cyan-500\/30,
+html[data-theme="professional"] main .border-indigo-500\/30 {
+  border-color: rgba(0, 168, 132, 0.32) !important;
+}
+
+html[data-theme="professional"] main .hover\:bg-pink-600\/5:hover,
+html[data-theme="professional"] main .hover\:bg-purple-600\/5:hover,
+html[data-theme="professional"] main .hover\:bg-blue-600\/5:hover,
+html[data-theme="professional"] main .hover\:bg-emerald-600\/5:hover {
+  background-color: rgba(0, 168, 132, 0.12) !important;
+}
+
+html[data-theme="professional"] main .bg-gradient-to-br.from-purple-500\/20,
+html[data-theme="professional"] main .bg-gradient-to-br.from-blue-500\/20,
+html[data-theme="professional"] main .bg-gradient-to-br.from-pink-500\/20,
+html[data-theme="professional"] main .bg-gradient-to-br.from-emerald-500\/20 {
+  background: rgba(0, 168, 132, 0.14) !important;
+  border-color: rgba(0, 168, 132, 0.22) !important;
+}
+
+html[data-theme="professional"] main .bg-gradient-to-br.from-purple-500\/20 svg,
+html[data-theme="professional"] main .bg-gradient-to-br.from-blue-500\/20 svg,
+html[data-theme="professional"] main .bg-gradient-to-br.from-pink-500\/20 svg,
+html[data-theme="professional"] main .bg-gradient-to-br.from-emerald-500\/20 svg {
+  color: #017561 !important;
+}
+
+html[data-theme="professional"] main .border-amber-500\/30,
+html[data-theme="professional"] main .border-amber-500\/20 {
+  border-color: rgba(0, 168, 132, 0.24) !important;
+}
+
+html[data-theme="professional"] main .bg-amber-500\/10,
+html[data-theme="professional"] main .bg-amber-500\/15 {
+  background-color: rgba(0, 168, 132, 0.11) !important;
+}
+
+html[data-theme="professional"] main .text-amber-100,
+html[data-theme="professional"] main .text-amber-100\/80,
+html[data-theme="professional"] main .text-amber-300 {
+  color: #017561 !important;
+}
+
+html[data-theme="professional"] main #chart-grad stop:first-child {
+  stop-color: #00A884 !important;
+  stop-opacity: 0.24 !important;
+}
+
+html[data-theme="professional"] main #chart-grad stop:last-child {
+  stop-color: #00A884 !important;
+}
+
+html[data-theme="professional"] main #line-grad stop {
+  stop-color: #00A884 !important;
+}
+
+html[data-theme="professional"] main #line-grad stop:nth-child(2),
+html[data-theme="professional"] main #line-grad stop:nth-child(3) {
+  stop-color: #017561 !important;
+}
+
+html[data-theme="professional"] main svg circle {
+  fill: #00A884;
+}
+
+html[data-theme="professional"] .financial-professional-card,
+html[data-theme="professional"] .financial-professional-surface {
+  background: #ffffff !important;
+  border-color: #D1D7DB !important;
+  color: #111B21 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+}
+
+html[data-theme="professional"] main .bg-gradient-to-br.from-emerald-500\/10,
+html[data-theme="professional"] main .bg-gradient-to-br.from-purple-500\/10,
+html[data-theme="professional"] main .bg-gradient-to-br.from-blue-500\/10,
+html[data-theme="professional"] main .bg-gradient-to-br.from-amber-500\/10 {
+  background: #ffffff !important;
+  border-color: #D1D7DB !important;
+}
+
+html[data-theme="professional"] main .from-purple-500,
+html[data-theme="professional"] main .via-blue-500,
+html[data-theme="professional"] main .to-emerald-400,
+html[data-theme="professional"] main .bg-purple-500,
+html[data-theme="professional"] main .bg-blue-500 {
+  background-color: #00A884 !important;
+  --tw-gradient-from: #00A884 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #00A884 var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+html[data-theme="professional"] main .bg-purple-500\/15,
+html[data-theme="professional"] main .bg-blue-500\/15,
+html[data-theme="professional"] main .bg-emerald-500\/15,
+html[data-theme="professional"] main .bg-amber-500\/15,
+html[data-theme="professional"] main .bg-cyan-500\/10,
+html[data-theme="professional"] main .bg-yellow-500\/10 {
+  background-color: rgba(0, 168, 132, 0.12) !important;
+}
+
+html[data-theme="professional"] main .text-yellow-200,
+html[data-theme="professional"] main .text-cyan-200,
+html[data-theme="professional"] main .text-purple-200,
+html[data-theme="professional"] main .text-blue-200,
+html[data-theme="professional"] main .text-purple-300,
+html[data-theme="professional"] main .text-blue-300 {
+  color: #017561 !important;
+}
+
+html[data-theme="professional"] main .border-yellow-500\/30,
+html[data-theme="professional"] main .border-cyan-500\/30,
+html[data-theme="professional"] main .border-purple-500\/20,
+html[data-theme="professional"] main .border-blue-500\/20 {
+  border-color: rgba(0, 168, 132, 0.28) !important;
+}
+
+html[data-theme="professional"] main .bg-zinc-950,
+html[data-theme="professional"] main .bg-zinc-950\/80,
+html[data-theme="professional"] main .bg-zinc-950\/60 {
+  background-color: #ffffff !important;
+}
+
+html[data-theme="professional"] main .shadow-black\/30,
+html[data-theme="professional"] main .shadow-black\/50 {
+  --tw-shadow-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="professional"] main input[type="checkbox"] {
+  accent-color: #00A884;
+}
+
+.landing-whatsapp {
+  --primary: #00A884;
+  --primary-dark: #017561;
+  --bg: #E7F7F1;
+  --white: #FFFFFF;
+  --surface-soft: #F5F7F8;
+  --text: #111B21;
+  --text-secondary: #667781;
+  --border: #D1D7DB;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  font-family: "Inter", sans-serif;
+}
+
+.landing-whatsapp nav {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(16px);
+}
+
+.landing-whatsapp .text-white,
+.landing-whatsapp .text-zinc-100,
+.landing-whatsapp .text-zinc-200,
+.landing-whatsapp .text-zinc-300 {
+  color: var(--text) !important;
+}
+
+.landing-whatsapp .text-zinc-400,
+.landing-whatsapp .text-zinc-500,
+.landing-whatsapp .text-zinc-600 {
+  color: var(--text-secondary) !important;
+}
+
+.landing-whatsapp .text-emerald-100,
+.landing-whatsapp .text-emerald-200,
+.landing-whatsapp .text-emerald-300,
+.landing-whatsapp .text-emerald-400,
+.landing-whatsapp .text-purple-200,
+.landing-whatsapp .text-purple-300,
+.landing-whatsapp .text-purple-400,
+.landing-whatsapp .text-cyan-300 {
+  color: var(--primary-dark) !important;
+}
+
+.landing-whatsapp .bg-emerald-400,
+.landing-whatsapp .bg-emerald-600,
+.landing-whatsapp .hover\:bg-emerald-300:hover,
+.landing-whatsapp .hover\:bg-emerald-500:hover {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+.landing-whatsapp button.bg-emerald-400:hover,
+.landing-whatsapp button.bg-emerald-600:hover,
+.landing-whatsapp a.bg-emerald-400:hover {
+  background-color: var(--primary-dark) !important;
+}
+
+.landing-whatsapp .border-emerald-400\/20,
+.landing-whatsapp .border-emerald-400\/25,
+.landing-whatsapp .border-emerald-400\/30,
+.landing-whatsapp .border-emerald-400\/35,
+.landing-whatsapp .border-white\/10,
+.landing-whatsapp .border-white\/15 {
+  border-color: var(--border) !important;
+}
+
+.landing-whatsapp .bg-white\/5,
+.landing-whatsapp .bg-white\/\[0\.03\],
+.landing-whatsapp .bg-white\/\[0\.04\],
+.landing-whatsapp .bg-emerald-400\/10,
+.landing-whatsapp .bg-emerald-400\/15,
+.landing-whatsapp .bg-purple-400\/10,
+.landing-whatsapp .bg-purple-500\/10 {
+  background-color: var(--white) !important;
+}
+
+.landing-whatsapp .bg-zinc-950\/80,
+.landing-whatsapp .bg-zinc-950\/60,
+.landing-whatsapp .bg-zinc-800,
+.landing-whatsapp .bg-black\/20,
+.landing-whatsapp .bg-\[\#07101a\] {
+  background-color: var(--white) !important;
+}
+
+.landing-whatsapp .bg-\[\#02050a\] {
+  background-color: var(--bg) !important;
+}
+
+.landing-whatsapp .from-zinc-900,
+.landing-whatsapp .via-zinc-950,
+.landing-whatsapp .to-emerald-950\/40,
+.landing-whatsapp .from-purple-950\/30,
+.landing-whatsapp .to-emerald-950\/30 {
+  --tw-gradient-from: #ffffff var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #ffffff var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.landing-whatsapp section > .absolute,
+.landing-whatsapp .bg-purple-500\/10,
+.landing-whatsapp .bg-emerald-500\/12 {
+  background-color: rgba(0, 168, 132, 0.08) !important;
+}
+
+.landing-whatsapp h1,
+.landing-whatsapp h2,
+.landing-whatsapp h3,
+.landing-whatsapp .text-2xl,
+.landing-whatsapp .text-3xl,
+.landing-whatsapp .text-4xl,
+.landing-whatsapp .text-5xl,
+.landing-whatsapp .text-6xl {
+  color: var(--text) !important;
+}
+
+.landing-whatsapp h1 span,
+.landing-whatsapp .text-emerald-400 {
+  color: var(--primary) !important;
+}
+
+.landing-whatsapp .shadow-2xl,
+.landing-whatsapp .shadow-lg {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+}
+
+.landing-whatsapp .logo-led {
+  background: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(0, 168, 132, 0.16);
+}
+
+.landing-whatsapp .logo-led::after {
+  background: #ffffff !important;
+}
+
+.landing-whatsapp .border-\[\#02050a\] {
+  border-color: var(--bg) !important;
+}
+
+.landing-whatsapp svg circle[fill="#818CF8"],
+.landing-whatsapp svg circle[fill="#9333EA"],
+.landing-whatsapp svg circle[fill="#F472B6"] {
+  fill: var(--primary) !important;
+}
+
+html[data-theme="professional"] .glass-card,
+html[data-theme="professional"] main > div > [class*="rounded-"],
+html[data-theme="professional"] main section {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+html[data-theme="professional"] .shadow-purple-500\/20,
+html[data-theme="professional"] .shadow-purple-900\/30 {
+  --tw-shadow-color: rgba(0, 168, 132, 0.24) !important;
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.2);
+  }
+  14% {
+    transform: scale(1.15);
+    box-shadow: 0 0 35px rgba(147, 51, 234, 0.8);
+  }
+  28% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.2);
+  }
+  42% {
+    transform: scale(1.18);
+    box-shadow: 0 0 45px rgba(147, 51, 234, 0.9);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.2);
+  }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 7s infinite cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.logo-led {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  padding: 3px;
+  border-radius: 1rem;
+  overflow: hidden;
+  isolation: isolate;
+  background: rgba(24, 24, 27, 0.75);
+}
+
+.logo-led::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  z-index: -2;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 235deg,
+    rgba(16, 185, 129, 0.2) 260deg,
+    rgba(250, 204, 21, 0.95) 285deg,
+    rgba(168, 85, 247, 1) 310deg,
+    rgba(56, 189, 248, 0.75) 334deg,
+    transparent 360deg
+  );
+  animation: logoLedOrbit 2s linear infinite;
+}
+
+.logo-led::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  z-index: -1;
+  border-radius: 0.85rem;
+  background: #09090b;
+}
+
+.logo-led img {
+  display: block;
+  border: 0;
+  box-shadow: none;
+}
+
+.theme-logo-professional {
+  display: none !important;
+}
+
+html[data-theme="professional"] .theme-logo-dark,
+.landing-whatsapp .theme-logo-dark {
+  display: none !important;
+}
+
+html[data-theme="professional"] .theme-logo-professional,
+.landing-whatsapp .theme-logo-professional {
+  display: block !important;
+}
+
+@keyframes logoLedOrbit {
+  to {
+    transform: rotate(360deg);
+  }
 }

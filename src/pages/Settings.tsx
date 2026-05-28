@@ -1,38 +1,108 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PhotoUpload from "../components/PhotoUpload";
+import { fetchServerSettings, saveServerSettings } from "../services/crm.service";
 import {
   Database,
   Building,
   Sliders,
   Save,
   CheckCircle,
-  Eye,
-  EyeOff,
   RefreshCw,
   Trash2,
-  Bell
+  Bell,
+  MessageSquare,
+  Key,
+  Link2
 } from "lucide-react";
 
 export default function Settings() {
+  const defaultPastorNames = new Set(["Pr. Anderson Silva", "Pr. Anderson Silva (Google)", "Anderson Silva"]);
+
   const [churchName, setChurchName] = useState(() => 
     localStorage.getItem("settings_church_name") || "Bom Samaritano"
   );
-  const [pastorName, setPastorName] = useState(() => 
-    localStorage.getItem("settings_pastor_name") || "Pr. Anderson Silva"
-  );
+  const [pastorName, setPastorName] = useState(() => {
+    const storedName = localStorage.getItem("settings_pastor_name");
+    return storedName && !defaultPastorNames.has(storedName) ? storedName : "Pastor";
+  });
   const [whatsappCode, setWhatsappCode] = useState(() =>
     localStorage.getItem("settings_whatsapp_code") || "55"
   );
   const [birthdayNotifications, setBirthdayNotifications] = useState(() =>
     localStorage.getItem("settings_birthday_notif") !== "false"
   );
-  const [supabaseUrl] = useState(import.meta.env.VITE_SUPABASE_URL || "Não configurado");
-  const [showAnonKey, setShowAnonKey] = useState(false);
+  const [waAutoDispatch, setWaAutoDispatch] = useState(() =>
+    localStorage.getItem("settings_wa_auto") === "true"
+  );
+  const [waApiUrl, setWaApiUrl] = useState(() =>
+    localStorage.getItem("settings_wa_api_url") || ""
+  );
+  const [waApiKey, setWaApiKey] = useState(() =>
+    localStorage.getItem("settings_wa_api_key") || ""
+  );
+  const [financialPassword, setFinancialPassword] = useState(() =>
+    localStorage.getItem("settings_financial_password") || "1234"
+  );
   const [saved, setSaved] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [pastorPhoto, setPastorPhoto] = useState<string | null>(
     () => localStorage.getItem("settings_pastor_photo") || null
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchServerSettings()
+      .then((response) => {
+        if (!isMounted || !response?.settings) return;
+
+        const settings = response.settings;
+        const hasSavedServerSettings = Boolean(settings.updatedAt);
+        const localPastorName = localStorage.getItem("settings_pastor_name");
+        const localChurchName = localStorage.getItem("settings_church_name");
+
+        if (settings.churchName && (hasSavedServerSettings || !localChurchName)) {
+          setChurchName(settings.churchName);
+          localStorage.setItem("settings_church_name", settings.churchName);
+        }
+        if (
+          settings.pastorName &&
+          !defaultPastorNames.has(settings.pastorName) &&
+          (hasSavedServerSettings || !localPastorName || defaultPastorNames.has(localPastorName))
+        ) {
+          setPastorName(settings.pastorName);
+          localStorage.setItem("settings_pastor_name", settings.pastorName);
+        }
+        if (settings.pastorPhoto && (hasSavedServerSettings || !localStorage.getItem("settings_pastor_photo"))) {
+          setPastorPhoto(settings.pastorPhoto);
+          localStorage.setItem("settings_pastor_photo", settings.pastorPhoto);
+        }
+        if (settings.whatsappCode) {
+          setWhatsappCode(settings.whatsappCode);
+          localStorage.setItem("settings_whatsapp_code", settings.whatsappCode);
+        }
+        setBirthdayNotifications(settings.birthdayNotifications !== false);
+        localStorage.setItem("settings_birthday_notif", String(settings.birthdayNotifications !== false));
+        setWaAutoDispatch(settings.waAutoDispatch === true);
+        localStorage.setItem("settings_wa_auto", String(settings.waAutoDispatch === true));
+        if (settings.waApiUrl) {
+          setWaApiUrl(settings.waApiUrl);
+          localStorage.setItem("settings_wa_api_url", settings.waApiUrl);
+        }
+        if (settings.financialPassword) {
+          setFinancialPassword(settings.financialPassword);
+          localStorage.setItem("settings_financial_password", settings.financialPassword);
+        }
+        window.dispatchEvent(new Event("crm-settings-updated"));
+      })
+      .catch((error) => {
+        console.warn("Nao foi possivel carregar configuracoes do backend:", error);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handlePastorPhotoChange = (base64: string | null) => {
     setPastorPhoto(base64);
@@ -41,15 +111,31 @@ export default function Settings() {
     } else {
       localStorage.removeItem("settings_pastor_photo");
     }
+    saveServerSettings({
+      churchName,
+      pastorName,
+      pastorPhoto: base64 || "",
+      whatsappCode,
+      birthdayNotifications,
+      waAutoDispatch,
+      waApiUrl,
+      financialPassword,
+    }).catch((error) => {
+      console.warn("Nao foi possivel salvar a foto do pastor no backend local:", error);
+    });
     window.dispatchEvent(new Event("crm-settings-updated"));
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem("settings_church_name", churchName);
     localStorage.setItem("settings_pastor_name", pastorName);
     localStorage.setItem("settings_whatsapp_code", whatsappCode);
     localStorage.setItem("settings_birthday_notif", String(birthdayNotifications));
+    localStorage.setItem("settings_wa_auto", String(waAutoDispatch));
+    localStorage.setItem("settings_wa_api_url", waApiUrl);
+    localStorage.setItem("settings_wa_api_key", waApiKey);
+    localStorage.setItem("settings_financial_password", financialPassword || "1234");
     // Also update the user profile name inside crm_user
     const savedUser = localStorage.getItem("crm_user");
     if (savedUser) {
@@ -57,7 +143,7 @@ export default function Settings() {
       user.name = pastorName;
       // Derive initials from the new pastor name
       const initials = pastorName
-        .replace(/^(Pr\.|Dr\.|Pas\.?)\s*/i, "")
+        .replace(/^(Pr\.|Dr\.|Pas\.|Pastor|Pastora)\s+/i, "")
         .split(" ")
         .filter(Boolean)
         .slice(0, 2)
@@ -65,6 +151,20 @@ export default function Settings() {
         .join("");
       user.avatar = initials || user.avatar;
       localStorage.setItem("crm_user", JSON.stringify(user));
+    }
+    try {
+      await saveServerSettings({
+        churchName,
+        pastorName,
+        pastorPhoto: pastorPhoto || "",
+        whatsappCode,
+        birthdayNotifications,
+        waAutoDispatch,
+        waApiUrl,
+        financialPassword: financialPassword || "1234",
+      });
+    } catch (error) {
+      console.warn("Nao foi possivel salvar configuracoes no backend local:", error);
     }
     // Notify all listening components (Sidebar, Dashboard, etc.) of the change
     window.dispatchEvent(new Event("crm-settings-updated"));
@@ -142,7 +242,7 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Database / Supabase Card */}
+        {/* Local Database Card */}
         <div className="glass-card p-6 bg-gradient-to-br from-zinc-900/60 to-zinc-950 border border-white/10">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-base font-bold text-zinc-200 flex items-center gap-2">
@@ -151,40 +251,88 @@ export default function Settings() {
             </h3>
             <span className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-              Ativo / Conectado
+              Local / No notebook
             </span>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Supabase URL</label>
+              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Servidor local</label>
               <input
                 type="text"
                 readOnly
-                value={supabaseUrl}
+                value={import.meta.env.VITE_API_BASE_URL || "http://localhost:3001"}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-400 focus:outline-none cursor-default font-mono"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Supabase Anon Key</label>
-              <div className="relative">
-                <input
-                  type={showAnonKey ? "text" : "password"}
-                  readOnly
-                  value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrc2xweGx1a2JkZ2ZkYmppbGYiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTY3ODY0MDI0NCwiZXhwIjoyMDA0MjE2MjQ0fQ"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-4 pr-12 py-2.5 text-sm text-zinc-400 focus:outline-none cursor-default font-mono"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowAnonKey(!showAnonKey)}
-                  title={showAnonKey ? "Ocultar chave" : "Mostrar chave"}
-                  className="absolute right-3 top-2.5 text-zinc-500 hover:text-zinc-300 transition-colors"
-                >
-                  {showAnonKey ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
+              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Arquivos de dados</label>
+              <input
+                type="text"
+                readOnly
+                value="backend/users.json, backend/members.json, backend/visitors.json e dados do navegador local"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-400 focus:outline-none cursor-default font-mono"
+              />
             </div>
           </div>
+        </div>
+
+        {/* WhatsApp API Configuration Card */}
+        <div className="glass-card p-6 bg-gradient-to-br from-zinc-900/60 to-zinc-950 border border-purple-500/20 shadow-lg shadow-purple-500/5">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-base font-bold text-zinc-200 flex items-center gap-2">
+              <MessageSquare className="text-emerald-400" size={18} />
+              <span>Conexão WhatsApp API (Disparo Automático)</span>
+            </h3>
+            <button
+              type="button"
+              onClick={() => setWaAutoDispatch(!waAutoDispatch)}
+              className={`relative w-12 h-6 rounded-full transition-all duration-300 focus:outline-none ${
+                waAutoDispatch ? "bg-emerald-500" : "bg-zinc-700"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 ${
+                  waAutoDispatch ? "translate-x-6" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
+          <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
+            Ative para realizar disparos automáticos em segundo plano diretamente pela API (ex: Evolution API, Baileys, Meta Cloud ou WPPConnect), sem precisar abrir abas do WhatsApp Web.
+          </p>
+
+          {waAutoDispatch && (
+            <div className="space-y-4 pt-2 border-t border-white/5 animate-fade-in">
+              <div>
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <Link2 size={14} className="text-purple-400" />
+                  URL do Endpoint da API (Instância)
+                </label>
+                <input
+                  type="text"
+                  value={waApiUrl}
+                  onChange={(e) => setWaApiUrl(e.target.value)}
+                  placeholder="Ex: https://api.ultramsg.com/instance176612/messages/chat"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500 font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <Key size={14} className="text-amber-400" />
+                  API Key / Token de Autenticação
+                </label>
+                <input
+                  type="password"
+                  value={waApiKey}
+                  onChange={(e) => setWaApiKey(e.target.value)}
+                  placeholder="Insira seu token de autorização da instância"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500 font-mono"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Global preferences */}
@@ -211,6 +359,22 @@ export default function Settings() {
                 <option value="en" className="bg-zinc-900">English</option>
                 <option value="es" className="bg-zinc-900">Español</option>
               </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Key size={14} className="text-emerald-400" />
+                Senha do Financeiro
+              </label>
+              <input
+                type="password"
+                value={financialPassword}
+                onChange={(e) => setFinancialPassword(e.target.value)}
+                placeholder="Ex: 1234"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500"
+              />
+              <p className="mt-2 text-xs text-zinc-500">
+                Esta senha sera solicitada antes de abrir o painel financeiro.
+              </p>
             </div>
           </div>
 

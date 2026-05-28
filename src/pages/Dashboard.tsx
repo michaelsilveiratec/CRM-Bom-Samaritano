@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Users,
@@ -9,45 +9,320 @@ import {
   DollarSign,
   ArrowUpRight,
   ArrowDownRight,
-  MessageSquare,
   Clock,
   Sparkles,
   CheckCircle,
   Plus,
   Trash2,
-  CalendarDays,
   Target,
+  X,
   Gift,
-  Send
+  Waves
 } from "lucide-react";
+import { API_BASE } from "../services/api";
+import { fetchServerMembers, fetchServerSettings, fetchServerVisitors, saveServerSettings } from "../services/crm.service";
+import { createQrCodeDataUrl } from "../utils/qrcode";
+
+interface BirthdayAlert {
+  id: number | string;
+  name: string;
+  phone: string;
+  type: "Membro" | "Visitante";
+  birthDate: string;
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const defaultPastorNames = new Set(["Pr. Anderson Silva", "Pr. Anderson Silva (Google)", "Anderson Silva"]);
+  const defaultTasks = [
+    { id: 1, text: "Preparar sermão de domingo sobre João 3:16", completed: false },
+    { id: 2, text: "Ligar para novos visitantes do último culto", completed: true },
+    { id: 3, text: "Reunião de líderes de célula - 19:30", completed: false },
+    { id: 4, text: "Revisar relatório financeiro semanal", completed: false }
+  ];
+
+  const readPastorName = () => {
+    const storedName = localStorage.getItem("settings_pastor_name");
+    if (storedName && !defaultPastorNames.has(storedName)) {
+      return storedName;
+    }
+    return "Pastor";
+  };
+
+  const getGreetingName = (name: string) => {
+    const cleaned = name.trim().replace(/^(Pr\.|Dr\.|Pas\.|Pastor|Pastora)\s+/i, "");
+    return cleaned.split(" ").filter(Boolean)[0] || name.trim() || "Pastor";
+  };
 
   // Pastor name — reactive to Settings changes
-  const [pastorName, setPastorName] = useState(() =>
-    localStorage.getItem("settings_pastor_name") || "Pastor"
-  );
+  const [pastorName, setPastorName] = useState(readPastorName);
   useEffect(() => {
-    const handleUpdate = () =>
-      setPastorName(localStorage.getItem("settings_pastor_name") || "Pastor");
+    const handleUpdate = () => setPastorName(readPastorName());
     window.addEventListener("crm-settings-updated", handleUpdate);
     return () => window.removeEventListener("crm-settings-updated", handleUpdate);
+  }, []);
+
+  useEffect(() => {
+    fetchServerSettings()
+      .then((response) => {
+        const serverPastorName = response?.settings?.pastorName;
+        if (serverPastorName && !defaultPastorNames.has(serverPastorName)) {
+          localStorage.setItem("settings_pastor_name", serverPastorName);
+          setPastorName(serverPastorName);
+        }
+      })
+      .catch((error) => {
+        console.warn("Nao foi possivel carregar configuracoes do backend local:", error);
+      });
+  }, []);
+
+  const [waAutoDispatch, setWaAutoDispatch] = useState(() => localStorage.getItem("settings_wa_auto") === "true");
+  const [waApiUrl, setWaApiUrl] = useState(() => localStorage.getItem("settings_wa_api_url") || "");
+
+  const [showMobileModal, setShowMobileModal] = useState(false);
+  const [birthdayAlerts, setBirthdayAlerts] = useState<BirthdayAlert[]>([]);
+  const tomorrowBirthdayLabel = useMemo(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toLocaleDateString("pt-BR", { day: "2-digit", month: "long" });
+  }, []);
+  const fallbackMobileLink = typeof window !== "undefined" ? `${window.location.origin}/mobile` : "/mobile";
+  const [mobileLink, setMobileLink] = useState(fallbackMobileLink);
+  const mobileQrSrc = useMemo(() => createQrCodeDataUrl(mobileLink), [mobileLink]);
+  const [mobileCopyMsg, setMobileCopyMsg] = useState<string | null>(null);
+  const [mobileQrError, setMobileQrError] = useState(false);
+
+  useEffect(() => {
+    const normalizeRecords = (items: any[], type: BirthdayAlert["type"]): BirthdayAlert[] =>
+      items
+        .map((item) => ({
+          id: item.id || `${type}-${item.name}-${item.phone}`,
+          name: String(item.name || "").trim(),
+          phone: String(item.phone || "").trim(),
+          type,
+          birthDate: String(item.birthDate || "").trim(),
+        }))
+        .filter((item) => item.name && item.birthDate);
+
+    const readCachedRecords = (key: string, type: BirthdayAlert["type"]) => {
+      try {
+        const cached = localStorage.getItem(key);
+        return cached ? normalizeRecords(JSON.parse(cached), type) : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const getMonthDay = (value: string) => {
+      if (!value) return "";
+      const isoLike = value.includes("T") ? value : `${value}T00:00:00`;
+      const date = new Date(isoLike);
+      if (Number.isNaN(date.getTime())) return "";
+      return `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    };
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowMonthDay = `${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+
+    const applyBirthdayFilter = (records: BirthdayAlert[]) =>
+      records.filter((record) => getMonthDay(record.birthDate) === tomorrowMonthDay);
+
+    const cachedRecords = [
+      ...readCachedRecords("members_data", "Membro"),
+      ...readCachedRecords("visitors_data", "Visitante"),
+    ];
+    setBirthdayAlerts(applyBirthdayFilter(cachedRecords));
+
+    const loadServerBirthdays = async () => {
+      try {
+        const [membersResponse, visitorsResponse] = await Promise.all([
+          fetchServerMembers(),
+          fetchServerVisitors(),
+        ]);
+        const serverRecords = [
+          ...normalizeRecords(membersResponse?.members || [], "Membro"),
+          ...normalizeRecords(visitorsResponse?.visitors || [], "Visitante"),
+        ];
+        setBirthdayAlerts(applyBirthdayFilter(serverRecords));
+      } catch (error) {
+        console.warn("Nao foi possivel carregar aniversariantes do servidor:", error);
+      }
+    };
+
+    loadServerBirthdays();
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetch(`${API_BASE}/api/network-info`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (isMounted && data?.mobileUrl) {
+          setMobileLink(data.mobileUrl);
+        }
+      })
+      .catch((error) => {
+        console.warn("Não foi possível carregar o link mobile da rede local:", error);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const storedPastorName = localStorage.getItem("settings_pastor_name");
+    if (!storedPastorName || defaultPastorNames.has(storedPastorName)) {
+      return;
+    }
+
+    saveServerSettings({
+      churchName: localStorage.getItem("settings_church_name") || "Bom Samaritano",
+      pastorName,
+      pastorPhoto: localStorage.getItem("settings_pastor_photo") || "",
+      whatsappCode: localStorage.getItem("settings_whatsapp_code") || "55",
+      birthdayNotifications: localStorage.getItem("settings_birthday_notif") !== "false",
+      waAutoDispatch,
+      waApiUrl,
+    }).catch((error) => {
+      console.warn("Nao foi possivel sincronizar configuracoes com o backend local:", error);
+    });
+  }, [pastorName, waAutoDispatch, waApiUrl]);
+
+  useEffect(() => {
+    const handleSettingsUpdate = () => {
+      setWaAutoDispatch(localStorage.getItem("settings_wa_auto") === "true");
+      setWaApiUrl(localStorage.getItem("settings_wa_api_url") || "");
+    };
+
+    window.addEventListener("crm-settings-updated", handleSettingsUpdate);
+    return () => window.removeEventListener("crm-settings-updated", handleSettingsUpdate);
+  }, []);
+
+  // Real-time Weather Geolocation & Fetch
+  const [weatherData, setWeatherData] = useState<{
+    cidade: string;
+    temperatura: string;
+    clima: string;
+    chuva: string;
+    icon: string;
+  } | null>(null);
+
+  useEffect(() => {
+    async function fetchWeatherByCoords(lat: number, lon: number, cityName?: string) {
+      try {
+        let city = cityName;
+        if (!city) {
+          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`, {
+            headers: {
+              "User-Agent": "CRM-Bom-Samaritano/1.0"
+            }
+          });
+          const geoJson = await geoRes.json();
+          const addr = geoJson.address || {};
+          city = addr.city || addr.town || addr.village || addr.suburb || addr.municipality || "Sua Localidade";
+        }
+
+        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+        const weatherJson = await weatherRes.json();
+        const current = weatherJson.current_weather;
+
+        const wmoCodes: Record<number, { text: string; icon: string; rain: string }> = {
+          0: { text: "Céu Limpo", icon: "☀️", rain: "Não" },
+          1: { text: "Principalmente Limpo", icon: "🌤️", rain: "Não" },
+          2: { text: "Parcialmente Nublado", icon: "⛅", rain: "Não" },
+          3: { text: "Nublado", icon: "☁️", rain: "Não" },
+          45: { text: "Nevoeiro", icon: "🌫️", rain: "Não" },
+          48: { text: "Nevoeiro", icon: "🌫️", rain: "Não" },
+          51: { text: "Garoa Leve", icon: "🌧️", rain: "Sim" },
+          53: { text: "Garoa", icon: "🌧️", rain: "Sim" },
+          55: { text: "Garoa Densa", icon: "🌧️", rain: "Sim" },
+          61: { text: "Chuva Fraca", icon: "🌧️", rain: "Sim" },
+          63: { text: "Chuva Moderada", icon: "🌧️", rain: "Sim" },
+          65: { text: "Chuva Forte", icon: "🌧️", rain: "Sim" },
+          71: { text: "Neve", icon: "❄️", rain: "Não" },
+          73: { text: "Neve", icon: "❄️", rain: "Não" },
+          75: { text: "Neve Forte", icon: "❄️", rain: "Não" },
+          80: { text: "Pancadas de Chuva", icon: "🌧️", rain: "Sim" },
+          81: { text: "Pancadas de Chuva", icon: "🌧️", rain: "Sim" },
+          82: { text: "Pancadas de Chuva", icon: "🌧️", rain: "Sim" },
+          95: { text: "Tempestade", icon: "⛈️", rain: "Sim" },
+          96: { text: "Tempestade", icon: "⛈️", rain: "Sim" },
+          99: { text: "Tempestade Forte", icon: "⛈️", rain: "Sim" }
+        };
+
+        const code = current?.weathercode ?? 0;
+        const condition = wmoCodes[code] || { text: "Céu Limpo", icon: "☀️", rain: "Não" };
+
+        setWeatherData({
+          cidade: city || "Barueri",
+          temperatura: Math.round(current?.temperature ?? 22).toString(),
+          clima: condition.text,
+          chuva: condition.rain,
+          icon: condition.icon
+        });
+      } catch (err) {
+        console.error("Erro ao carregar clima por coordenadas:", err);
+      }
+    }
+
+    async function fetchWeather() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            await fetchWeatherByCoords(latitude, longitude);
+          },
+          async (error) => {
+            console.log("Geolocalização negada, usando fallback de IP:", error.message);
+            try {
+              const geoRes = await fetch("https://ipapi.co/json/");
+              const geoData = await geoRes.json();
+              const city = geoData.city || "São Paulo";
+              const lat = geoData.latitude || -23.55;
+              const lon = geoData.longitude || -46.63;
+              await fetchWeatherByCoords(lat, lon, city);
+            } catch (ipErr) {
+              console.error("Erro no fallback de IP:", ipErr);
+              await fetchWeatherByCoords(-23.50, -46.87, "Barueri");
+            }
+          },
+          { enableHighAccuracy: true, timeout: 5000 }
+        );
+      } else {
+        try {
+          const geoRes = await fetch("https://ipapi.co/json/");
+          const geoData = await geoRes.json();
+          const city = geoData.city || "São Paulo";
+          const lat = geoData.latitude || -23.55;
+          const lon = geoData.longitude || -46.63;
+          await fetchWeatherByCoords(lat, lon, city);
+        } catch (ipErr) {
+          console.error("Erro no fallback de IP:", ipErr);
+          await fetchWeatherByCoords(-23.50, -46.87, "Barueri");
+        }
+      }
+    }
+    fetchWeather();
   }, []);
 
   // Local storage based tasks for interactivity
   const [tasks, setTasks] = useState<{ id: number; text: string; completed: boolean }[]>(() => {
     const saved = localStorage.getItem("dashboard_tasks");
-    return saved ? JSON.parse(saved) : [
-      { id: 1, text: "Preparar sermão de domingo sobre João 3:16", completed: false },
-      { id: 2, text: "Ligar para novos visitantes do último culto", completed: true },
-      { id: 3, text: "Reunião de líderes de célula - 19:30", completed: false },
-      { id: 4, text: "Revisar relatório financeiro semanal", completed: false }
-    ];
+    if (!saved) return defaultTasks;
+
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : defaultTasks;
+    } catch {
+      localStorage.removeItem("dashboard_tasks");
+      return defaultTasks;
+    }
   });
 
   const [newTaskText, setNewTaskText] = useState("");
-
   useEffect(() => {
     localStorage.setItem("dashboard_tasks", JSON.stringify(tasks));
   }, [tasks]);
@@ -71,21 +346,21 @@ export default function Dashboard() {
   const today = new Date();
   const todayMonthDay = `${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-  // Dynamic Birthday Members and Stats
-  const [birthdayMembers, setBirthdayMembers] = useState<any[]>([]);
+  // Dynamic Recent Activities and Stats
+  const [dynamicRecentActivities, setDynamicRecentActivities] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<number[]>(Array(12).fill(0));
   const [dynamicStats, setDynamicStats] = useState({
-    members: 1248,
-    visitors: 86,
-    cells: 104,
-    finance: 145250
+    members: 0,
+    visitors: 0,
+    discipleship: 0,
+    baptism2026: 0
   });
 
   useEffect(() => {
     // Calculate Stats from LocalStorage
-    let membersCount = 1248;
-    let cellsCount = 104;
-    let visitorsCount = 86;
-    let totalFinance = 145250;
+    let membersCount = 0;
+    let visitorsCount = 0;
+    let baptism2026Count = 0;
 
     // 1. Members and Cells
     const membersRaw = localStorage.getItem("members_data");
@@ -93,33 +368,8 @@ export default function Dashboard() {
       try {
         const membersParsed = JSON.parse(membersRaw);
         const activeMembers = membersParsed.filter((m: any) => m.status === "Ativo");
-        if (membersParsed.length > 0) membersCount = activeMembers.length;
-        
-        const uniqueCells = new Set();
-        membersParsed.forEach((m: any) => {
-          if (m.cellName && m.cellName.trim() !== "" && m.cellName !== "Nenhuma") {
-            uniqueCells.add(m.cellName.trim());
-          }
-        });
-        if (uniqueCells.size > 0) cellsCount = uniqueCells.size;
-
-        // Calculate birthdays
-        const bdays = membersParsed.filter((m: any) => {
-          if (!m.birthDate) return false;
-          const parts = m.birthDate.split("-");
-          if (parts.length === 3) {
-            const mmdd = `${parts[1]}-${parts[2]}`;
-            return mmdd === todayMonthDay;
-          }
-          return false;
-        });
-        setBirthdayMembers(bdays);
+        membersCount = activeMembers.length;
       } catch (e) {}
-    } else {
-      // Fallback if no members data yet
-      setBirthdayMembers([
-        { id: 1, name: "Sandra Regina", role: "Obreira", phone: "(11) 98888-7777" }
-      ]);
     }
 
     // 2. Visitors
@@ -127,85 +377,152 @@ export default function Dashboard() {
     if (visitorsRaw) {
       try {
         const visitorsParsed = JSON.parse(visitorsRaw);
-        if (visitorsParsed.length > 0) visitorsCount = visitorsParsed.length;
+        visitorsCount = visitorsParsed.length;
       } catch (e) {}
     }
 
-    // 3. Finance
-    const financeRaw = localStorage.getItem("financial_records_data");
-    if (financeRaw) {
+    // 3. Baptism candidates in 2026
+    const baptismRaw = localStorage.getItem("baptism_candidates_data");
+    if (baptismRaw) {
       try {
-        const financeParsed = JSON.parse(financeRaw);
-        if (financeParsed.length > 0) {
-          totalFinance = financeParsed.reduce((acc: number, record: any) => acc + (Number(record.value) || 0), 0);
-        }
+        const baptismParsed = JSON.parse(baptismRaw);
+        baptism2026Count = Array.isArray(baptismParsed)
+          ? baptismParsed.filter((candidate: any) => {
+              const date = String(candidate.baptizedAt || candidate.plannedBaptismDate || candidate.createdAt || "");
+              return date.startsWith("2026");
+            }).length
+          : 0;
+      } catch (e) {}
+    }
+
+    // 4. Discipleship
+    let discipleshipCount = 0;
+    const discipleshipRaw = localStorage.getItem("discipleship_data");
+    if (discipleshipRaw) {
+      try {
+        const discipleshipParsed = JSON.parse(discipleshipRaw);
+        const activePairs = discipleshipParsed.filter((p: any) => p.status === "Em Progresso");
+        discipleshipCount = activePairs.length;
       } catch (e) {}
     }
 
     setDynamicStats({
       members: membersCount,
       visitors: visitorsCount,
-      cells: cellsCount,
-      finance: totalFinance
+      discipleship: discipleshipCount,
+      baptism2026: baptism2026Count
     });
-  }, [todayMonthDay]);
 
-  const [sendingStates, setSendingStates] = useState<{ [key: number]: "idle" | "loading" | "sent" }>({});
-
-  const handleFastWhatsAppSend = async (member: any) => {
-    // Set to loading
-    setSendingStates(prev => ({ ...prev, [member.id]: "loading" }));
-    
+    // 5. Recent Activities & Chart Data
     try {
-      // Disparo real usando a API do backend
-      await fetch("http://localhost:3001/api/messages/birthday", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone: member.phone,
-          memberName: member.name,
-          pastorName: pastorName
-        }),
+      const allActivities: any[] = [];
+      const safeParse = (key: string) => {
+        const raw = localStorage.getItem(key);
+        if (!raw) return [];
+
+        try {
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          localStorage.removeItem(key);
+          return [];
+        }
+      };
+
+      const membersParsed = safeParse("members_data");
+      const visitorsParsed = safeParse("visitors_data");
+      const financeParsed = safeParse("financial_records_data");
+      const pairsParsed = safeParse("discipleship_data");
+
+      const monthlyGrowth = Array(12).fill(0);
+      const currentYear = today.getFullYear();
+
+      membersParsed.forEach((m: any) => {
+        allActivities.push({
+          id: m.id, timestamp: m.id, user: "Secretaria", type: "membro",
+          desc: `Novo membro cadastrado: ${m.name}`, time: new Date(m.id).toLocaleString("pt-BR"),
+          icon: Users, color: "text-purple-400 bg-purple-500/10"
+        });
+        const d = new Date(m.id);
+        if (!isNaN(d.getTime()) && d.getFullYear() === currentYear) {
+          monthlyGrowth[d.getMonth()]++;
+        }
       });
 
-      setSendingStates(prev => ({ ...prev, [member.id]: "sent" }));
-      setTimeout(() => {
-        setSendingStates(prev => ({ ...prev, [member.id]: "idle" }));
-      }, 3000);
-    } catch (err) {
-      console.error(err);
-      setSendingStates(prev => ({ ...prev, [member.id]: "idle" }));
+      visitorsParsed.forEach((v: any) => {
+        allActivities.push({
+          id: v.id, timestamp: v.id, user: "Recepção", type: "culto",
+          desc: `Registrou novo visitante: ${v.name}`, time: new Date(v.id).toLocaleString("pt-BR"),
+          icon: UserCheck, color: "text-blue-400 bg-blue-500/10"
+        });
+        const d = new Date(v.id);
+        if (!isNaN(d.getTime()) && d.getFullYear() === currentYear) {
+          monthlyGrowth[d.getMonth()]++;
+        }
+      });
+
+      // Accumulate growth (Crescimento de Culto)
+      for (let i = 1; i < 12; i++) {
+        monthlyGrowth[i] += monthlyGrowth[i - 1];
+      }
+      setChartData(monthlyGrowth);
+
+      financeParsed.forEach((f: any) => {
+        allActivities.push({
+          id: f.id, timestamp: f.id, user: "Tesouraria", type: "financeiro",
+          desc: `Lançamento de ${f.category} (${f.contributor})`, time: new Date(f.id).toLocaleString("pt-BR"),
+          icon: DollarSign, color: "text-emerald-400 bg-emerald-500/10"
+        });
+      });
+
+      pairsParsed.forEach((p: any) => {
+        allActivities.push({
+          id: p.id, timestamp: p.id, user: "Discipulado", type: "discipulado",
+          desc: `Dupla criada: ${p.mentor} & ${p.disciple}`, time: new Date(p.id).toLocaleString("pt-BR"),
+          icon: Heart, color: "text-pink-400 bg-pink-500/10"
+        });
+      });
+
+      allActivities.sort((a, b) => b.timestamp - a.timestamp);
+      
+      if (allActivities.length > 0) {
+        setDynamicRecentActivities(allActivities.slice(0, 5));
+      } else {
+        setDynamicRecentActivities([
+          { id: 1, user: "Sistema", type: "info", desc: "Nenhuma atividade recente encontrada.", time: "Agora", icon: Sparkles, color: "text-zinc-400 bg-zinc-500/10" }
+        ]);
+      }
+    } catch (e) {
+      console.error(e);
     }
-  };
+  }, [todayMonthDay]);
 
-  const getWhatsAppLink = (name: string, phone: string) => {
-    if (!phone) return "#";
-    const cleanPhone = phone.replace(/\D/g, "");
-    const formattedPhone = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
-    const message = `Graça e Paz, querida ${name}! Nós da Igreja Bom Samaritano te desejamos um feliz aniversário! 🎉 Que o Senhor te abençoe rica e abundantemente neste dia tão especial. Um forte abraço do seu ${pastorName}! 🙏✨`;
-    return `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
-  };
+  // Calculate SVG Chart Paths based on chartData
+  const maxChartVal = Math.max(...chartData, 10);
+  const xCoords = [25, 75, 125, 175, 225, 275, 325, 375, 425, 475, 525, 575];
+  const yCoords = chartData.map(val => 180 - (val / maxChartVal) * 140);
+  
+  const linePath = xCoords.map((x, i) => `${i === 0 ? 'M' : 'L'} ${x} ${yCoords[i]}`).join(" ");
+  const fillPath = `${linePath} L 575 200 L 25 200 Z`;
 
   // Dynamically populated stats
   const stats = [
-    { label: "Membros Ativos", value: dynamicStats.members.toLocaleString("pt-BR"), change: "+4.2%", isPositive: true, icon: Users, color: "from-purple-500/20 to-indigo-500/20", border: "border-purple-500/30" },
-    { label: "Visitantes Registrados", value: dynamicStats.visitors.toString(), change: "+12.8%", isPositive: true, icon: UserCheck, color: "from-blue-500/20 to-cyan-500/20", border: "border-blue-500/30" },
-    { label: "Células Ativas", value: dynamicStats.cells.toString(), change: "+2 novas", isPositive: true, icon: Target, color: "from-pink-500/20 to-rose-500/20", border: "border-pink-500/30" },
-    { label: "Entradas Financeiras", value: formatCurrency(dynamicStats.finance), change: "Atualizado", isPositive: true, icon: DollarSign, color: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-500/30" }
-  ];
-
-  const recentActivities = [
-    { id: 1, user: "Pr. Anderson", type: "culto", desc: "Registrou novo visitante: Isabela Costa", time: "Hoje, 14:30", icon: UserCheck, color: "text-blue-400 bg-blue-500/10" },
-    { id: 2, user: "Líder Carlos", type: "discipulado", desc: "Dupla de discipulado concluída (Lição 4)", time: "Hoje, 10:15", icon: Heart, color: "text-pink-400 bg-pink-500/10" },
-    { id: 3, user: "Tesouraria", type: "financeiro", desc: "Lançamento de dízimo mensal realizado", time: "Ontem, 18:45", icon: DollarSign, color: "text-emerald-400 bg-emerald-500/10" },
-    { id: 4, user: "Secretaria", type: "membro", desc: "Novo membro cadastrado: Rodrigo Souza", time: "Ontem, 11:20", icon: Users, color: "text-purple-400 bg-purple-500/10" }
+    { label: "Membros Ativos", value: dynamicStats.members.toLocaleString("pt-BR"), change: "Dinâmico", isPositive: true, icon: Users, color: "from-purple-500/20 to-indigo-500/20", border: "border-purple-500/30" },
+    { label: "Visitantes Registrados", value: dynamicStats.visitors.toString(), change: "Dinâmico", isPositive: true, icon: UserCheck, color: "from-blue-500/20 to-cyan-500/20", border: "border-blue-500/30" },
+    { label: "Duplas Discipulado", value: dynamicStats.discipleship.toString(), change: "Dinâmico", isPositive: true, icon: Target, color: "from-pink-500/20 to-rose-500/20", border: "border-pink-500/30" },
+    {
+      label: "Batizantes 2026",
+      value: dynamicStats.baptism2026.toLocaleString("pt-BR"),
+      change: "Dinâmico",
+      isPositive: true,
+      icon: Waves,
+      color: "from-teal-500/20 to-cyan-500/20",
+      border: "border-teal-500/30"
+    }
   ];
 
   return (
+    <>
     <div className="space-y-8 animate-fade-in">
       {/* Welcome Banner */}
       <div className="relative glass-card p-8 overflow-hidden border border-purple-500/10 bg-gradient-to-r from-zinc-950 via-zinc-900 to-purple-950/20">
@@ -219,79 +536,73 @@ export default function Dashboard() {
               <span>Gestão Ministerial</span>
             </div>
             <h2 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-purple-300 bg-clip-text text-transparent">
-              Graça e Paz, {pastorName.replace(/^(Pr\.|Dr\.|Pas\.?)\s*/i, "").split(" ")[0] || "Pastor"}!
+              Graça e Paz, {getGreetingName(pastorName)}!
             </h2>
             <p className="text-zinc-400 text-sm max-w-xl">
               Aqui está o panorama completo da sua igreja para hoje. Acompanhe dízimos, visitantes, discipulados e agende suas atividades ministeriais com facilidade.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="px-4 py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center gap-2 text-purple-300 text-xs font-semibold">
-              <CalendarDays size={16} />
-              <span>{today.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}</span>
-            </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setShowMobileModal(true)}
+              className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-emerald-500/10 transition-all hover:bg-emerald-500 active:scale-95"
+            >
+              <UserCheck size={16} />
+              <span>QR Code Recepção</span>
+            </button>
+            {weatherData && (
+              <div className="px-4 py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center gap-2 text-purple-300 text-xs font-semibold">
+                <span className="text-sm">{weatherData.icon}</span>
+                <span>
+                  {weatherData.cidade}: {weatherData.temperatura}°C • {weatherData.clima}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Birthday Alerts Panel */}
-      {birthdayMembers.length > 0 && (
-        <div className="relative glass-card p-6 border border-emerald-500/30 bg-gradient-to-r from-zinc-950 to-emerald-950/20 overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 blur-[80px] rounded-full pointer-events-none" />
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-start gap-4">
-              <div className="p-3.5 bg-emerald-500/10 rounded-2xl text-emerald-400 border border-emerald-500/20 shadow-lg shadow-emerald-500/5 mt-1">
-                <Gift size={26} className="animate-bounce" />
+      {localStorage.getItem("settings_birthday_notif") !== "false" && birthdayAlerts.length > 0 && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 shadow-lg shadow-amber-500/5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/15 text-amber-300">
+                <Gift size={24} />
               </div>
-              <div className="space-y-1">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  🎉 Aniversariantes de Hoje!
+              <div>
+                <h3 className="text-base font-bold text-amber-100">
+                  Aniversario amanha ({tomorrowBirthdayLabel}): {birthdayAlerts.length} pessoa(s)
                 </h3>
-                <p className="text-xs text-zinc-400 max-w-2xl">
-                  Hoje {birthdayMembers.length === 1 ? "temos 1 membro completando" : `temos ${birthdayMembers.length} membros completando`} ano de vida! Demonstre carinho pastoral enviando uma benção especial diretamente no WhatsApp dele(a).
+                <p className="mt-1 text-sm text-amber-100/80">
+                  Programe a mensagem de aniversario para nao deixar passar.
                 </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {birthdayAlerts.slice(0, 6).map((person) => (
+                    <span
+                      key={`${person.type}-${person.id}`}
+                      className="rounded-full border border-amber-500/20 bg-zinc-950/40 px-3 py-1 text-xs font-semibold text-amber-100"
+                    >
+                      {person.name} ({person.type})
+                    </span>
+                  ))}
+                  {birthdayAlerts.length > 6 && (
+                    <span className="rounded-full border border-amber-500/20 bg-zinc-950/40 px-3 py-1 text-xs font-semibold text-amber-100">
+                      +{birthdayAlerts.length - 6} outro(s)
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              {birthdayMembers.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between gap-4 bg-white/5 border border-white/5 p-3 rounded-xl min-w-[260px] hover:border-emerald-500/20 transition-all"
-                >
-                  <div>
-                    <h4 className="text-xs font-bold text-zinc-200">{member.name}</h4>
-                    <span className="text-[10px] text-emerald-400 font-semibold">{member.role}</span>
-                  </div>
-                  <button
-                    onClick={() => handleFastWhatsAppSend(member)}
-                    disabled={sendingStates[member.id] === "loading" || sendingStates[member.id] === "sent"}
-                    className={`px-3 py-2 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1.5 shadow-lg active:scale-95 ${
-                      sendingStates[member.id] === "sent"
-                        ? "bg-purple-600 text-white shadow-purple-600/10 cursor-default"
-                        : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/10 cursor-pointer"
-                    }`}
-                  >
-                    {sendingStates[member.id] === "loading" ? (
-                      <>
-                        <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Enviando...</span>
-                      </>
-                    ) : sendingStates[member.id] === "sent" ? (
-                      <>
-                        <CheckCircle size={12} />
-                        <span>Enviado!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send size={12} />
-                        <span>WhatsApp (1-Click)</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              ))}
-            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/app/messages")}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-amber-400 active:scale-95"
+            >
+              <Calendar size={16} />
+              <span>Programar mensagem</span>
+            </button>
           </div>
         </div>
       )}
@@ -303,13 +614,15 @@ export default function Dashboard() {
             key={i}
             className={`glass-card p-6 border transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/5 flex flex-col justify-between ${stat.border}`}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-start gap-4">
               <div>
                 <p className="text-xs font-semibold tracking-wider uppercase text-zinc-400">{stat.label}</p>
                 <h3 className="text-3xl font-bold text-white mt-2 tracking-tight">{stat.value}</h3>
               </div>
-              <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} border border-white/5`}>
-                <stat.icon size={22} className="text-white" />
+              <div className="flex items-center gap-2">
+                <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} border border-white/5`}>
+                  <stat.icon size={22} className="text-white" />
+                </div>
               </div>
             </div>
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5 text-xs">
@@ -365,32 +678,31 @@ export default function Dashboard() {
               </defs>
               {/* Line Fill */}
               <path
-                d="M 25 180 L 75 170 L 125 160 L 175 140 L 225 150 L 275 145 L 325 130 L 375 120 L 425 110 L 475 90 L 525 70 L 575 40 L 575 200 L 25 200 Z"
+                d={fillPath}
                 fill="url(#chart-grad)"
                 className="transition-all duration-500"
               />
               {/* Glowing Line */}
               <path
-                d="M 25 180 L 75 170 L 125 160 L 175 140 L 225 150 L 275 145 L 325 130 L 375 120 L 425 110 L 475 90 L 525 70 L 575 40"
+                d={linePath}
                 fill="none"
                 stroke="url(#line-grad)"
                 strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                className="transition-all duration-500"
               />
               {/* Dot Markers */}
-              <circle cx="25" cy="180" r="4" fill="#818CF8" />
-              <circle cx="75" cy="170" r="4" fill="#818CF8" />
-              <circle cx="125" cy="160" r="4" fill="#818CF8" />
-              <circle cx="175" cy="140" r="4" fill="#9333EA" />
-              <circle cx="225" cy="150" r="4" fill="#9333EA" />
-              <circle cx="275" cy="145" r="4" fill="#9333EA" />
-              <circle cx="325" cy="130" r="4" fill="#C084FC" />
-              <circle cx="375" cy="120" r="4" fill="#C084FC" />
-              <circle cx="425" cy="110" r="4" fill="#C084FC" />
-              <circle cx="475" cy="90" r="4" fill="#F472B6" />
-              <circle cx="525" cy="70" r="4" fill="#F472B6" />
-              <circle cx="575" cy="40" r="4" fill="#F472B6" />
+              {xCoords.map((x, i) => (
+                <circle 
+                  key={i} 
+                  cx={x} 
+                  cy={yCoords[i]} 
+                  r="4" 
+                  fill={i < 4 ? "#818CF8" : i < 8 ? "#9333EA" : "#F472B6"} 
+                  className="transition-all duration-500"
+                />
+              ))}
             </svg>
 
             {/* Labels overlay */}
@@ -423,28 +735,28 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-2 gap-4">
             <button
-              onClick={() => navigate("/members", { state: { openModal: true } })}
+              onClick={() => navigate("/app/members", { state: { openModal: true } })}
               className="flex flex-col items-center justify-center p-4 bg-white/5 border border-white/5 rounded-xl hover:border-purple-500/30 hover:bg-purple-600/5 transition-all text-center group"
             >
               <Users className="text-purple-400 group-hover:scale-110 transition-transform mb-2" size={24} />
               <span className="text-xs font-semibold text-zinc-200">Novo Membro</span>
             </button>
             <button
-              onClick={() => navigate("/visitors", { state: { openModal: true } })}
+              onClick={() => navigate("/app/visitors", { state: { openModal: true } })}
               className="flex flex-col items-center justify-center p-4 bg-white/5 border border-white/5 rounded-xl hover:border-blue-500/30 hover:bg-blue-600/5 transition-all text-center group"
             >
               <UserCheck className="text-blue-400 group-hover:scale-110 transition-transform mb-2" size={24} />
               <span className="text-xs font-semibold text-zinc-200">Novo Visitante</span>
             </button>
             <button
-              onClick={() => navigate("/discipleship", { state: { openModal: true } })}
+              onClick={() => navigate("/app/discipleship", { state: { openModal: true } })}
               className="flex flex-col items-center justify-center p-4 bg-white/5 border border-white/5 rounded-xl hover:border-pink-500/30 hover:bg-pink-600/5 transition-all text-center group"
             >
               <Heart className="text-pink-400 group-hover:scale-110 transition-transform mb-2" size={24} />
               <span className="text-xs font-semibold text-zinc-200">Discipulado</span>
             </button>
             <button
-              onClick={() => navigate("/financial", { state: { openModal: true } })}
+              onClick={() => navigate("/app/financial", { state: { openModal: true } })}
               className="flex flex-col items-center justify-center p-4 bg-white/5 border border-white/5 rounded-xl hover:border-emerald-500/30 hover:bg-emerald-600/5 transition-all text-center group"
             >
               <DollarSign className="text-emerald-400 group-hover:scale-110 transition-transform mb-2" size={24} />
@@ -526,23 +838,95 @@ export default function Dashboard() {
           </div>
 
           <div className="space-y-4">
-            {recentActivities.map((act) => (
-              <div key={act.id} className="flex gap-4 items-start">
-                <div className={`p-2.5 rounded-xl ${act.color} border border-white/5 mt-0.5`}>
-                  <act.icon size={16} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm font-semibold text-zinc-200 truncate">{act.user}</p>
-                    <span className="text-[10px] text-zinc-500 font-medium">{act.time}</span>
+              {dynamicRecentActivities.map((activity, i) => {
+                const Icon = activity.icon;
+                return (
+                  <div key={activity.id || i} className="flex gap-4 relative group">
+                    <div className={`p-2.5 rounded-xl ${activity.color} border border-white/5 mt-0.5`}>
+                      <Icon size={16} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-center">
+                        <p className="text-sm font-semibold text-zinc-200 truncate">{activity.user}</p>
+                        <span className="text-[10px] text-zinc-500 font-medium">{activity.time}</span>
+                      </div>
+                      <p className="text-xs text-zinc-400 mt-0.5">{activity.desc}</p>
+                    </div>
                   </div>
-                  <p className="text-xs text-zinc-400 mt-0.5">{act.desc}</p>
-                </div>
-              </div>
-            ))}
+                );
+              })}
           </div>
         </div>
       </div>
     </div>
+    {showMobileModal && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
+        <div className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-950 p-6 shadow-2xl shadow-black/50">
+          <div className="mb-5 flex items-start justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-white">QR Code Recepcao</h3>
+              <p className="mt-1 text-sm text-zinc-400">Escaneie no tablet ou celular da recepcao.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowMobileModal(false)}
+              className="rounded-xl border border-white/10 bg-white/5 p-2 text-zinc-300 transition hover:bg-white/10 hover:text-white"
+              aria-label="Fechar QR Code"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex h-72 w-72 items-center justify-center rounded-2xl border border-white/10 bg-white p-3">
+              {mobileQrError ? (
+                <div className="px-4 text-center text-sm font-semibold text-zinc-900">
+                  Nao foi possivel carregar a imagem do QR. Use o link abaixo.
+                </div>
+              ) : (
+                <img
+                  src={mobileQrSrc}
+                  alt="QR Code do cadastro mobile"
+                  className="h-full w-full"
+                  onError={() => setMobileQrError(true)}
+                />
+              )}
+            </div>
+
+            <div className="w-full break-words rounded-xl border border-white/10 bg-white/5 p-3 text-center text-sm text-zinc-200">
+              {mobileLink}
+            </div>
+
+            <div className="grid w-full grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(mobileLink);
+                    setMobileCopyMsg("Link copiado.");
+                  } catch {
+                    setMobileCopyMsg("Nao foi possivel copiar. Selecione o link acima.");
+                  }
+                }}
+                className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-500"
+              >
+                Copiar link
+              </button>
+              <a
+                href={mobileLink}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-center text-sm font-bold text-zinc-100 transition hover:bg-white/10"
+              >
+                Abrir
+              </a>
+            </div>
+
+            {mobileCopyMsg ? <p className="text-xs text-zinc-400">{mobileCopyMsg}</p> : null}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

@@ -5,20 +5,34 @@ import {
   Users,
   UserPlus,
   Heart,
+  Droplets,
   Wallet,
   MessageSquare,
+  FileText,
   Settings,
-  Sparkles,
   LogOut
 } from "lucide-react";
 
 function readUser() {
   const pastorName = localStorage.getItem("settings_pastor_name");
   const savedUser = localStorage.getItem("crm_user");
-  const base = savedUser
-    ? JSON.parse(savedUser)
-    : { name: "Pr. Anderson Silva", role: "Pastor Presidente", avatar: "AS" };
-  if (pastorName) base.name = pastorName;
+  const defaultNames = new Set(["Pr. Anderson Silva", "Pr. Anderson Silva (Google)", "Anderson Silva"]);
+  let base = { name: "Pastor", role: "Pastor Presidente", avatar: "P" };
+
+  if (savedUser) {
+    try {
+      base = { ...base, ...JSON.parse(savedUser) };
+    } catch {
+      localStorage.removeItem("crm_user");
+    }
+  }
+
+  if (pastorName && !defaultNames.has(pastorName)) {
+    base.name = pastorName;
+  } else if (defaultNames.has(base.name) || (pastorName && defaultNames.has(pastorName))) {
+    base.name = "Pastor";
+    base.avatar = "P";
+  }
   return base;
 }
 
@@ -41,26 +55,37 @@ export default function Sidebar() {
   }, []);
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-    { icon: UserPlus, label: "Visitantes", path: "/visitors" },
-    { icon: Users, label: "Membros", path: "/members" },
-    { icon: Heart, label: "Discipulado", path: "/discipleship" },
-    { icon: Wallet, label: "Financeiro", path: "/financial" },
-    { icon: MessageSquare, label: "Mensagens", path: "/messages" },
-    { icon: Settings, label: "Configurações", path: "/settings" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/app/dashboard" },
+    { icon: UserPlus, label: "Visitantes", path: "/app/visitors" },
+    { icon: Users, label: "Membros", path: "/app/members" },
+    { icon: Heart, label: "Discipulado", path: "/app/discipleship" },
+    { icon: Droplets, label: "Batismo", path: "/app/baptism" },
+    { icon: Wallet, label: "Financeiro", path: "/app/financial" },
+    { icon: MessageSquare, label: "Mensagens", path: "/app/messages" },
+    { icon: FileText, label: "Certificados", path: "/app/certificates" },
+    { icon: Settings, label: "Configurações", path: "/app/settings" },
   ];
 
   const handleLogout = () => {
     localStorage.removeItem("crm_user");
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
   };
 
   return (
     <aside className="w-64 bg-zinc-950 border-r border-white/10 flex flex-col h-full justify-between">
       <div className="p-6">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="bg-purple-600/20 p-2 rounded-xl border border-purple-500/30">
-            <Sparkles className="w-6 h-6 text-purple-400 animate-pulse" />
+        <div className="flex items-center gap-4 mb-8">
+          <div className="logo-led cursor-pointer">
+            <img
+              src="/logo.png"
+              alt="Bom Samaritano Logo"
+              className="theme-logo-dark w-16 h-16 object-contain rounded-xl"
+            />
+            <img
+              src="/logo-profissional.svg"
+              alt="Bom Samaritano Logo Profissional"
+              className="theme-logo-professional w-16 h-16 object-contain rounded-xl"
+            />
           </div>
           <div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">

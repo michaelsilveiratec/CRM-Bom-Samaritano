@@ -1,4 +1,4 @@
-import { Bell, Search, Calendar, Plus, Users, UserPlus, Heart, Wallet, X } from "lucide-react";
+import { Bell, Search, Calendar, Plus, Users, UserPlus, Heart, Wallet, X, Lock, Sparkles, Moon, Sun } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,9 @@ export default function Header() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "professional">(() => {
+    return localStorage.getItem("crm_theme") === "professional" ? "professional" : "dark";
+  });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -17,6 +20,14 @@ export default function Header() {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("crm_theme", theme);
+  }, [theme]);
+
+  const timeLeft = { hours: 0, minutes: 0, seconds: 0, expired: false };
+  const setShowUpgradeModal = (_value: boolean) => {};
 
   // Close dropdowns on click outside
   useEffect(() => {
@@ -46,30 +57,26 @@ export default function Header() {
     navigate(path, { state: { openModal: true } });
   };
 
-  // Determine today's birthday members for notifications
-  const today = new Date();
-  const todayMD = `${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-
   // Static notification list - birthday members
   const notifications = [
-    { id: 1, text: "🎂 Sandra Regina faz aniversário hoje!", sub: "Clique para enviar parabéns", type: "birthday", link: "/members" },
-    { id: 2, text: "🎂 Lucas Rocha faz aniversário hoje!", sub: "Clique para enviar parabéns", type: "birthday", link: "/members" },
-    { id: 3, text: "👤 Novo visitante: Clarice Lima", sub: "Registrado em 10/05/2026", type: "visitor", link: "/visitors" },
-    { id: 4, text: "💰 Dízimo de Anderson Silva registrado", sub: "R$ 800,00 via Pix", type: "financial", link: "/financial" },
+    { id: 1, text: "🎂 Sandra Regina faz aniversário hoje!", sub: "Clique para enviar parabéns", type: "birthday", link: "/app/members" },
+    { id: 2, text: "🎂 Lucas Rocha faz aniversário hoje!", sub: "Clique para enviar parabéns", type: "birthday", link: "/app/members" },
+    { id: 3, text: "👤 Novo visitante: Clarice Lima", sub: "Registrado em 10/05/2026", type: "visitor", link: "/app/visitors" },
+    { id: 4, text: "💰 Dízimo de Anderson Silva registrado", sub: "R$ 800,00 via Pix", type: "financial", link: "/app/financial" },
   ];
 
   // Quick search results based on static data
   const quickSearchData = [
-    { label: "Anderson Silva", type: "Membro", link: "/members" },
-    { label: "Sandra Regina", type: "Membro - Aniversariante Hoje 🎂", link: "/members" },
-    { label: "Lucas Rocha", type: "Líder de Célula", link: "/members" },
-    { label: "Clarice Lima", type: "Visitante", link: "/visitors" },
-    { label: "Rodrigo Alencar", type: "Visitante - Acompanhado", link: "/visitors" },
-    { label: "Dashboard", type: "Página", link: "/dashboard" },
-    { label: "Financeiro", type: "Página", link: "/financial" },
-    { label: "Discipulado", type: "Página", link: "/discipleship" },
-    { label: "Mensagens", type: "Página", link: "/messages" },
-    { label: "Configurações", type: "Página", link: "/settings" },
+    { label: "Anderson Silva", type: "Membro", link: "/app/members" },
+    { label: "Sandra Regina", type: "Membro - Aniversariante Hoje 🎂", link: "/app/members" },
+    { label: "Lucas Rocha", type: "Líder de Célula", link: "/app/members" },
+    { label: "Clarice Lima", type: "Visitante", link: "/app/visitors" },
+    { label: "Rodrigo Alencar", type: "Visitante - Acompanhado", link: "/app/visitors" },
+    { label: "Dashboard", type: "Página", link: "/app/dashboard" },
+    { label: "Financeiro", type: "Página", link: "/app/financial" },
+    { label: "Discipulado", type: "Página", link: "/app/discipleship" },
+    { label: "Mensagens", type: "Página", link: "/app/messages" },
+    { label: "Configurações", type: "Página", link: "/app/settings" },
   ];
 
   const filteredSearch = searchQuery.length >= 2
@@ -136,10 +143,22 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-6">
+
+
         <div className="hidden md:flex items-center gap-2 text-zinc-400 text-sm bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
           <Calendar className="w-4 h-4 text-purple-400" />
           <span className="capitalize">{formattedDate}</span>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setTheme((current) => current === "dark" ? "professional" : "dark")}
+          title={theme === "dark" ? "Ativar tema profissional" : "Ativar tema dark"}
+          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-zinc-300 transition-all hover:border-purple-500/30 hover:bg-white/10 hover:text-white active:scale-95"
+        >
+          {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+          <span className="hidden xl:inline">{theme === "dark" ? "Profissional" : "Dark"}</span>
+        </button>
 
         {/* Notification Bell */}
         <div className="relative" ref={notifRef}>
@@ -191,28 +210,28 @@ export default function Header() {
                 Registrar Novo(a)
               </div>
               <button
-                onClick={() => handleNavigate("/members")}
+                onClick={() => handleNavigate("/app/members")}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-300 hover:text-white hover:bg-purple-600/20 hover:border-purple-500/30 border border-transparent transition-all text-left"
               >
                 <Users size={16} className="text-purple-400" />
                 <span>Membro</span>
               </button>
               <button
-                onClick={() => handleNavigate("/visitors")}
+                onClick={() => handleNavigate("/app/visitors")}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-300 hover:text-white hover:bg-blue-600/20 hover:border-blue-500/30 border border-transparent transition-all text-left"
               >
                 <UserPlus size={16} className="text-blue-400" />
                 <span>Visitante</span>
               </button>
               <button
-                onClick={() => handleNavigate("/discipleship")}
+                onClick={() => handleNavigate("/app/discipleship")}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-300 hover:text-white hover:bg-rose-600/20 hover:border-rose-500/30 border border-transparent transition-all text-left"
               >
                 <Heart size={16} className="text-rose-400" />
                 <span>Dupla de Discipulado</span>
               </button>
               <button
-                onClick={() => handleNavigate("/financial")}
+                onClick={() => handleNavigate("/app/financial")}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-300 hover:text-white hover:bg-emerald-600/20 hover:border-emerald-500/30 border border-transparent transition-all text-left"
               >
                 <Wallet size={16} className="text-emerald-400" />
@@ -222,6 +241,88 @@ export default function Header() {
           )}
         </div>
       </div>
+
+      {/* ========== UPGRADE / TRIAL EXPIRED MODAL ========== */}
+      {/* Modal disabled - all users now have permanent plans */}
+      {false && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-zinc-950 border border-purple-500/30 rounded-3xl max-w-2xl w-full p-8 md:p-12 shadow-[0_0_100px_rgba(147,51,234,0.3)] text-center relative overflow-hidden">
+            <div className="absolute -top-32 -left-32 w-64 h-64 bg-purple-600/20 rounded-full blur-[80px]" />
+            <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-pink-600/20 rounded-full blur-[80px]" />
+
+            <div className="relative z-10 space-y-6">
+              <div className="w-16 h-16 bg-gradient-to-tr from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl shadow-purple-500/30 animate-bounce">
+                {timeLeft.expired ? <Lock size={32} className="text-white" /> : <Sparkles size={32} className="text-white" />}
+              </div>
+
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-wider">
+                  {timeLeft.expired ? "Acesso Expirado" : "Teste Premium em Andamento"}
+                </div>
+                <h3 className="text-3xl md:text-4xl font-black text-white">
+                  {timeLeft.expired ? "O seu teste de 24 horas chegou ao fim." : "Adquira o Acesso Definitivo"}
+                </h3>
+                <p className="text-sm text-zinc-400 max-w-lg mx-auto">
+                  {timeLeft.expired
+                    ? "Para continuar utilizando o Eclesia CRM com todos os cadastros, relatórios e WhatsApp ilimitado, adquira uma licença definitiva para sua Igreja."
+                    : "Você está aproveitando o período de teste. Garanta o acesso vitalício à ferramenta antes que seu tempo expire!"}
+                </p>
+              </div>
+
+              {/* Pacotes / Preços */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 text-left">
+                <div className="bg-zinc-900/60 border border-white/10 rounded-2xl p-5 space-y-3 relative overflow-hidden">
+                  <div className="text-xs font-bold uppercase tracking-wider text-zinc-500">Plano Anual</div>
+                  <div className="text-2xl font-black text-white">R$ 49,90<span className="text-xs font-normal text-zinc-400">/mês</span></div>
+                  <p className="text-xs text-zinc-400">Até 5.000 membros, suporte prioritário e relatórios ilimitados.</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 border border-purple-500/40 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-xl shadow-purple-500/10">
+                  <div className="absolute top-0 right-0 bg-gradient-to-l from-purple-500 to-pink-500 text-[9px] font-bold text-white px-3 py-1 rounded-bl-xl uppercase tracking-wider">
+                    Recomendado
+                  </div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-purple-400">Licença Vitalícia</div>
+                  <div className="text-2xl font-black text-white">R$ 497<span className="text-xs font-normal text-purple-300">/único</span></div>
+                  <p className="text-xs text-zinc-300">Membros ilimitados, WhatsApp sem taxas, atualizações para sempre.</p>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                <a
+                  href="https://api.whatsapp.com/send/?phone=5511993470407&text=Olá! Gostaria de adquirir o pacote premium do Eclesia CRM."
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:opacity-95 rounded-2xl font-bold text-white shadow-2xl shadow-purple-500/30 transition-all text-base hover:scale-[1.02] active:scale-95"
+                >
+                  <Sparkles size={20} className="text-yellow-300" />
+                  <span>Liberar Acesso Definitivo (Falar com Consultor)</span>
+                </a>
+
+                {!timeLeft.expired && (
+                  <button
+                    onClick={() => setShowUpgradeModal(false)}
+                    className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors font-semibold"
+                  >
+                    Continuar testando (Restam {timeLeft.hours}h {timeLeft.minutes}m)
+                  </button>
+                )}
+
+                {timeLeft.expired && (
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem("crm_user");
+                      navigate("/");
+                    }}
+                    className="text-xs text-rose-500 hover:text-rose-400 transition-colors font-semibold"
+                  >
+                    Sair do sistema
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
