@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { Camera, X } from "lucide-react";
+import { compressImageFile, dataUrlSize } from "../utils/image";
 
 interface PhotoUploadProps {
   photoUrl?: string;
@@ -11,7 +12,7 @@ interface PhotoUploadProps {
 
 function getInitials(name: string): string {
   return name
-    .replace(/^(Pr\.|Dr\.|Pas\.?)\s*/i, "")
+    .replace(/^(Pr\.|Dr\.|Pas\.|Pastor|Pastora)\s+/i, "")
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
@@ -39,18 +40,35 @@ export default function PhotoUpload({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 3 * 1024 * 1024) {
-      alert("A imagem deve ter no máximo 3MB.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const base64 = ev.target?.result as string;
-      onPhotoChange(base64);
-    };
-    reader.readAsDataURL(file);
+    (async () => {
+      try {
+        // If small, just read as base64
+        if (file.size <= 200 * 1024) {
+          const reader = new FileReader();
+          reader.onload = (ev) => onPhotoChange(String(ev.target?.result || ""));
+          reader.readAsDataURL(file);
+          e.target.value = "";
+          return;
+        }
+
+        const compressed = await compressImageFile(file, { maxWidth: 1200, maxHeight: 1200, initialQuality: 0.85 });
+        const size = dataUrlSize(compressed);
+        if (size > 1_200_000) {
+          // Fallback: omit photo if still too large
+          alert("A imagem é muito grande e foi omitida do envio. Tente outra imagem menor.");
+          onPhotoChange(null);
+        } else {
+          onPhotoChange(compressed);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Não foi possível processar a imagem. Tente novamente ou envie sem foto.");
+        onPhotoChange(null);
+      } finally {
+        e.target.value = "";
+      }
+    })();
     // Reset so the same file can be re-selected
-    e.target.value = "";
   };
 
   return (

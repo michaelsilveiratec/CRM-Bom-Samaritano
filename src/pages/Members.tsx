@@ -1,6 +1,10 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import PhotoUpload from "../components/PhotoUpload";
+import { exportToCSV, exportToPDF } from "../utils/exportData";
+import { cacheRecordsWithoutEmbeddedPhotos } from "../utils/localCache";
+import { fetchServerMembers, createServerMember, updateServerMember, deleteServerMember } from "../services/crm.service";
+import { sendBirthdayMessage } from "../services/whatsapp";
 import {
   Users,
   Search,
@@ -13,108 +17,84 @@ import {
   Shield,
   Gift,
   Send,
-  Trash2
+  Trash2,
+  Edit2,
+  Download,
+  FileSpreadsheet,
+  FileText
 } from "lucide-react";
 
 interface Member {
   id: number;
   name: string;
-  role: "Pastor" | "Diácono" | "Obreiro" | "Líder de Célula" | "Membro";
+  role: "Pastor" | "DiÃ¡cono" | "Obreiro" | "LÃ­der de CÃ©lula" | "Membro";
   phone: string;
   email: string;
   cellName: string;
+  address?: string;
+  neighborhood?: string;
+  city?: string;
+  maritalStatus?: string;
+  registrationDate?: string;
   baptismDate: string;
   birthDate: string;
-  status: "Ativo" | "Inativo" | "Licença";
+  status: "Ativo" | "Inativo" | "LicenÃ§a";
   photoUrl?: string;
+  source?: string;
+  createdByMobile?: boolean;
+  createdAt?: string;
 }
 
 export default function Members() {
   // Generate today's dates for dynamic anniversary demonstration
   const todayObj = new Date();
-  const currentYear = todayObj.getFullYear();
   const currentMonthDay = `${String(todayObj.getMonth() + 1).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
 
-  const [members, setMembers] = useState<Member[]>(() => {
-    const saved = localStorage.getItem("members_data");
-    return saved ? JSON.parse(saved) : [
-      {
-        id: 1,
-        name: "Anderson Silva",
-        role: "Pastor",
-        phone: "(11) 99999-8888",
-        email: "pr.anderson@bomsamaritano.org",
-        cellName: "Ministério Pastoral",
-        baptismDate: "2015-08-15",
-        birthDate: "1985-06-15",
-        status: "Ativo",
-      },
-      {
-        id: 2,
-        name: "Sandra Regina",
-        role: "Obreiro",
-        phone: "(11) 98888-7777",
-        email: "sandra.regina@gmail.com",
-        cellName: "Célula Bom Samaritano",
-        baptismDate: "2018-04-12",
-        birthDate: `${currentYear - 32}-${currentMonthDay}`, // ALWAYS CELEBRATES TODAY!
-        status: "Ativo",
-      },
-      {
-        id: 3,
-        name: "Lucas Rocha",
-        role: "Líder de Célula",
-        phone: "(11) 97777-6666",
-        email: "lucas.rocha@outlook.com",
-        cellName: "Célula Resgatar",
-        baptismDate: "2019-11-22",
-        birthDate: `${currentYear - 28}-${currentMonthDay}`, // ALWAYS CELEBRATES TODAY!
-        status: "Ativo",
-      },
-      {
-        id: 4,
-        name: "Renata Fagundes",
-        role: "Membro",
-        phone: "(11) 96666-5555",
-        email: "renata.fagundes@gmail.com",
-        cellName: "Célula Videira",
-        baptismDate: "2021-06-30",
-        birthDate: "2000-02-14",
-        status: "Ativo",
-      },
-      {
-        id: 5,
-        name: "Carlos Eduardo",
-        role: "Diácono",
-        phone: "(11) 95555-4444",
-        email: "carlos.diacono@hotmail.com",
-        cellName: "Célula Graça",
-        baptismDate: "2017-02-18",
-        birthDate: "1988-11-05",
-        status: "Ativo",
-      },
-      {
-        id: 6,
-        name: "Beatriz Oliveira",
-        role: "Membro",
-        phone: "(11) 94444-3333",
-        email: "beatriz.oliveira@gmail.com",
-        cellName: "Célula Videira",
-        baptismDate: "2023-12-10",
-        birthDate: "1997-05-01",
-        status: "Inativo",
-      },
-    ];
+  const normalizeMember = (member: any): Member => ({
+    id: member.id ?? Date.now(),
+    ...member,
+    role: (member.role || "Membro") as Member["role"],
+    status: (member.status || "Ativo") as Member["status"],
+    createdByMobile: member.source === "mobile" || member.createdByMobile === true,
+    createdAt: member.createdAt || new Date().toISOString(),
   });
 
+  const loadCachedMembers = () => {
+    try {
+      const cached = localStorage.getItem("members_data");
+      return cached ? JSON.parse(cached).map(normalizeMember) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const [members, setMembers] = useState<Member[]>(loadCachedMembers);
+
   useEffect(() => {
-    localStorage.setItem("members_data", JSON.stringify(members));
+    const loadRemoteMembers = async () => {
+      try {
+        const response = await fetchServerMembers();
+        const backendMembers = (response?.members || []).map(normalizeMember);
+        setMembers(backendMembers);
+        cacheRecordsWithoutEmbeddedPhotos("members_data", backendMembers);
+      } catch (error) {
+        console.warn("NÃ£o foi possÃ­vel carregar membros do servidor:", error);
+      }
+    };
+
+    loadRemoteMembers();
+  }, []);
+
+  useEffect(() => {
+    cacheRecordsWithoutEmbeddedPhotos("members_data", members);
   }, [members]);
 
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState<string>("All");
   const [filterStatus, setFilterStatus] = useState<string>("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sendingBirthdayId, setSendingBirthdayId] = useState<number | null>(null);
+  const [birthdayMessages, setBirthdayMessages] = useState<{ memberId: number; success: boolean; message: string }[]>([]);
   const location = useLocation();
 
   useEffect(() => {
@@ -130,66 +110,220 @@ export default function Members() {
   const [newPhone, setNewPhone] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newCellName, setNewCellName] = useState("");
+  const [newAddress, setNewAddress] = useState("");
+  const [newNeighborhood, setNewNeighborhood] = useState("");
+  const [newCity, setNewCity] = useState("");
+  const [newMaritalStatus, setNewMaritalStatus] = useState("");
   const [newBaptism, setNewBaptism] = useState("");
   const [newBirth, setNewBirth] = useState("");
   const [newStatus, setNewStatus] = useState<Member["status"]>("Ativo");
   const [newPhoto, setNewPhoto] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
-  const handleAddMember = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newName || !newPhone) return;
+  const formatStoredDate = (value?: string | number) => {
+    if (!value) return "";
+    const date =
+      typeof value === "number"
+        ? new Date(value)
+        : new Date(String(value).includes("T") ? value : `${value}T00:00:00`);
+    return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("pt-BR");
+  };
 
-    const newMember: Member = {
-      id: Date.now(),
-      name: newName,
-      role: newRole,
-      phone: newPhone,
-      email: newEmail || `${newName.toLowerCase().replace(/\s+/g, ".")}@example.com`,
-      cellName: newCellName || "Não Associado",
-      baptismDate: newBaptism || new Date().toISOString().split("T")[0],
-      birthDate: newBirth || "2000-01-01",
-      status: newStatus,
-      photoUrl: newPhoto || undefined,
-    };
+  const getRegistrationDate = (member: Member) => {
+    return (
+      formatStoredDate(member.registrationDate) ||
+      formatStoredDate(member.createdAt) ||
+      formatStoredDate(member.id > 1000000000000 ? member.id : undefined) ||
+      "NÃ£o informado"
+    );
+  };
 
-    setMembers([newMember, ...members]);
-    setIsModalOpen(false);
-
-    // Reset Form
+  const resetForm = () => {
     setNewName("");
     setNewRole("Membro");
     setNewPhone("");
     setNewEmail("");
     setNewCellName("");
+    setNewAddress("");
+    setNewNeighborhood("");
+    setNewCity("");
+    setNewMaritalStatus("");
     setNewBaptism("");
     setNewBirth("");
     setNewStatus("Ativo");
     setNewPhoto(null);
+    setEditingId(null);
   };
 
-  const handleMemberPhotoChange = (id: number, base64: string | null) => {
+  const handleAddMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName || !newPhone) return;
+
+    if (editingId) {
+      const updatedMember = {
+        name: newName,
+        role: newRole,
+        phone: newPhone,
+        email: newEmail,
+        cellName: newCellName,
+        address: newAddress,
+        neighborhood: newNeighborhood,
+        city: newCity,
+        maritalStatus: newMaritalStatus,
+        baptismDate: newBaptism,
+        birthDate: newBirth,
+        status: newStatus,
+        photoUrl: newPhoto || undefined,
+      };
+      
+      try {
+        const response = await updateServerMember(editingId, {
+          name: updatedMember.name,
+          role: updatedMember.role,
+          phone: updatedMember.phone,
+          email: updatedMember.email,
+          cellName: updatedMember.cellName,
+          address: updatedMember.address,
+          neighborhood: updatedMember.neighborhood,
+          city: updatedMember.city,
+          maritalStatus: updatedMember.maritalStatus,
+          baptismDate: updatedMember.baptismDate,
+          birthDate: updatedMember.birthDate,
+          status: updatedMember.status,
+          photoUrl: updatedMember.photoUrl,
+        });
+        setMembers(members.map(m => 
+          m.id === editingId ? normalizeMember(response.member) : m
+        ));
+      } catch (error) {
+        console.warn("Falha ao atualizar membro no backend:", error);
+        alert("Nao foi possivel salvar o membro no servidor. Verifique se o backend esta rodando na porta 3001.");
+        return;
+      }
+    } else {
+      const registrationDate = new Date().toISOString().split("T")[0];
+      const newMember = {
+        name: newName,
+        role: newRole,
+        phone: newPhone,
+        email: newEmail || `${newName.toLowerCase().replace(/\s+/g, ".")}@example.com`,
+        cellName: newCellName || "NÃ£o Associado",
+        address: newAddress,
+        neighborhood: newNeighborhood,
+        city: newCity,
+        maritalStatus: newMaritalStatus,
+        registrationDate,
+        baptismDate: newBaptism || new Date().toISOString().split("T")[0],
+        birthDate: newBirth || "2000-01-01",
+        status: newStatus,
+        photoUrl: newPhoto || undefined,
+      };
+      
+      try {
+        // Send to backend API
+        const response = await createServerMember({
+          name: newMember.name,
+          role: newMember.role,
+          phone: newMember.phone,
+          email: newMember.email,
+          cellName: newMember.cellName,
+          address: newMember.address,
+          neighborhood: newMember.neighborhood,
+          city: newMember.city,
+          maritalStatus: newMember.maritalStatus,
+          registrationDate: newMember.registrationDate,
+          baptismDate: newMember.baptismDate,
+          birthDate: newMember.birthDate,
+          status: newMember.status,
+          photoUrl: newMember.photoUrl,
+          source: "web",
+          visitDate: "",
+          referredBy: "",
+          notes: "",
+        });
+        setMembers([normalizeMember(response.member), ...members]);
+      } catch (error) {
+        console.warn("Falha ao salvar membro no backend:", error);
+        alert("Nao foi possivel salvar o membro no servidor. Verifique se o backend esta rodando na porta 3001.");
+        return;
+      }
+    }
+
+    setIsModalOpen(false);
+    resetForm();
+  };
+
+  const openEditModal = (member: Member) => {
+    setNewName(member.name);
+    setNewRole(member.role);
+    setNewPhone(member.phone);
+    setNewEmail(member.email);
+    setNewCellName(member.cellName);
+    setNewAddress(member.address || "");
+    setNewNeighborhood(member.neighborhood || "");
+    setNewCity(member.city || "");
+    setNewMaritalStatus(member.maritalStatus || "");
+    setNewBaptism(member.baptismDate);
+    setNewBirth(member.birthDate);
+    setNewStatus(member.status);
+    setNewPhoto(member.photoUrl || null);
+    setEditingId(member.id);
+    setIsModalOpen(true);
+  };
+
+  const handleMemberPhotoChange = async (id: number, base64: string | null) => {
+    const member = members.find((m) => m.id === id);
+    if (!member) return;
+
+    const updatedMember = { ...member, photoUrl: base64 || undefined };
     setMembers(members.map(m =>
-      m.id === id ? { ...m, photoUrl: base64 || undefined } : m
+      m.id === id ? updatedMember : m
     ));
-  };
 
-  const handleDeleteMember = (id: number) => {
-    if (window.confirm("Deseja realmente excluir este membro do sistema?")) {
-      setMembers(members.filter((m) => m.id !== id));
+    try {
+      const response = await updateServerMember(id, updatedMember);
+      setMembers((current) => current.map((m) => (m.id === id ? normalizeMember(response.member) : m)));
+    } catch (error) {
+      console.warn("Falha ao salvar foto do membro no backend:", error);
+      setMembers((current) => current.map((m) => (m.id === id ? member : m)));
+      alert("Nao foi possivel salvar a foto no servidor. Verifique se o backend esta rodando na porta 3001.");
     }
   };
 
-  const cycleStatus = (id: number) => {
-    setMembers(
-      members.map((m) => {
-        if (m.id === id) {
-          const statuses: Member["status"][] = ["Ativo", "Inativo", "Licença"];
-          const nextIdx = (statuses.indexOf(m.status) + 1) % statuses.length;
-          return { ...m, status: statuses[nextIdx] };
-        }
-        return m;
-      })
-    );
+  const handleDeleteMember = async (id: number) => {
+    try {
+      await deleteServerMember(id);
+    } catch (error) {
+      console.warn("Falha ao deletar membro no backend:", error);
+      alert("Nao foi possivel deletar o membro no servidor. Verifique se o backend esta rodando na porta 3001.");
+      return;
+    }
+    setMembers(members.filter((m) => m.id !== id));
+  };
+
+  const cycleStatus = async (id: number) => {
+    const member = members.find((m) => m.id === id);
+    if (!member) return;
+
+    const statuses: Member["status"][] = ["Ativo", "Inativo", "LicenÃ§a"];
+    const nextIdx = (statuses.indexOf(member.status) + 1) % statuses.length;
+    const newStatus = statuses[nextIdx];
+
+    try {
+      const response = await updateServerMember(id, { ...member, status: newStatus });
+      setMembers(
+        members.map((m) => {
+          if (m.id === id) {
+            return normalizeMember(response.member);
+          }
+          return m;
+        })
+      );
+    } catch (error) {
+      console.warn("Falha ao atualizar status no backend:", error);
+      alert("Nao foi possivel atualizar o status no servidor. Verifique se o backend esta rodando na porta 3001.");
+      return;
+    }
   };
 
   const isBirthdayToday = (birthStr: string) => {
@@ -201,18 +335,52 @@ export default function Members() {
     return `${m}-${d}` === currentMonthDay;
   };
 
-  const getWhatsAppLink = (name: string, phone: string) => {
-    const cleanPhone = phone.replace(/\D/g, "");
-    const formattedPhone = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
-    const message = `Graça e Paz, querida ${name}! Nós da Igreja Bom Samaritano te desejamos um feliz aniversário! 🎉 Que o Senhor te abençoe rica e abundantemente neste dia tão especial. 'O Senhor te abençoe e te guarde; o Senhor faça resplandecer o seu rosto sobre ti e tenha misericórdia de ti; o Senhor sobre ti levante o seu rosto e te dê a paz.' (Números 6:24-26). Um forte abraço do seu Pastor Anderson! 🙏✨`;
-    return `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
+
+  const handleSendBirthday = async (member: Member) => {
+    if (!member.phone) {
+      alert("Telefone do membro nÃ£o disponÃ­vel!");
+      return;
+    }
+
+    setSendingBirthdayId(member.id);
+    const pastorName = localStorage.getItem("settings_pastor_name") || "Pastor";
+    
+    try {
+      const result = await sendBirthdayMessage(member.phone, member.name, pastorName, member.photoUrl);
+      
+      if (result.success) {
+        setBirthdayMessages((prev) => [
+          ...prev,
+          { memberId: member.id, success: true, message: `âœ… ParabÃ©ns enviado para ${member.name}!` },
+        ]);
+        setTimeout(() => {
+          setBirthdayMessages((prev) => prev.filter((msg) => msg.memberId !== member.id));
+        }, 5000);
+      } else {
+        setBirthdayMessages((prev) => [
+          ...prev,
+          { memberId: member.id, success: false, message: `âŒ Erro: ${result.error || "Falha ao enviar"}` },
+        ]);
+      }
+    } catch (error: any) {
+      setBirthdayMessages((prev) => [
+        ...prev,
+        { memberId: member.id, success: false, message: `âŒ Erro ao enviar: ${error.message}` },
+      ]);
+    } finally {
+      setSendingBirthdayId(null);
+    }
   };
 
   const filteredMembers = members.filter((m) => {
     const matchesSearch =
       m.name.toLowerCase().includes(search.toLowerCase()) ||
       m.phone.includes(search) ||
-      m.cellName.toLowerCase().includes(search.toLowerCase());
+      m.cellName.toLowerCase().includes(search.toLowerCase()) ||
+      (m.address || "").toLowerCase().includes(search.toLowerCase()) ||
+      (m.neighborhood || "").toLowerCase().includes(search.toLowerCase()) ||
+      (m.city || "").toLowerCase().includes(search.toLowerCase()) ||
+      (m.maritalStatus || "").toLowerCase().includes(search.toLowerCase());
     const matchesRole = filterRole === "All" || m.role === filterRole;
     const matchesStatus = filterStatus === "All" || m.status === filterStatus;
     return matchesSearch && matchesRole && matchesStatus;
@@ -222,11 +390,11 @@ export default function Members() {
     switch (role) {
       case "Pastor":
         return "bg-purple-500/15 text-purple-400 border border-purple-500/20";
-      case "Diácono":
+      case "DiÃ¡cono":
         return "bg-blue-500/15 text-blue-400 border border-blue-500/20";
       case "Obreiro":
         return "bg-amber-500/15 text-amber-400 border border-amber-500/20";
-      case "Líder de Célula":
+      case "LÃ­der de CÃ©lula":
         return "bg-rose-500/15 text-rose-400 border border-rose-500/20";
       case "Membro":
         return "bg-zinc-500/15 text-zinc-300 border border-white/5";
@@ -235,20 +403,139 @@ export default function Members() {
 
   return (
     <div className="space-y-8 animate-fade-in">
+      {/* NotificaÃ§Ãµes de AniversÃ¡rio */}
+      {birthdayMessages.length > 0 && (
+        <div className="fixed top-4 right-4 z-50 space-y-2">
+          {birthdayMessages.map((msg) => (
+            <div
+              key={`${msg.memberId}-${msg.success}`}
+              className={`p-4 rounded-lg border ${
+                msg.success
+                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                  : "bg-rose-500/10 border-rose-500/30 text-rose-300"
+              } animate-pulse`}
+            >
+              {msg.message}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-extrabold tracking-tight text-white">Membros</h2>
           <p className="text-sm text-zinc-400 mt-1">
-            Cadastro de obreiros, líderes de célula e membros batizados
+            Cadastro de obreiros, lÃ­deres de cÃ©lula e membros batizados
           </p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-lg hover:shadow-purple-500/20 active:scale-95 transition-all self-start md:self-auto"
-        >
-          <Plus size={18} />
-          <span>Cadastrar Membro</span>
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative group">
+            <button
+              className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 hover:border-emerald-500/30 hover:bg-emerald-500/5 text-zinc-300 hover:text-emerald-400 px-4 py-3 rounded-xl text-sm font-semibold transition-all active:scale-95"
+            >
+              <Download size={16} />
+              <span>Exportar</span>
+            </button>
+            <div className="absolute right-0 top-full mt-2 w-52 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+              <button
+                onClick={() => {
+                  const csvData = filteredMembers.map((m) => ({
+                    foto: m.photoUrl || "",
+                    nome: m.name,
+                    cargo: m.role,
+                    telefone: m.phone,
+                    email: m.email,
+                    celula: m.cellName,
+                    endereco: m.address || "",
+                    bairro: m.neighborhood || "",
+                    cidade: m.city || "",
+                    estadoCivil: m.maritalStatus || "",
+                    dataRegistro: getRegistrationDate(m),
+                    nascimento: new Date(m.birthDate + "T00:00:00").toLocaleDateString("pt-BR"),
+                    batismo: new Date(m.baptismDate + "T00:00:00").toLocaleDateString("pt-BR"),
+                    status: m.status,
+                  }));
+                  exportToCSV(
+                    csvData,
+                    [
+                      { key: "foto", label: "Foto" },
+                      { key: "nome", label: "Nome" },
+                      { key: "cargo", label: "Cargo" },
+                      { key: "telefone", label: "Telefone" },
+                      { key: "email", label: "E-mail" },
+                      { key: "celula", label: "CÃ©lula" },
+                      { key: "endereco", label: "EndereÃ§o" },
+                      { key: "bairro", label: "Bairro" },
+                      { key: "cidade", label: "Cidade" },
+                      { key: "estadoCivil", label: "Estado Civil" },
+                      { key: "dataRegistro", label: "Data de Registro" },
+                      { key: "nascimento", label: "Nascimento" },
+                      { key: "batismo", label: "Batismo" },
+                      { key: "status", label: "Status" },
+                    ],
+                    "membros_eclesia_crm"
+                  );
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-zinc-300 hover:bg-emerald-500/10 hover:text-emerald-400 transition-all"
+              >
+                <FileSpreadsheet size={16} />
+                <span>Baixar CSV (Excel)</span>
+              </button>
+              <button
+                onClick={() => {
+                  const pdfData = filteredMembers.map((m) => ({
+                    foto: m.photoUrl || "",
+                    nome: m.name,
+                    cargo: m.role,
+                    telefone: m.phone,
+                    email: m.email,
+                    celula: m.cellName,
+                    endereco: m.address || "",
+                    bairro: m.neighborhood || "",
+                    cidade: m.city || "",
+                    estadoCivil: m.maritalStatus || "",
+                    dataRegistro: getRegistrationDate(m),
+                    nascimento: new Date(m.birthDate + "T00:00:00").toLocaleDateString("pt-BR"),
+                    batismo: new Date(m.baptismDate + "T00:00:00").toLocaleDateString("pt-BR"),
+                    status: m.status,
+                  }));
+                  exportToPDF(
+                    pdfData,
+                    [
+                      { key: "foto", label: "Foto" },
+                      { key: "nome", label: "Nome" },
+                      { key: "cargo", label: "Cargo" },
+                      { key: "telefone", label: "Telefone" },
+                      { key: "email", label: "E-mail" },
+                      { key: "celula", label: "CÃ©lula" },
+                      { key: "endereco", label: "EndereÃ§o" },
+                      { key: "bairro", label: "Bairro" },
+                      { key: "cidade", label: "Cidade" },
+                      { key: "estadoCivil", label: "Estado Civil" },
+                      { key: "dataRegistro", label: "Data de Registro" },
+                      { key: "nascimento", label: "Nascimento" },
+                      { key: "batismo", label: "Batismo" },
+                      { key: "status", label: "Status" },
+                    ],
+                    "RelatÃ³rio de Membros",
+                    "membros_eclesia_crm"
+                  );
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-zinc-300 hover:bg-purple-500/10 hover:text-purple-400 transition-all border-t border-white/5"
+              >
+                <FileText size={16} />
+                <span>Baixar PDF (ImpressÃ£o)</span>
+              </button>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-lg hover:shadow-purple-500/20 active:scale-95 transition-all"
+          >
+            <Plus size={18} />
+            <span>Cadastrar Membro</span>
+          </button>
+        </div>
       </div>
 
       {/* Stats Summary row */}
@@ -269,9 +556,9 @@ export default function Members() {
             <Heart size={24} />
           </div>
           <div>
-            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Líderes de Célula</p>
+            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">LÃ­deres de CÃ©lula</p>
             <h4 className="text-2xl font-bold text-white mt-1">
-              {members.filter((m) => m.role === "Líder de Célula").length}
+              {members.filter((m) => m.role === "LÃ­der de CÃ©lula").length}
             </h4>
           </div>
         </div>
@@ -295,7 +582,7 @@ export default function Members() {
           <Search className="absolute left-3 top-3.5 w-4 h-4 text-zinc-500" />
           <input
             type="text"
-            placeholder="Buscar membros por nome, célula, telefone..."
+            placeholder="Buscar membros por nome, cÃ©lula, telefone, bairro, cidade..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-purple-500 transition-all"
@@ -309,9 +596,9 @@ export default function Members() {
           >
             <option value="All" className="bg-zinc-900">Todos Cargos</option>
             <option value="Pastor" className="bg-zinc-900">Pastores</option>
-            <option value="Diácono" className="bg-zinc-900">Diáconos</option>
+            <option value="DiÃ¡cono" className="bg-zinc-900">DiÃ¡conos</option>
             <option value="Obreiro" className="bg-zinc-900">Obreiros</option>
-            <option value="Líder de Célula" className="bg-zinc-900">Líderes de Célula</option>
+            <option value="LÃ­der de CÃ©lula" className="bg-zinc-900">LÃ­deres de CÃ©lula</option>
             <option value="Membro" className="bg-zinc-900">Membros</option>
           </select>
           <select
@@ -322,7 +609,7 @@ export default function Members() {
             <option value="All" className="bg-zinc-900">Todos Status</option>
             <option value="Ativo" className="bg-zinc-900">Ativo</option>
             <option value="Inativo" className="bg-zinc-900">Inativo</option>
-            <option value="Licença" className="bg-zinc-900">Licença</option>
+            <option value="LicenÃ§a" className="bg-zinc-900">LicenÃ§a</option>
           </select>
         </div>
       </div>
@@ -334,11 +621,12 @@ export default function Members() {
             <thead>
               <tr className="border-b border-white/10 bg-white/5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
                 <th className="px-6 py-4">Membro / Cargo</th>
-                <th className="px-6 py-4">Célula / Ministério</th>
+                <th className="px-6 py-4">CÃ©lula / MinistÃ©rio</th>
+                <th className="px-6 py-4">EndereÃ§o</th>
                 <th className="px-6 py-4">Contato</th>
-                <th className="px-6 py-4">Nascimento / Batismo</th>
+                <th className="px-6 py-4">Datas</th>
                 <th className="px-6 py-4">Status (Clique p/ Alternar)</th>
-                <th className="px-6 py-4 text-center">Ações</th>
+                <th className="px-6 py-4 text-center">AÃ§Ãµes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -351,7 +639,7 @@ export default function Members() {
                         <PhotoUpload
                           photoUrl={member.photoUrl}
                           name={member.name}
-                          size="sm"
+                          size="md"
                           onPhotoChange={(base64) => handleMemberPhotoChange(member.id, base64)}
                         />
                         <div>
@@ -376,6 +664,19 @@ export default function Members() {
                       {member.cellName}
                     </td>
                     <td className="px-6 py-4 space-y-1">
+                      <div className="text-xs text-zinc-300 font-medium">
+                        {member.address || "NÃ£o informado"}
+                      </div>
+                      <div className="text-[11px] text-zinc-500">
+                        {[member.neighborhood, member.city].filter(Boolean).join(" - ") || "Bairro/Cidade nÃ£o informado"}
+                      </div>
+                      {member.maritalStatus && (
+                        <div className="text-[10px] text-zinc-500">
+                          Estado civil: {member.maritalStatus}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 space-y-1">
                       <div className="flex items-center gap-1.5 text-xs text-zinc-400">
                         <Phone size={12} className="text-purple-400" />
                         <span>{member.phone}</span>
@@ -393,6 +694,10 @@ export default function Members() {
                       <div className="flex items-center gap-1 text-[11px] text-zinc-500">
                         <Calendar size={11} className="shrink-0" />
                         <span>Bat: {new Date(member.baptismDate + "T00:00:00").toLocaleDateString("pt-BR")}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[11px] text-zinc-500">
+                        <Calendar size={11} className="shrink-0" />
+                        <span>Reg: {getRegistrationDate(member)}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -412,16 +717,22 @@ export default function Members() {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
                         {isBirthday && (
-                          <a
-                            href={getWhatsAppLink(member.name, member.phone)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Parabenizar no WhatsApp"
-                            className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all shadow-md active:scale-90"
+                          <button
+                            onClick={() => handleSendBirthday(member)}
+                            disabled={sendingBirthdayId === member.id}
+                            title="Enviar parabÃ©ns automÃ¡tico via WhatsApp"
+                            className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all shadow-md active:scale-90 disabled:opacity-50 disabled:cursor-wait"
                           >
                             <Send size={14} />
-                          </a>
+                          </button>
                         )}
+                        <button
+                          onClick={() => openEditModal(member)}
+                          title="Editar Membro"
+                          className="text-zinc-500 hover:text-blue-400 p-1.5 rounded-lg hover:bg-blue-500/10 transition-all active:scale-90"
+                        >
+                          <Edit2 size={15} />
+                        </button>
                         <button
                           onClick={() => handleDeleteMember(member.id)}
                           title="Excluir Membro"
@@ -437,7 +748,7 @@ export default function Members() {
 
               {filteredMembers.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-16 text-center text-zinc-500 text-sm font-semibold">
+                  <td colSpan={7} className="py-16 text-center text-zinc-500 text-sm font-semibold">
                     Nenhum membro encontrado.
                   </td>
                 </tr>
@@ -450,13 +761,19 @@ export default function Members() {
       {/* Cadastrar Membro Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-950 border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-scale-up">
+          <div className="bg-zinc-950 border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl animate-scale-up">
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 <Users className="text-purple-400" size={20} />
-                <span>Cadastrar Novo Membro</span>
+                <span>{editingId ? "Editar Membro" : "Cadastrar Novo Membro"}</span>
               </h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-zinc-500 hover:text-zinc-300">
+              <button 
+                onClick={() => {
+                  setIsModalOpen(false);
+                  resetForm();
+                }} 
+                className="text-zinc-500 hover:text-zinc-300 transition-colors"
+              >
                 <X size={20} />
               </button>
             </div>
@@ -470,7 +787,7 @@ export default function Members() {
                   size="lg"
                   onPhotoChange={(base64) => setNewPhoto(base64)}
                 />
-                <p className="text-[10px] text-zinc-500">Clique para adicionar foto (opcional, máx. 3MB)</p>
+                <p className="text-[10px] text-zinc-500">Clique para adicionar foto (opcional, mÃ¡x. 3MB)</p>
               </div>
               <div>
                 <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Nome Completo</label>
@@ -497,16 +814,16 @@ export default function Members() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Cargo / Função</label>
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Cargo / FunÃ§Ã£o</label>
                   <select
                     value={newRole}
                     onChange={(e) => setNewRole(e.target.value as Member["role"])}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-purple-500 cursor-pointer"
                   >
                     <option value="Membro" className="bg-zinc-900">Membro</option>
-                    <option value="Líder de Célula" className="bg-zinc-900">Líder de Célula</option>
+                    <option value="LÃ­der de CÃ©lula" className="bg-zinc-900">LÃ­der de CÃ©lula</option>
                     <option value="Obreiro" className="bg-zinc-900">Obreiro</option>
-                    <option value="Diácono" className="bg-zinc-900">Diácono</option>
+                    <option value="DiÃ¡cono" className="bg-zinc-900">DiÃ¡cono</option>
                     <option value="Pastor" className="bg-zinc-900">Pastor</option>
                   </select>
                 </div>
@@ -514,12 +831,12 @@ export default function Members() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Célula / Ministério</label>
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">CÃ©lula / MinistÃ©rio</label>
                   <input
                     type="text"
                     value={newCellName}
                     onChange={(e) => setNewCellName(e.target.value)}
-                    placeholder="Ex: Célula Resgatar"
+                    placeholder="Ex: CÃ©lula Resgatar"
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500"
                   />
                 </div>
@@ -532,6 +849,55 @@ export default function Members() {
                     placeholder="Ex: lucas@example.com"
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500"
                   />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">EndereÃ§o</label>
+                <input
+                  type="text"
+                  value={newAddress}
+                  onChange={(e) => setNewAddress(e.target.value)}
+                  placeholder="Ex: Rua das Flores, 123"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Bairro</label>
+                  <input
+                    type="text"
+                    value={newNeighborhood}
+                    onChange={(e) => setNewNeighborhood(e.target.value)}
+                    placeholder="Ex: Centro"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Cidade</label>
+                  <input
+                    type="text"
+                    value={newCity}
+                    onChange={(e) => setNewCity(e.target.value)}
+                    placeholder="Ex: Rio de Janeiro"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Estado Civil</label>
+                  <select
+                    value={newMaritalStatus}
+                    onChange={(e) => setNewMaritalStatus(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-purple-500 cursor-pointer"
+                  >
+                    <option value="" className="bg-zinc-900">NÃ£o informado</option>
+                    <option value="Solteiro(a)" className="bg-zinc-900">Solteiro(a)</option>
+                    <option value="Casado(a)" className="bg-zinc-900">Casado(a)</option>
+                    <option value="Divorciado(a)" className="bg-zinc-900">Divorciado(a)</option>
+                    <option value="ViÃºvo(a)" className="bg-zinc-900">ViÃºvo(a)</option>
+                    <option value="UniÃ£o EstÃ¡vel" className="bg-zinc-900">UniÃ£o EstÃ¡vel</option>
+                  </select>
                 </div>
               </div>
 
@@ -566,14 +932,17 @@ export default function Members() {
                 >
                   <option value="Ativo" className="bg-zinc-900">Ativo</option>
                   <option value="Inativo" className="bg-zinc-900">Inativo</option>
-                  <option value="Licença" className="bg-zinc-900">Licença</option>
+                  <option value="LicenÃ§a" className="bg-zinc-900">LicenÃ§a</option>
                 </select>
               </div>
 
               <div className="flex gap-3 justify-end pt-4 border-t border-white/10">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    resetForm();
+                  }}
                   className="px-5 py-2.5 bg-white/5 border border-white/5 text-zinc-400 hover:text-zinc-200 rounded-xl text-sm font-semibold transition-all"
                 >
                   Cancelar
@@ -582,7 +951,7 @@ export default function Members() {
                   type="submit"
                   className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-sm font-semibold shadow-lg hover:shadow-purple-500/20 active:scale-95 transition-all"
                 >
-                  Salvar Membro
+                  {editingId ? "Salvar AlteraÃ§Ãµes" : "Salvar Membro"}
                 </button>
               </div>
             </form>

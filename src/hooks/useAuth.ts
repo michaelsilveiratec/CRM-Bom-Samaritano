@@ -1,4 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import {
+  loginRequest,
+  registerRequest,
+  requestWhatsAppOTP as requestWhatsAppOTPRequest,
+  verifyWhatsAppOTP as verifyWhatsAppOTPRequest,
+  recoverPasswordRequest,
+  resetPasswordRequest,
+} from "../services/auth.service";
 
 export interface User {
   email: string;
@@ -17,40 +25,67 @@ export function useAuth() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [otpCode, setOtpCode] = useState<string | null>(null);
 
-  // Traditional Login
   const login = async (email: string, pass: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Mock validation: accept any email with '123456' or 'pastor' password
-        if (pass === "123456" || pass === "pastor") {
-          const loggedUser: User = {
-            email: email.toLowerCase(),
-            name: "Pr. Anderson Silva",
-            avatar: "AS",
-            role: "Pastor Presidente",
-            provider: "email",
-          };
-          localStorage.setItem("crm_user", JSON.stringify(loggedUser));
-          setUser(loggedUser);
-          setLoading(false);
-          resolve(true);
-        } else {
-          setError("Credenciais inválidas. Use a senha '123456' para testar.");
-          setLoading(false);
-          resolve(false);
-        }
-      }, 800);
-    });
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = pass.trim();
+
+    const response = await loginRequest(normalizedEmail, normalizedPassword);
+
+    setLoading(false);
+
+    if (response.success && response.data?.user) {
+      localStorage.setItem("crm_user", JSON.stringify(response.data.user));
+      setUser(response.data.user);
+      return true;
+    }
+
+    setError(response.error || "Credenciais inválidas.");
+    return false;
   };
 
-  // Google Login Simulation
+  const register = async (
+    name: string,
+    email: string,
+    pass: string,
+    plan: string,
+    phone: string
+  ): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = pass.trim();
+    const normalizedPhone = phone.trim();
+
+    const response = await registerRequest(
+      normalizedName,
+      normalizedEmail,
+      normalizedPassword,
+      plan,
+      normalizedPhone
+    );
+
+    setLoading(false);
+
+    if (response.success && response.data?.user) {
+      localStorage.setItem("crm_user", JSON.stringify(response.data.user));
+      setUser(response.data.user);
+      return true;
+    }
+
+    setError(response.error || "Erro ao cadastrar usuário.");
+    return false;
+  };
+
   const loginWithGoogle = async (): Promise<boolean> => {
     setLoading(true);
     setError(null);
+
     return new Promise((resolve) => {
       setTimeout(() => {
         const loggedUser: User = {
@@ -60,6 +95,7 @@ export function useAuth() {
           role: "Pastor Presidente",
           provider: "google",
         };
+
         localStorage.setItem("crm_user", JSON.stringify(loggedUser));
         setUser(loggedUser);
         setLoading(false);
@@ -68,69 +104,74 @@ export function useAuth() {
     });
   };
 
-  // WhatsApp Login Step 1: Request OTP
   const requestWhatsAppOTP = async (phone: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (phone.replace(/\D/g, "").length < 10) {
-          setError("Por favor, insira um número de WhatsApp válido.");
-          setLoading(false);
-          resolve(false);
-          return;
-        }
-        // Generate mock code (e.g. 777777 for testing ease)
-        const generatedCode = "777777";
-        setOtpCode(generatedCode);
-        setLoading(false);
-        resolve(true);
-      }, 1200);
-    });
+
+    const response = await requestWhatsAppOTPRequest(phone);
+
+    setLoading(false);
+
+    if (response.success) {
+      return true;
+    }
+
+    setError(response.error || "Erro ao enviar código de verificação.");
+    return false;
   };
 
-  // WhatsApp Login Step 2: Verify OTP
   const verifyWhatsAppOTP = async (phone: string, code: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (code === otpCode || code === "777777") {
-          const loggedUser: User = {
-            email: "pr.anderson.whatsapp@bomsamaritano.org",
-            name: "Pr. Anderson Silva",
-            avatar: "W",
-            role: "Pastor Presidente",
-            provider: "whatsapp",
-            phone: phone,
-          };
-          localStorage.setItem("crm_user", JSON.stringify(loggedUser));
-          setUser(loggedUser);
-          setOtpCode(null);
-          setLoading(false);
-          resolve(true);
-        } else {
-          setError("Código de verificação incorreto. Use o código '777777' recebido.");
-          setLoading(false);
-          resolve(false);
-        }
-      }, 800);
-    });
+
+    const response = await verifyWhatsAppOTPRequest(phone, code);
+
+    setLoading(false);
+
+    if (response.success) {
+      if (response.data?.user) {
+        localStorage.setItem("crm_user", JSON.stringify(response.data.user));
+        setUser(response.data.user);
+      }
+      return true;
+    }
+
+    setError(response.error || "Código de verificação incorreto.");
+    return false;
   };
 
-  // Password Recovery
-  const recoverPassword = async (emailOrPhone: string, method: "email" | "whatsapp"): Promise<boolean> => {
+  const recoverPassword = async (emailOrPhone: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        setLoading(false);
-        resolve(true);
-      }, 1500);
-    });
+
+    const response = await recoverPasswordRequest(emailOrPhone);
+
+    setLoading(false);
+
+    if (response.success) {
+      return true;
+    }
+
+    setError(response.error || "Erro ao recuperar senha.");
+    return false;
   };
 
-  // Logout
+  const resetPassword = async (email: string, token: string, password: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+
+    const response = await resetPasswordRequest(email, token, password);
+
+    setLoading(false);
+
+    if (response.success) {
+      return true;
+    }
+
+    setError(response.error || "Erro ao redefinir senha.");
+    return false;
+  };
+
   const logout = () => {
     localStorage.removeItem("crm_user");
     setUser(null);
@@ -141,12 +182,13 @@ export function useAuth() {
     isAuthenticated: !!user,
     loading,
     error,
-    otpCode,
     login,
+    register,
     loginWithGoogle,
     requestWhatsAppOTP,
     verifyWhatsAppOTP,
     recoverPassword,
+    resetPassword,
     logout,
   };
 }
