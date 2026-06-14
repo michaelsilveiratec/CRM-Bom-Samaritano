@@ -25,6 +25,7 @@ type CertificateForm = {
   fatherName: string;
   motherName: string;
   childName: string;
+  childGender: "boy" | "girl";
   birthDate: string;
   presentationDate: string;
   churchName: string;
@@ -57,6 +58,7 @@ function readSavedCertificates(): SavedCertificate[] {
         fatherName: "",
         motherName: "",
         childName: item.childName || "",
+        childGender: item.form?.childGender || "boy",
         birthDate: "",
         presentationDate: item.presentationDate || "",
         churchName: item.churchName || localStorage.getItem("settings_church_name") || "Bom Samaritano",
@@ -66,13 +68,14 @@ function readSavedCertificates(): SavedCertificate[] {
         bibleVerse: "Instrui o menino no caminho em que deve andar. - Proverbios 22:6",
       };
 
+      const itemForm = { ...fallbackForm, ...(item.form || {}) };
       return {
         id: item.id || `${Date.now()}`,
-        certificateNumber: item.certificateNumber || fallbackForm.certificateNumber,
-        childName: item.childName || item.form?.childName || "",
-        presentationDate: item.presentationDate || item.form?.presentationDate || "",
-        churchName: item.churchName || item.form?.churchName || fallbackForm.churchName,
-        form: item.form || fallbackForm,
+        certificateNumber: item.certificateNumber || itemForm.certificateNumber,
+        childName: item.childName || itemForm.childName || "",
+        presentationDate: item.presentationDate || itemForm.presentationDate || "",
+        churchName: item.churchName || itemForm.churchName || fallbackForm.churchName,
+        form: itemForm,
         createdAt: item.createdAt || new Date().toISOString(),
         updatedAt: item.updatedAt || item.createdAt || new Date().toISOString(),
       };
@@ -108,6 +111,7 @@ const emptyForm: CertificateForm = {
   fatherName: "",
   motherName: "",
   childName: "",
+  childGender: "boy",
   birthDate: "",
   presentationDate: "",
   churchName: localStorage.getItem("settings_church_name") || "Bom Samaritano",
@@ -379,353 +383,336 @@ export default function Certificates() {
 
   const buildPremiumCertificateHtml = (certificateForm: CertificateForm = form) => {
     const certificateQrCodeDataUrl = createQrCodeDataUrl(`CERT:${certificateForm.certificateNumber}`.slice(0, 48));
+    const childPronoun = certificateForm.childGender === "girl" ? "apresentada" : "apresentado";
+    const accentColor = certificateForm.childGender === "girl" ? "#CF6C9B" : "#2C77D8";
+    const pageColor = "#F8F5EE";
+    const frameColor = "#0B2347";
+    const goldColor = "#C9A227";
+    const textColor = "#0B2347";
+    const detailText = "#414558";
     const logoHtml = certificateForm.churchLogo
       ? `<div class="logo-medallion"><img class="church-logo" src="${certificateForm.churchLogo}" alt="Logotipo da igreja" /></div>`
-      : "";
-    const signatureHtml = certificateForm.pastorSignature
-      ? `<img class="signature" src="${certificateForm.pastorSignature}" alt="Assinatura do pastor" />`
-      : `<div class="signature-line">${escapeHtml(certificateForm.pastorName || "Nome do Pastor")}</div>`;
-    const verseHtml = certificateForm.bibleVerse.trim()
-      ? `<p class="verse">${escapeHtml(certificateForm.bibleVerse.trim())}</p>`
-      : "";
-    const officialSealHtml = buildOfficialSealSvg(92);
+      : `<div class="logo-placeholder">${escapeHtml(certificateForm.churchName || "Igreja Internacional da Graça de Deus")}</div>`;
+    const rawVerse = certificateForm.bibleVerse.trim() || "Deixai vir a mim os pequeninos, porque deles é o Reino de Deus.";
+    const [verseText, verseReference] = rawVerse.includes("-")
+      ? rawVerse.split("-").map((part) => part.trim())
+      : [rawVerse, "Marcos 10:14"];
+    const sealHtml = buildOfficialSealSvg(96);
 
-    return `
-      <!doctype html>
+    return `<!doctype html>
       <html>
         <head>
           <meta charset="utf-8" />
-          <title>Certificado - ${escapeHtml(certificateForm.childName || "Apresentacao de Crianca")}</title>
+          <title>Certificado - ${escapeHtml(certificateForm.childName || "Apresentação de Criança")}</title>
           <style>
-            @page { size: A4 portrait; margin: 8mm; }
+            @page { size: A4 landscape; margin: 12mm; }
             * { box-sizing: border-box; }
             body {
               margin: 0;
-              background: #f8f4ea;
-              color: #0b1e5b;
-              font-family: Georgia, "Times New Roman", serif;
+              padding: 0;
+              min-height: 100vh;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              background: ${pageColor};
+              font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+              color: ${textColor};
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
             }
+            .page {
+              width: 1000px;
+              height: 706px;
+              padding: 20px;
+              background: ${pageColor};
+              border: 18px solid ${frameColor};
+              position: relative;
+              overflow: hidden;
+            }
+            .page:before {
+              content: "";
+              position: absolute;
+              inset: 22px;
+              border: 4px solid ${goldColor};
+              pointer-events: none;
+              box-shadow: inset 0 0 0 1px rgba(11,35,71,.08);
+            }
+            .page:after {
+              content: "";
+              position: absolute;
+              inset: 0;
+              background-image: radial-gradient(circle at 50% 50%, rgba(11,35,71,.06) 0%, rgba(11,35,71,0) 44%),
+                linear-gradient(145deg, rgba(255,255,255,.22) 0%, transparent 12%, transparent 100%);
+              pointer-events: none;
+            }
             .certificate {
-              min-height: calc(297mm - 16mm);
               position: relative;
-              overflow: hidden;
-              padding: 7mm;
-              text-align: center;
-              border: 2px solid #c89b3c;
-              background:
-                radial-gradient(ellipse at top center, rgba(255,255,255,.08), transparent 42%),
-                linear-gradient(135deg, #071742, #0b1e5b 48%, #071742);
-            }
-            .certificate:before {
-              content: "";
-              position: absolute;
-              inset: 14px;
-              border: 2px solid rgba(200,155,60,.92);
-              pointer-events: none;
-              z-index: 1;
-            }
-            .certificate:after {
-              content: "";
-              position: absolute;
-              left: 50%;
-              top: 50%;
-              width: 78%;
-              height: 78%;
-              transform: translate(-50%, -50%);
-              border-radius: 999px;
-              border: 1px solid rgba(200,155,60,.18);
-              z-index: 1;
-            }
-            .content {
-              position: relative;
-              z-index: 2;
-              min-height: calc(297mm - 30mm);
-              overflow: hidden;
-              padding: 11mm 15mm 9mm;
-              border: 2px solid rgba(200,155,60,.84);
-              border-radius: 34px;
-              background:
-                repeating-radial-gradient(ellipse at top center, rgba(200,155,60,.10) 0 1px, transparent 1px 7px),
-                radial-gradient(ellipse at 50% 0%, #fffdf6 0%, #f8f4ea 45%, #fffaf0 100%);
-              box-shadow:
-                inset 0 0 0 7px rgba(255,255,255,.45),
-                inset 0 0 0 9px rgba(200,155,60,.28);
-            }
-            .content:before,
-            .content:after {
-              content: "";
-              position: absolute;
-              left: 50%;
-              width: 112%;
-              height: 160px;
-              transform: translateX(-50%);
-              border-radius: 50%;
-              pointer-events: none;
-              z-index: 0;
-            }
-            .content:before {
-              top: -95px;
-              border-bottom: 8px solid #c89b3c;
-              box-shadow: 0 8px 0 #f5d98d, 0 16px 0 #0b1e5b;
-            }
-            .content:after {
-              bottom: -95px;
-              border-top: 8px solid #c89b3c;
-              box-shadow: 0 -8px 0 #f5d98d, 0 -16px 0 #0b1e5b;
-            }
-            .topbar {
+              width: 100%;
+              height: 100%;
+              padding: 36px 44px;
               display: flex;
-              align-items: center;
+              flex-direction: column;
               justify-content: space-between;
               gap: 18px;
-              color: #0b1e5b;
-              font-family: Arial, sans-serif;
-              font-size: 10px;
-              font-weight: 800;
-              letter-spacing: .8px;
-              text-transform: uppercase;
             }
-            .number {
-              border: 1px solid rgba(200,155,60,.70);
-              border-radius: 999px;
-              padding: 7px 12px;
-              background: rgba(255,255,255,.62);
-              white-space: nowrap;
-            }
-            .top-church {
-              max-width: 245px;
-              text-align: right;
-            }
-            .logo-medallion {
-              width: 330px;
-              height: 190px;
-              margin: 0 auto -4px;
+            .watermark {
+              position: absolute;
+              inset: 0;
               display: grid;
               place-items: center;
+              opacity: 0.08;
+              pointer-events: none;
+            }
+            .watermark svg {
+              width: 320px;
+              height: 320px;
+            }
+            .logo-medallion,
+            .logo-placeholder {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              margin: 0 auto;
+            }
+            .logo-placeholder {
+              width: 260px;
+              height: 66px;
+              border-radius: 20px;
+              border: 1px solid rgba(11,35,71,.12);
+              background: rgba(255,255,255,.95);
+              color: ${textColor};
+              font-size: 11px;
+              letter-spacing: .24em;
+              text-transform: uppercase;
+              font-weight: 700;
+              padding: 0 16px;
+              text-align: center;
             }
             .church-logo {
-              width: 310px;
-              height: 178px;
+              max-width: 260px;
+              max-height: 66px;
               object-fit: contain;
             }
-            .corner {
-              position: absolute;
-              width: 94px;
-              height: 94px;
-              border-color: #c89b3c;
-              opacity: .98;
-              z-index: 1;
-            }
-            .corner:after {
-              content: "";
-              position: absolute;
-              width: 46px;
-              height: 46px;
-              border-color: #0b1e5b;
-              opacity: .72;
-            }
-            .tl { top: 30px; left: 30px; border-top: 3px solid; border-left: 3px solid; border-radius: 18px 0 0 0; }
-            .tl:after { top: 13px; left: 13px; border-top: 2px solid; border-left: 2px solid; border-radius: 12px 0 0 0; }
-            .tr { top: 30px; right: 30px; border-top: 3px solid; border-right: 3px solid; border-radius: 0 18px 0 0; }
-            .tr:after { top: 13px; right: 13px; border-top: 2px solid; border-right: 2px solid; border-radius: 0 12px 0 0; }
-            .bl { bottom: 30px; left: 30px; border-bottom: 3px solid; border-left: 3px solid; border-radius: 0 0 0 18px; }
-            .bl:after { bottom: 13px; left: 13px; border-bottom: 2px solid; border-left: 2px solid; border-radius: 0 0 0 12px; }
-            .br { bottom: 30px; right: 30px; border-bottom: 3px solid; border-right: 3px solid; border-radius: 0 0 18px 0; }
-            .br:after { bottom: 13px; right: 13px; border-bottom: 2px solid; border-right: 2px solid; border-radius: 0 0 12px 0; }
-            .cross { color: #c89b3c; font-size: 22px; margin-bottom: 3px; }
-            h1 {
-              margin: 0;
-              color: #0b1e5b;
+            .title-main {
+              margin: 0 auto;
               font-size: 62px;
-              letter-spacing: 7px;
+              line-height: 1;
+              font-family: Georgia, "Times New Roman", serif;
+              letter-spacing: .16em;
               text-transform: uppercase;
-              text-shadow: 0 1px 0 #fff;
+              color: ${frameColor};
             }
-            h2 {
-              margin: 8px 0 10px;
-              color: #c89b3c;
-              font-size: 25px;
-              letter-spacing: 2px;
+            .title-sub {
+              margin: 8px auto 0;
+              font-size: 18px;
+              font-weight: 700;
+              letter-spacing: .18em;
               text-transform: uppercase;
+              color: ${goldColor};
             }
-            .divider {
-              width: 240px;
-              height: 1px;
-              margin: 0 auto 16px;
-              background: linear-gradient(90deg, transparent, #c89b3c, transparent);
+            .label-cert {
+              margin: 24px auto 0;
+              display: inline-flex;
+              padding: 10px 28px;
+              border-radius: 999px;
+              border: 1px solid ${frameColor};
+              background: rgba(255,255,255,.95);
+              color: ${frameColor};
+              font-size: 12px;
+              font-weight: 700;
+              letter-spacing: .28em;
             }
-            .small {
-              color: #27345e;
-              font-family: Arial, sans-serif;
-              font-size: 15px;
-              line-height: 1.62;
-              margin: 0;
+            .child-name {
+              margin: 18px auto 0;
+              font-size: 56px;
+              line-height: 1;
+              font-family: Georgia, "Times New Roman", serif;
+              font-weight: 900;
+              letter-spacing: .08em;
+              text-transform: uppercase;
+              color: ${frameColor};
+              text-align: center;
+              width: fit-content;
+              border-bottom: 5px solid ${goldColor};
+              padding-bottom: 6px;
             }
-            .script {
-              color: #0b1e5b;
-              font-family: "Brush Script MT", "Segoe Script", cursive;
-              font-size: 38px;
-              line-height: 1.2;
-              margin: 8px 0;
+            .copy {
+              margin: 18px auto 0;
+              max-width: 740px;
+              text-align: center;
+              color: ${detailText};
+              font-size: 16px;
+              line-height: 1.85;
             }
-            .child {
-              color: #c89b3c;
-              font-size: 54px;
-              margin: 13px 0 14px;
-            }
-            .dates {
+            .info-grid {
               display: grid;
               grid-template-columns: 1fr 1fr;
               gap: 16px;
-              max-width: 520px;
-              margin: 0 auto 14px;
-              font-family: Arial, sans-serif;
+              margin: 28px auto 0;
+              width: 100%;
+              max-width: 760px;
             }
-            .date-box {
-              border: 1px solid rgba(200,155,60,.78);
-              border-radius: 8px;
-              padding: 12px;
-              background: rgba(255,255,255,.58);
-              box-shadow: inset 0 0 0 1px rgba(11,30,91,.12);
+            .info-card {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              padding: 18px 20px;
+              border-radius: 20px;
+              background: rgba(255,255,255,.95);
+              border: 1px solid rgba(196,162,39,.35);
+              box-shadow: 0 4px 18px rgba(11,35,71,.06);
             }
-            .date-box span {
-              display: block;
-              margin-bottom: 5px;
+            .info-card span {
               font-size: 10px;
               font-weight: 800;
+              letter-spacing: .24em;
               text-transform: uppercase;
-              color: #0b1e5b;
+              color: ${detailText};
             }
-            .date-box strong {
-              color: #0b1e5b;
-              font-size: 18px;
+            .info-card strong {
+              font-size: 24px;
+              line-height: 1.2;
+              color: ${textColor};
             }
-            .message {
-              max-width: 640px;
-              margin: 0 auto 11px;
-              color: #27345e;
-              font-family: Arial, sans-serif;
+            .verse-banner {
+              margin: 28px auto 0;
+              padding: 18px 24px;
+              max-width: 780px;
+              border-radius: 24px;
+              background: ${frameColor};
+              border: 1px solid ${goldColor};
+              color: white;
+              text-align: center;
               font-size: 14px;
-              line-height: 1.64;
+              line-height: 1.7;
             }
-            .verse {
-              max-width: 620px;
-              margin: 0 auto 12px;
-              color: #ad7f2c;
-              font-size: 14px;
-              font-style: italic;
-              line-height: 1.55;
-            }
-            .signature {
-              max-width: 230px;
-              max-height: 70px;
-              object-fit: contain;
-              margin: 2px auto 1px;
+            .verse-banner strong {
               display: block;
+              margin-top: 6px;
+              font-size: 12px;
+              color: ${goldColor};
+            }
+            .signature-grid {
+              display: grid;
+              grid-template-columns: repeat(3, minmax(0, 1fr));
+              gap: 18px;
+              margin-top: 28px;
+            }
+            .signature-block {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 10px;
             }
             .signature-line {
-              min-width: 260px;
-              display: inline-block;
-              border-bottom: 1px solid #0b1e5b;
-              padding: 0 20px 5px;
-              color: #0b1e5b;
-              font-family: "Brush Script MT", "Segoe Script", cursive;
-              font-size: 24px;
+              width: 220px;
+              height: 1px;
+              background: rgba(11,35,71,.2);
             }
-            .pastor-label {
-              margin-top: 2px;
-              color: #0b1e5b;
-              font-family: Arial, sans-serif;
+            .signature-title {
               font-size: 11px;
-              font-weight: 800;
-              letter-spacing: 1px;
+              letter-spacing: .18em;
               text-transform: uppercase;
+              color: ${detailText};
             }
-            .church {
-              margin-top: 12px;
-              color: #0b1e5b;
-              font-size: 22px;
-              font-weight: 800;
+            .signature-name {
+              font-size: 14px;
+              font-weight: 700;
+              color: ${textColor};
             }
-            .seal {
-              width: 92px;
-              height: 108px;
-              margin: 5px auto 0;
-              display: block;
-            }
-            .seal .official-seal { width: 92px; height: 108px; display: block; }
-            .validation {
+            .seal-holder {
               position: absolute;
-              right: 18px;
-              bottom: 18px;
+              left: 42px;
+              bottom: 42px;
+              width: 108px;
+              height: 108px;
+            }
+            .qr-holder {
+              position: absolute;
+              right: 42px;
+              bottom: 42px;
               display: flex;
               align-items: center;
-              gap: 8px;
-              z-index: 2;
-              color: #0b1e5b;
-              font-family: Arial, sans-serif;
-              font-size: 9px;
-              text-align: left;
+              gap: 12px;
+              background: rgba(255,255,255,.94);
+              border: 1px solid rgba(11,35,71,.12);
+              border-radius: 24px;
+              padding: 12px 14px;
             }
-            .validation img {
-              width: 56px;
-              height: 56px;
-              padding: 3px;
-              background: #fff;
-              border: 1px solid rgba(200,155,60,.45);
+            .qr-holder img {
+              width: 72px;
+              height: 72px;
+              border-radius: 18px;
+              background: white;
+              padding: 8px;
+              border: 1px solid rgba(0,0,0,.08);
             }
-            @media print { body { background: #f8f4ea; } }
+            .qr-holder div {
+              font-size: 11px;
+              color: ${detailText};
+              line-height: 1.4;
+            }
+            .qr-holder strong {
+              display: block;
+              color: ${textColor};
+              font-size: 12px;
+              margin-top: 4px;
+            }
+            @media print {
+              body { background: white; }
+              .page { box-shadow: none; margin: 0 auto; }
+            }
           </style>
         </head>
         <body>
-          <main class="certificate">
-            <div class="corner tl"></div>
-            <div class="corner tr"></div>
-            <div class="corner bl"></div>
-            <div class="corner br"></div>
-            <div class="content">
-              <div class="topbar">
-                <span class="number">${escapeHtml(certificateForm.certificateNumber)}</span>
-                <span class="top-church">${escapeHtml(certificateForm.churchName || "Nome da Igreja")}</span>
-              </div>
+          <div class="page">
+            <div class="watermark">
+              <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="120" cy="120" r="98" stroke="#0B2347" stroke-width="2" fill="none" />
+                <circle cx="120" cy="120" r="70" stroke="#0B2347" stroke-width="1" fill="none" />
+                <path d="M40 120H200M120 40V200M64 60C106 108 176 108 216 60M64 180C106 132 176 132 216 180" fill="none" stroke="#0B2347" stroke-width="1" />
+                <path d="M112 74H128V132H154V150H128V208H112V150H86V132H112Z" fill="#0B2347" opacity="0.9" />
+              </svg>
+            </div>
+            <div class="certificate">
               ${logoHtml}
-              <div class="cross">+</div>
-              <h1>CERTIFICADO</h1>
-              <h2>DE APRESENTACAO DE CRIANCA</h2>
-              <div class="divider"></div>
-              <p class="small">Certificamos que, no dia da apresentacao, os pais</p>
-              <div class="script">${escapeHtml(certificateForm.fatherName || "Nome do Pai")}</div>
-              <p class="small">e</p>
-              <div class="script">${escapeHtml(certificateForm.motherName || "Nome da Mae")}</div>
-              <p class="small">apresentaram diante de Deus e da igreja a crianca</p>
-              <div class="script child">${escapeHtml(certificateForm.childName || "Nome da Crianca")}</div>
-              <div class="dates">
-                <div class="date-box"><span>Data de nascimento</span><strong>${formatDate(certificateForm.birthDate)}</strong></div>
-                <div class="date-box"><span>Data da apresentacao</span><strong>${formatDate(certificateForm.presentationDate)}</strong></div>
+              <div class="title-main">CERTIFICADO</div>
+              <div class="title-sub">DE APRESENTAÇÃO AO SENHOR</div>
+              <div class="label-cert">CERTIFICAMOS QUE</div>
+              <div class="child-name">${escapeHtml(certificateForm.childName || "NOME DA CRIANÇA")}</div>
+              <div class="copy">Certificamos que o(a) menor acima identificado(a) foi ${childPronoun} ao Senhor Jesus Cristo, conforme os princípios da Palavra de Deus e o exemplo deixado por nosso Salvador, recebendo a oração de consagração perante a Igreja.</div>
+              <div class="info-grid">
+                <div class="info-card"><span>Data da Apresentação</span><strong>${formatDate(certificateForm.presentationDate)}</strong></div>
+                <div class="info-card"><span>Igreja</span><strong>${escapeHtml(certificateForm.churchName || "Igreja Internacional da Graça de Deus")}</strong></div>
               </div>
-              <p class="message">
-                Como ato de fe e compromisso, esta crianca foi consagrada ao Senhor,
-                para que seja criada nos caminhos do Senhor e em amor e obediencia a Sua Palavra.
-              </p>
-              ${verseHtml}
-              ${signatureHtml}
-              <div class="pastor-label">Pastor</div>
-              <div class="church">${escapeHtml(certificateForm.churchName || "Nome da Igreja")}</div>
-              <div class="seal">${officialSealHtml}</div>
+              <div class="verse-banner">"${escapeHtml(verseText)}"${verseReference ? `<strong>${escapeHtml(verseReference)}</strong>` : ""}</div>
+              <div class="signature-grid">
+                <div class="signature-block">
+                  ${certificateForm.pastorSignature ? `<img class="signature" src="${certificateForm.pastorSignature}" alt="Assinatura do pastor" />` : `<div class="signature-line"></div>`}
+                  <div class="signature-name">${escapeHtml(certificateForm.pastorName || "Nome do Pastor")}</div>
+                  <div class="signature-title">Pastor Responsável</div>
+                </div>
+                <div class="signature-block">
+                  <div class="signature-line"></div>
+                  <div class="signature-name">${escapeHtml(certificateForm.fatherName || "Nome do Pai")} & ${escapeHtml(certificateForm.motherName || "Nome da Mãe")}</div>
+                  <div class="signature-title">Pais ou Responsáveis</div>
+                </div>
+                <div class="signature-block">
+                  <div class="signature-line"></div>
+                  <div class="signature-name">${escapeHtml(certificateForm.churchName || "Igreja da Graça")}</div>
+                  <div class="signature-title">Igreja da Graça</div>
+                </div>
+              </div>
+              <div class="seal-holder">${sealHtml}</div>
+              <div class="qr-holder">
+                <img src="${certificateQrCodeDataUrl}" alt="QR Code de validação" />
+                <div><strong>Validação</strong>${escapeHtml(certificateForm.certificateNumber)}</div>
+              </div>
             </div>
-            <div class="validation">
-              <img src="${certificateQrCodeDataUrl}" alt="QR Code de validacao" />
-              <div><strong>Validacao</strong><br />${escapeHtml(certificateForm.certificateNumber)}</div>
-            </div>
-          </main>
-          <script>window.onload = () => setTimeout(() => window.print(), 300);</script>
+          </div>
         </body>
-      </html>
-    `;
+      </html>`;
   };
-
   const handleGenerateCertificate = () => {
     if (!requiredComplete) {
       alert("Preencha todos os campos obrigatorios antes de gerar o certificado.");
@@ -806,6 +793,22 @@ export default function Certificates() {
               <TextInput label="Nome do Pai" required value={form.fatherName} onChange={(value) => updateField("fatherName", value)} />
               <TextInput label="Nome da Mae" required value={form.motherName} onChange={(value) => updateField("motherName", value)} />
               <TextInput label="Nome da Crianca" required value={form.childName} onChange={(value) => updateField("childName", value)} />
+              <div className="grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => updateField("childGender", "boy")}
+                  className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition ${form.childGender === "boy" ? "border-blue-300 bg-blue-500/15 text-blue-100" : "border-white/10 bg-white/5 text-zinc-200 hover:border-blue-400/40"}`}
+                >
+                  Menino
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateField("childGender", "girl")}
+                  className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition ${form.childGender === "girl" ? "border-pink-300 bg-pink-500/15 text-pink-100" : "border-white/10 bg-white/5 text-zinc-200 hover:border-pink-400/40"}`}
+                >
+                  Menina
+                </button>
+              </div>
               <DateInput label="Data de nascimento" required value={form.birthDate} onChange={(value) => updateField("birthDate", value)} />
               <DateInput label="Data da apresentacao" required value={form.presentationDate} onChange={(value) => updateField("presentationDate", value)} />
               <TextInput label="Versiculo biblico opcional" value={form.bibleVerse} onChange={(value) => updateField("bibleVerse", value)} />
@@ -1056,90 +1059,97 @@ function DateInput({
 }
 
 function PremiumCertificatePreview({ form, qrCodeDataUrl }: { form: CertificateForm; qrCodeDataUrl: string }) {
+  const isGirl = form.childGender === "girl";
+  const childPronoun = isGirl ? "apresentada" : "apresentado";
+  const frameColor = "#0B2347";
+  const goldColor = "#C9A227";
+  const paper = "#F8F5EE";
+  const detailText = "#4f5165";
+  const accent = isGirl ? "#CF6C9B" : "#2C77D8";
+  const logoName = form.churchName || "Igreja Internacional da Graça de Deus";
+  const rawVerse = form.bibleVerse.trim() || "Deixai vir a mim os pequeninos, porque deles é o Reino de Deus.";
+  const [verseText, verseReference] = rawVerse.includes("-")
+    ? rawVerse.split("-").map((part) => part.trim())
+    : [rawVerse, "Marcos 10:14"];
+
   return (
-    <div className="mx-auto max-w-[640px] rounded-xl bg-[#0B1E5B] p-2 text-[#0B1E5B] shadow-2xl">
-      <div className="relative min-h-[860px] overflow-hidden border-2 border-[#C89B3C] bg-gradient-to-br from-[#071742] via-[#0B1E5B] to-[#071742] p-5 text-center">
-        <span className="absolute inset-3 border-2 border-[#C89B3C]/90" />
-        <div className="relative min-h-[820px] overflow-hidden rounded-[34px] border-2 border-[#C89B3C]/85 bg-[#F8F4EA] px-8 py-8 shadow-inner">
-          <span className="absolute -top-24 left-1/2 h-40 w-[112%] -translate-x-1/2 rounded-[50%] border-b-8 border-[#C89B3C] shadow-[0_8px_0_#F5D98D,0_16px_0_#0B1E5B]" />
-          <span className="absolute -bottom-24 left-1/2 h-40 w-[112%] -translate-x-1/2 rounded-[50%] border-t-8 border-[#C89B3C] shadow-[0_-8px_0_#F5D98D,0_-16px_0_#0B1E5B]" />
-          <span className="pointer-events-none absolute inset-[18px] border border-[#0B1E5B]/25 outline outline-1 -outline-offset-[7px] outline-[#C89B3C]/60" />
-          <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[230px] leading-none text-[#0B1E5B]/[0.035]">+</span>
-          <span className="absolute left-4 top-4 h-24 w-24 rounded-tl-2xl border-l-[3px] border-t-[3px] border-[#C89B3C] after:absolute after:left-3 after:top-3 after:h-12 after:w-12 after:rounded-tl-xl after:border-l-2 after:border-t-2 after:border-[#0B1E5B]/70" />
-          <span className="absolute right-4 top-4 h-24 w-24 rounded-tr-2xl border-r-[3px] border-t-[3px] border-[#C89B3C] after:absolute after:right-3 after:top-3 after:h-12 after:w-12 after:rounded-tr-xl after:border-r-2 after:border-t-2 after:border-[#0B1E5B]/70" />
-          <span className="absolute bottom-4 left-4 h-24 w-24 rounded-bl-2xl border-b-[3px] border-l-[3px] border-[#C89B3C] after:absolute after:bottom-3 after:left-3 after:h-12 after:w-12 after:rounded-bl-xl after:border-b-2 after:border-l-2 after:border-[#0B1E5B]/70" />
-          <span className="absolute bottom-4 right-4 h-24 w-24 rounded-br-2xl border-b-[3px] border-r-[3px] border-[#C89B3C] after:absolute after:bottom-3 after:right-3 after:h-12 after:w-12 after:rounded-br-xl after:border-b-2 after:border-r-2 after:border-[#0B1E5B]/70" />
-
-          <div className="relative z-10 flex items-center justify-between gap-4 text-[10px] font-black uppercase tracking-wider">
-            <span className="rounded-full border border-[#C89B3C]/70 bg-white/60 px-3 py-1">{form.certificateNumber}</span>
-            <span className="max-w-[170px] truncate text-right">{form.churchName || "Nome da Igreja"}</span>
+    <div className="mx-auto max-w-[700px] rounded-3xl p-3 shadow-[0_20px_60px_rgba(0,0,0,0.18)]" style={{ background: paper }}>
+      <div className="relative overflow-hidden rounded-[34px] border-8" style={{ borderColor: frameColor, background: paper }}>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(11,35,71,0.08)_0%,_transparent_42%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(201,162,39,0.12)_0%,_transparent_35%)]" />
+        <div className="absolute inset-0 border-4 border-[#C9A227]" />
+        <div className="relative flex min-h-[880px] flex-col justify-between p-10">
+          <div className="absolute inset-0 grid place-items-center opacity-10">
+            <div className="text-[220px] font-black uppercase tracking-[0.26em] text-[#0B2347]">IIGD</div>
           </div>
-
-          {form.churchLogo && (
-            <div className="relative z-10 mx-auto -mt-1 grid h-[190px] w-[330px] place-items-center">
-              <img src={form.churchLogo} alt="Logotipo da igreja" className="h-[178px] w-[310px] object-contain" />
+          <div className="relative z-10 space-y-5">
+            <div className="mx-auto flex h-[72px] w-[280px] items-center justify-center rounded-3xl bg-white/90 border border-[#0B2347]/10 px-6 text-center text-xs font-black uppercase tracking-[0.28em] text-[#0B2347] shadow-sm">
+              {form.churchLogo ? <img src={form.churchLogo} alt="Logotipo da igreja" className="max-h-[56px] object-contain" /> : logoName}
             </div>
-          )}
-
-          <div className="relative z-10 -mt-1 text-2xl text-[#C89B3C]">+</div>
-          <h1 className="relative z-10 mt-1 font-serif text-[56px] font-black uppercase leading-none tracking-[0.18em] text-[#0B1E5B]">
-            Certificado
-          </h1>
-          <h2 className="relative z-10 mt-3 font-serif text-xl font-bold uppercase tracking-[0.12em] text-[#C89B3C]">
-            de Apresentacao de Crianca
-          </h2>
-          <div className="relative z-10 mx-auto mt-4 h-px w-56 bg-gradient-to-r from-transparent via-[#C89B3C] to-transparent" />
-
-          <p className="relative z-10 mt-6 text-sm text-[#27345e]">Certificamos que, no dia da apresentacao, os pais</p>
-          <p className="relative z-10 mt-2 font-serif text-3xl italic text-[#0B1E5B]">{form.fatherName || "Nome do Pai"}</p>
-          <p className="relative z-10 mt-1 text-sm text-[#27345e]">e</p>
-          <p className="relative z-10 mt-1 font-serif text-3xl italic text-[#0B1E5B]">{form.motherName || "Nome da Mae"}</p>
-          <p className="relative z-10 mt-4 text-sm text-[#27345e]">apresentaram diante de Deus e da igreja a crianca</p>
-          <p className="relative z-10 mt-2 font-serif text-5xl italic text-[#C89B3C]">{form.childName || "Nome da Crianca"}</p>
-
-          <div className="relative z-10 mx-auto mt-5 grid max-w-md grid-cols-2 gap-4">
-            <div className="rounded-lg border border-[#C89B3C]/80 bg-white/50 p-3 shadow-inner">
-              <p className="text-[10px] font-black uppercase">Data de nascimento</p>
-              <p className="mt-1 text-sm font-black">{formatDate(form.birthDate)}</p>
+            <div className="flex items-center justify-center gap-3">
+              <div className="h-1 w-20 rounded-full bg-[#0B2347]" />
+              <div className="text-sm font-semibold uppercase tracking-[0.36em] text-[#C9A227]">certificado</div>
+              <div className="h-1 w-20 rounded-full bg-[#0B2347]" />
             </div>
-            <div className="rounded-lg border border-[#C89B3C]/80 bg-white/50 p-3 shadow-inner">
-              <p className="text-[10px] font-black uppercase">Data da apresentacao</p>
-              <p className="mt-1 text-sm font-black">{formatDate(form.presentationDate)}</p>
+            <div className="text-center">
+              <div className="text-[52px] font-serif font-black uppercase leading-none tracking-[0.16em] text-[#0B2347]">CERTIFICADO</div>
+              <div className="mt-2 text-[16px] font-semibold uppercase tracking-[0.26em] text-[#C9A227]">de apresentação ao Senhor</div>
+            </div>
+            <div className="mx-auto inline-flex rounded-full border border-[#0B2347] bg-white/90 px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#0B2347]">
+              Certificamos que
+            </div>
+            <div className="mx-auto max-w-[680px] text-center text-[54px] font-serif font-black uppercase leading-none tracking-[0.06em] text-[#0B2347]">
+              {form.childName || "Nome da Criança"}
+            </div>
+            <p className="mx-auto max-w-[720px] text-center text-sm leading-7 text-[#4f5165]">
+              Certificamos que o(a) menor acima identificado(a) foi <span className="font-semibold text-[#0B2347]">{childPronoun}</span> ao Senhor Jesus Cristo, conforme os princípios da Palavra de Deus e o exemplo deixado por nosso Salvador, recebendo a oração de consagração perante a Igreja.
+            </p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-[24px] border border-[#C9A227]/30 bg-white/90 p-5 shadow-[0_8px_24px_rgba(11,35,71,0.08)]">
+                <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4f5165]">Data da Apresentação</div>
+                <div className="mt-3 text-[22px] font-semibold text-[#0B2347]">{formatDate(form.presentationDate)}</div>
+              </div>
+              <div className="rounded-[24px] border border-[#C9A227]/30 bg-white/90 p-5 shadow-[0_8px_24px_rgba(11,35,71,0.08)]">
+                <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4f5165]">Igreja</div>
+                <div className="mt-3 text-[22px] font-semibold text-[#0B2347]">{form.churchName || "Igreja Internacional da Graça de Deus"}</div>
+              </div>
+            </div>
+            <div className="mx-auto mt-2 max-w-[760px] rounded-[26px] border border-[#0B2347]/10 bg-[#0B2347] px-6 py-5 text-center text-sm font-semibold leading-7 text-white shadow-sm">
+              {verseText}
+              <span className="mt-2 block text-[11px] text-[#E0C66C]">{verseReference}</span>
             </div>
           </div>
 
-          <p className="relative z-10 mx-auto mt-5 max-w-md text-sm leading-6 text-[#27345e]">
-            Como ato de fe e compromisso, esta crianca foi consagrada ao Senhor, para que seja criada nos caminhos do Senhor
-            e em amor e obediencia a Sua Palavra.
-          </p>
-          {form.bibleVerse.trim() && (
-            <p className="relative z-10 mx-auto mt-2 max-w-md text-sm italic leading-6 text-[#AD7F2C]">"{form.bibleVerse}"</p>
-          )}
+          <div className="relative z-10 grid gap-5 lg:grid-cols-[1.12fr_0.66fr]">
+            <div className="grid gap-5 md:grid-cols-2">
+              <div className="signature-block rounded-[24px] border border-[#C9A227]/25 bg-white/95 p-5 text-center shadow-[0_10px_24px_rgba(11,35,71,0.08)]">
+                {form.pastorSignature ? (
+                  <img src={form.pastorSignature} alt="Assinatura do pastor" className="mx-auto h-16 object-contain" />
+                ) : (
+                  <div className="mx-auto h-[1px] w-40 bg-[#4f5165]" />
+                )}
+                <div className="mt-3 text-[14px] font-semibold text-[#0B2347]">{form.pastorName || "Nome do Pastor"}</div>
+                <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-[#4f5165]">Pastor Responsável</div>
+              </div>
+              <div className="signature-block rounded-[24px] border border-[#C9A227]/25 bg-white/95 p-5 text-center shadow-[0_10px_24px_rgba(11,35,71,0.08)]">
+                <div className="mx-auto h-[1px] w-40 bg-[#4f5165]" />
+                <div className="mt-3 text-[14px] font-semibold text-[#0B2347]">{form.fatherName || "Nome do Pai"} & {form.motherName || "Nome da Mãe"}</div>
+                <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-[#4f5165]">Pais ou Responsáveis</div>
+              </div>
+            </div>
 
-          <div className="relative z-10 mt-5 flex flex-col items-center">
-            {form.pastorSignature ? (
-              <img src={form.pastorSignature} alt="Assinatura do pastor" className="max-h-16 max-w-[220px] object-contain" />
-            ) : (
-              <p className="min-w-[230px] border-b border-[#0B1E5B] pb-1 font-serif text-2xl italic">
-                {form.pastorName || "Nome do Pastor"}
-              </p>
-            )}
-            <p className="mt-1 text-[11px] font-black uppercase tracking-widest">Pastor</p>
-          </div>
-
-          <p className="relative z-10 mt-4 font-serif text-xl font-black text-[#0B1E5B]">{form.churchName || "Nome da Igreja"}</p>
-          <div
-            className="relative z-10 mx-auto mt-2 h-[108px] w-[92px]"
-            dangerouslySetInnerHTML={{ __html: buildOfficialSealSvg(92) }}
-          />
-
-          <div className="absolute bottom-5 right-5 z-10 flex items-center gap-2 text-left text-[9px] font-bold text-[#0B1E5B]">
-            <img src={qrCodeDataUrl} alt="QR Code de validacao" className="h-14 w-14 bg-white p-1" />
-            <span>
-              Validacao
-              <br />
-              {form.certificateNumber}
-            </span>
+            <div className="relative rounded-[24px] border border-[#C9A227]/25 bg-white/95 p-5 shadow-[0_10px_24px_rgba(11,35,71,0.08)]">
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-full bg-[#C9A227] px-4 py-1 text-[10px] uppercase tracking-[0.28em] text-[#0B2347]">Selo Oficial</div>
+              <div className="flex h-full flex-col items-center justify-center gap-4 pt-6">
+                <div className="h-[112px] w-[112px]" dangerouslySetInnerHTML={{ __html: buildOfficialSealSvg(112) }} />
+                <div className="text-center text-[11px] font-semibold uppercase tracking-[0.24em] text-[#4f5165]">Validação digital</div>
+                <div className="rounded-3xl border border-[#0B2347]/10 bg-[#F8F5EE] p-3">
+                  <img src={qrCodeDataUrl} alt="QR Code de validação" className="mx-auto h-24 w-24 rounded-2xl bg-white p-2" />
+                  <div className="mt-3 text-[11px] text-[#4f5165]">Código</div>
+                  <div className="text-[12px] font-semibold text-[#0B2347]">{form.certificateNumber}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

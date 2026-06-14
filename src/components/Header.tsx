@@ -1,11 +1,117 @@
 import { Bell, Search, Calendar, Plus, Users, UserPlus, Heart, Wallet, X, Lock, Sparkles, Moon, Sun } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchServerMembers, fetchServerVisitors } from "../services/crm.service";
+import { cacheRecordsWithoutEmbeddedPhotos } from "../utils/localCache";
+
+type NotificationType = "member" | "visitor";
+
+interface RegistrationRecord {
+  id?: number | string;
+  name?: string;
+  source?: string;
+  createdByMobile?: boolean;
+  createdAt?: string;
+  registrationDate?: string;
+  visitDate?: string;
+}
+
+interface HeaderNotification {
+  id: string;
+  text: string;
+  sub: string;
+  type: NotificationType;
+  link: string;
+  createdAtMs: number;
+}
+
+const READ_NOTIFICATIONS_KEY = "crm_read_registration_notifications";
+
+function safeParseRecords(key: string): RegistrationRecord[] {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function getRecordTime(record: RegistrationRecord) {
+  const rawDate = record.createdAt || record.registrationDate || record.visitDate || "";
+  const parsedDate = rawDate ? new Date(rawDate.includes("T") ? rawDate : `${rawDate}T00:00:00`).getTime() : 0;
+  const idTime = typeof record.id === "number" ? record.id : Number(record.id || 0);
+
+  return Number.isFinite(parsedDate) && parsedDate > 0 ? parsedDate : Number.isFinite(idTime) ? idTime : 0;
+}
+
+function getSourceLabel(record: RegistrationRecord) {
+  return record.createdByMobile || record.source === "mobile" ? "enviado pelo cadastro mobile" : "registrado no sistema";
+}
+
+function formatNotificationDate(timestamp: number) {
+  if (!timestamp) return "Data nao informada";
+
+  return new Date(timestamp).toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function readStoredNotificationIds() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(READ_NOTIFICATIONS_KEY) || "[]");
+    return new Set<string>(Array.isArray(parsed) ? parsed.map(String) : []);
+  } catch {
+    return new Set<string>();
+  }
+}
+
+function buildRegistrationNotifications(members: RegistrationRecord[], visitors: RegistrationRecord[]) {
+  const memberNotifications = members
+    .filter((member) => String(member.name || "").trim())
+    .map((member): HeaderNotification => {
+      const createdAtMs = getRecordTime(member);
+
+      return {
+        id: `member-${member.id || member.name}-${createdAtMs}`,
+        text: `Novo membro: ${String(member.name || "").trim()}`,
+        sub: `${getSourceLabel(member)} em ${formatNotificationDate(createdAtMs)}`,
+        type: "member",
+        link: "/app/members",
+        createdAtMs,
+      };
+    });
+
+  const visitorNotifications = visitors
+    .filter((visitor) => String(visitor.name || "").trim())
+    .map((visitor): HeaderNotification => {
+      const createdAtMs = getRecordTime(visitor);
+
+      return {
+        id: `visitor-${visitor.id || visitor.name}-${createdAtMs}`,
+        text: `Novo visitante: ${String(visitor.name || "").trim()}`,
+        sub: `${getSourceLabel(visitor)} em ${formatNotificationDate(createdAtMs)}`,
+        type: "visitor",
+        link: "/app/visitors",
+        createdAtMs,
+      };
+    });
+
+  return [...memberNotifications, ...visitorNotifications]
+    .sort((a, b) => b.createdAtMs - a.createdAtMs)
+    .slice(0, 12);
+}
 
 export default function Header() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<HeaderNotification[]>([]);
+  const [readNotificationIds, setReadNotificationIds] = useState<Set<string>>(() => readStoredNotificationIds());
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [theme, setTheme] = useState<"dark" | "professional">(() => {
@@ -19,6 +125,52 @@ export default function Header() {
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const loadCachedNotifications = () => {
+      const cachedMembers = safeParseRecords("members_data");
+      const cachedVisitors = safeParseRecords("visitors_data");
+      setNotifications(buildRegistrationNotifications(cachedMembers, cachedVisitors));
+    };
+
+    const loadServerNotifications = async () => {
+      try {
+        const [membersResponse, visitorsResponse] = await Promise.all([
+          fetchServerMembers(),
+          fetchServerVisitors(),
+        ]);
+        const serverMembers = membersResponse?.members || [];
+        const serverVisitors = visitorsResponse?.visitors || [];
+
+        cacheRecordsWithoutEmbeddedPhotos("members_data", serverMembers);
+        cacheRecordsWithoutEmbeddedPhotos("visitors_data", serverVisitors);
+        setNotifications(buildRegistrationNotifications(serverMembers, serverVisitors));
+      } catch (error) {
+        console.warn("Nao foi possivel carregar alertas de cadastro do servidor:", error);
+        loadCachedNotifications();
+      }
+    };
+
+    loadCachedNotifications();
+    loadServerNotifications();
+
+    const interval = window.setInterval(() => {
+      loadCachedNotifications();
+      loadServerNotifications();
+    }, 15000);
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === "members_data" || event.key === "visitors_data") {
+        loadCachedNotifications();
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("storage", handleStorage);
+    };
   }, []);
 
   useEffect(() => {
@@ -57,13 +209,19 @@ export default function Header() {
     navigate(path, { state: { openModal: true } });
   };
 
-  // Static notification list - birthday members
-  const notifications = [
-    { id: 1, text: "🎂 Sandra Regina faz aniversário hoje!", sub: "Clique para enviar parabéns", type: "birthday", link: "/app/members" },
-    { id: 2, text: "🎂 Lucas Rocha faz aniversário hoje!", sub: "Clique para enviar parabéns", type: "birthday", link: "/app/members" },
-    { id: 3, text: "👤 Novo visitante: Clarice Lima", sub: "Registrado em 10/05/2026", type: "visitor", link: "/app/visitors" },
-    { id: 4, text: "💰 Dízimo de Anderson Silva registrado", sub: "R$ 800,00 via Pix", type: "financial", link: "/app/financial" },
-  ];
+  const unreadNotifications = notifications.filter((notif) => !readNotificationIds.has(notif.id));
+  const unreadCount = unreadNotifications.length;
+
+  const markNotificationsAsRead = (items = notifications) => {
+    if (items.length === 0) return;
+
+    setReadNotificationIds((current) => {
+      const next = new Set(current);
+      items.forEach((item) => next.add(item.id));
+      localStorage.setItem(READ_NOTIFICATIONS_KEY, JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   // Quick search results based on static data
   const quickSearchData = [
@@ -163,27 +321,57 @@ export default function Header() {
         {/* Notification Bell */}
         <div className="relative" ref={notifRef}>
           <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="relative p-2 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
+            onClick={() => {
+              setShowNotifications(!showNotifications);
+            }}
+            className={`relative p-2 rounded-xl transition-all border ${
+              unreadCount > 0
+                ? "text-purple-200 bg-purple-500/10 border-purple-500/30 shadow-lg shadow-purple-500/10 animate-pulse"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border-transparent hover:border-white/10"
+            }`}
           >
             <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
+            {unreadCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-purple-500 px-1 text-[10px] font-black text-white ring-2 ring-zinc-950">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </button>
 
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-80 rounded-xl bg-zinc-950 border border-white/10 p-2 shadow-2xl z-50 backdrop-blur-xl">
               <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex justify-between items-center">
-                <span>Notificações ({notifications.length})</span>
+                <span>Alertas de cadastro ({unreadCount})</span>
                 <button onClick={() => setShowNotifications(false)} className="text-zinc-600 hover:text-zinc-400">
                   <X size={14} />
                 </button>
               </div>
-              {notifications.map(notif => (
+              {unreadNotifications.length === 0 && (
+                <div className="px-3 py-8 text-center">
+                  <Bell className="mx-auto mb-2 text-zinc-600" size={24} />
+                  <p className="text-xs font-semibold text-zinc-400">Nenhum alerta pendente.</p>
+                  <p className="mt-1 text-[10px] text-zinc-600">Quando chegar um novo cadastro, ele aparecerá aqui.</p>
+                </div>
+              )}
+              {unreadNotifications.map(notif => (
                 <button
                   key={notif.id}
-                  onClick={() => { navigate(notif.link); setShowNotifications(false); }}
+                  onClick={() => {
+                    markNotificationsAsRead([notif]);
+                    navigate(notif.link);
+                    setShowNotifications(false);
+                  }}
                   className="w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-white/5 transition-all border border-transparent"
                 >
+                  <div
+                    className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${
+                      notif.type === "member"
+                        ? "border-purple-500/20 bg-purple-500/10 text-purple-300"
+                        : "border-blue-500/20 bg-blue-500/10 text-blue-300"
+                    }`}
+                  >
+                    {notif.type === "member" ? <Users size={15} /> : <UserPlus size={15} />}
+                  </div>
                   <div className="flex-1">
                     <p className="text-xs font-semibold text-zinc-200">{notif.text}</p>
                     <p className="text-[10px] text-zinc-500 mt-0.5">{notif.sub}</p>

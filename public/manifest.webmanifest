@@ -1,0 +1,26 @@
+{
+  "name": "Bom Samaritano - Gestao Pastoral",
+  "short_name": "Bom Samaritano",
+  "description": "Aplicativo mobile para cadastros pastorais de membros e visitantes.",
+  "start_url": "/mobile",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#05050b",
+  "theme_color": "#00A884",
+  "categories": ["productivity", "business"],
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

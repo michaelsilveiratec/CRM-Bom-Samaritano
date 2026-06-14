@@ -15,9 +15,17 @@ app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+function devLog(...args) {
+  if (process.env.NODE_ENV !== "production") {
+    console.info(...args);
+  }
+}
+
 const USERS_FILE_PATH = path.resolve(__dirname, "users.json");
 const MEMBERS_FILE_PATH = path.resolve(__dirname, "members.json");
 const VISITORS_FILE_PATH = path.resolve(__dirname, "visitors.json");
+const CHILDREN_FILE_PATH = path.resolve(__dirname, "children.json");
+const YOUTH_FILE_PATH = path.resolve(__dirname, "youth.json");
 const SETTINGS_FILE_PATH = path.resolve(__dirname, "settings.json");
 const FINANCIAL_FILE_PATH = path.resolve(__dirname, "financial.json");
 const DISCIPLESHIP_FILE_PATH = path.resolve(__dirname, "discipleship.json");
@@ -107,6 +115,8 @@ function saveData(filePath, data) {
 
 const membersData = loadData(MEMBERS_FILE_PATH, []);
 const visitorsData = loadData(VISITORS_FILE_PATH, []);
+const childrenData = loadData(CHILDREN_FILE_PATH, []);
+const youthData = loadData(YOUTH_FILE_PATH, []);
 const financialData = loadData(FINANCIAL_FILE_PATH, []);
 const discipleshipData = loadData(DISCIPLESHIP_FILE_PATH, {
   journeys: [],
@@ -135,6 +145,14 @@ function persistMembers() {
 
 function persistVisitors() {
   saveData(VISITORS_FILE_PATH, visitorsData);
+}
+
+function persistChildren() {
+  saveData(CHILDREN_FILE_PATH, childrenData);
+}
+
+function persistYouth() {
+  saveData(YOUTH_FILE_PATH, youthData);
 }
 
 function persistFinancial() {
@@ -226,7 +244,7 @@ function generateResetToken() {
 async function sendPasswordResetEmail(email, resetToken, name) {
   const resetUrl = `${FRONTEND_URL}/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(resetToken)}`;
   // Log reset URL for local development troubleshooting
-  console.log(`🔗 Password reset URL for ${email}: ${resetUrl}`);
+  devLog(`🔗 Password reset URL for ${email}: ${resetUrl}`);
   const mailOptions = {
     from: `"CRM Bom Samaritano" <${process.env.GMAIL_USER || "no-reply@bomsamaritano.org"}>`,
     to: email,
@@ -263,7 +281,7 @@ async function handleForgotPassword(req, res) {
     if (user && process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
       await sendPasswordResetEmail(email, resetToken, user.name);
     }
-    console.log(`🔐 Password reset requested for ${email}. Token stored until ${new Date(expiresAt).toISOString()}`);
+    devLog(`🔐 Password reset requested for ${email}. Token stored until ${new Date(expiresAt).toISOString()}`);
     return res.json({ success: true, message: "E-mail de redefinição enviado. Verifique sua caixa de entrada." });
   } catch (err) {
     console.error("Erro ao enviar e-mail de recuperação:", err);
@@ -382,7 +400,7 @@ app.post("/api/auth/request-otp", async (req, res) => {
 
   try {
     await Promise.all(tasks);
-    console.log(`✅ OTP ${otpCode} gerado para ${key}`);
+    devLog(`✅ OTP gerado para ${key}`);
     return res.json({ success: true, message: "Código enviado com sucesso.", debug: process.env.NODE_ENV === "development" ? { code: otpCode } : undefined });
   } catch (err) {
     console.error("Erro ao enviar OTP:", err);
@@ -992,6 +1010,278 @@ app.delete("/api/visitors/:id", (req, res) => {
   return res.json({ success: true, message: "Visitante deletado com sucesso.", visitor: deletedVisitor });
 });
 
+app.get("/api/children", (req, res) => {
+  return res.json({ success: true, children: childrenData });
+});
+
+app.post("/api/children", (req, res) => {
+  const {
+    name,
+    role,
+    phone,
+    email,
+    cellName,
+    address,
+    neighborhood,
+    city,
+    maritalStatus,
+    registrationDate,
+    baptismDate,
+    birthDate,
+    visitDate,
+    referredBy,
+    status,
+    notes,
+    photoUrl,
+    source,
+  } = req.body;
+
+  if (!name || !phone) {
+    return res.status(400).json({ success: false, error: "Nome e telefone são obrigatórios." });
+  }
+
+  const newChild = {
+    id: Date.now(),
+    name: String(name).trim(),
+    role: String(role || "Criança").trim(),
+    phone: String(phone).trim(),
+    email: String(email || "").trim(),
+    cellName: String(cellName || "").trim(),
+    address: String(address || "").trim(),
+    neighborhood: String(neighborhood || "").trim(),
+    city: String(city || "").trim(),
+    maritalStatus: String(maritalStatus || "").trim(),
+    registrationDate: String(registrationDate || new Date().toISOString().split("T")[0]).trim(),
+    baptismDate: String(baptismDate || "").trim(),
+    birthDate: String(birthDate || "").trim(),
+    visitDate: String(visitDate || "").trim(),
+    referredBy: String(referredBy || "").trim(),
+    status: String(status || "Ativo").trim(),
+    notes: String(notes || "").trim(),
+    photoUrl: photoUrl ? String(photoUrl).trim() : undefined,
+    source: source ? String(source).trim() : undefined,
+    createdByMobile: source === "mobile",
+    createdAt: new Date().toISOString(),
+  };
+
+  childrenData.push(newChild);
+  persistChildren();
+
+  return res.json({ success: true, child: newChild });
+});
+
+app.put("/api/children/:id", (req, res) => {
+  const childId = parseInt(req.params.id, 10);
+  const childIndex = childrenData.findIndex((c) => c.id === childId);
+
+  if (childIndex === -1) {
+    return res.status(404).json({ success: false, error: "Criança não encontrada." });
+  }
+
+  const existingChild = childrenData[childIndex];
+  const {
+    name,
+    role,
+    phone,
+    email,
+    cellName,
+    address,
+    neighborhood,
+    city,
+    maritalStatus,
+    baptismDate,
+    birthDate,
+    visitDate,
+    referredBy,
+    status,
+    notes,
+    photoUrl,
+  } = req.body;
+
+  const finalName = name ?? existingChild.name;
+  const finalPhone = phone ?? existingChild.phone;
+
+  if (!finalName || !finalPhone) {
+    return res.status(400).json({ success: false, error: "Nome e telefone são obrigatórios." });
+  }
+
+  const updatedChild = {
+    ...existingChild,
+    name: String(finalName).trim(),
+    role: String(role ?? existingChild.role ?? "Criança").trim(),
+    phone: String(finalPhone).trim(),
+    email: String(email ?? existingChild.email ?? "").trim(),
+    cellName: String(cellName ?? existingChild.cellName ?? "").trim(),
+    address: String(address ?? existingChild.address ?? "").trim(),
+    neighborhood: String(neighborhood ?? existingChild.neighborhood ?? "").trim(),
+    city: String(city ?? existingChild.city ?? "").trim(),
+    maritalStatus: String(maritalStatus ?? existingChild.maritalStatus ?? "").trim(),
+    baptismDate: String(baptismDate ?? existingChild.baptismDate ?? "").trim(),
+    birthDate: String(birthDate ?? existingChild.birthDate ?? "").trim(),
+    visitDate: String(visitDate ?? existingChild.visitDate ?? "").trim(),
+    referredBy: String(referredBy ?? existingChild.referredBy ?? "").trim(),
+    status: String(status ?? existingChild.status ?? "Ativo").trim(),
+    notes: String(notes ?? existingChild.notes ?? "").trim(),
+    photoUrl: photoUrl ? String(photoUrl).trim() : existingChild.photoUrl,
+  };
+
+  childrenData[childIndex] = updatedChild;
+  persistChildren();
+
+  return res.json({ success: true, child: updatedChild });
+});
+
+app.delete("/api/children/:id", (req, res) => {
+  const childId = parseInt(req.params.id, 10);
+  const childIndex = childrenData.findIndex((c) => c.id === childId);
+
+  if (childIndex === -1) {
+    return res.status(404).json({ success: false, error: "Criança não encontrada." });
+  }
+
+  const deletedChild = childrenData[childIndex];
+  childrenData.splice(childIndex, 1);
+  persistChildren();
+
+  return res.json({ success: true, message: "Criança deletada com sucesso.", child: deletedChild });
+});
+
+app.get("/api/youth", (req, res) => {
+  return res.json({ success: true, youth: youthData });
+});
+
+app.post("/api/youth", (req, res) => {
+  const {
+    name,
+    role,
+    phone,
+    email,
+    cellName,
+    address,
+    neighborhood,
+    city,
+    maritalStatus,
+    registrationDate,
+    baptismDate,
+    birthDate,
+    visitDate,
+    referredBy,
+    status,
+    notes,
+    photoUrl,
+    source,
+  } = req.body;
+
+  if (!name || !phone) {
+    return res.status(400).json({ success: false, error: "Nome e telefone são obrigatórios." });
+  }
+
+  const newYouth = {
+    id: Date.now(),
+    name: String(name).trim(),
+    role: String(role || "Jovem").trim(),
+    phone: String(phone).trim(),
+    email: String(email || "").trim(),
+    cellName: String(cellName || "").trim(),
+    address: String(address || "").trim(),
+    neighborhood: String(neighborhood || "").trim(),
+    city: String(city || "").trim(),
+    maritalStatus: String(maritalStatus || "").trim(),
+    registrationDate: String(registrationDate || new Date().toISOString().split("T")[0]).trim(),
+    baptismDate: String(baptismDate || "").trim(),
+    birthDate: String(birthDate || "").trim(),
+    visitDate: String(visitDate || "").trim(),
+    referredBy: String(referredBy || "").trim(),
+    status: String(status || "Ativo").trim(),
+    notes: String(notes || "").trim(),
+    photoUrl: photoUrl ? String(photoUrl).trim() : undefined,
+    source: source ? String(source).trim() : undefined,
+    createdByMobile: source === "mobile",
+    createdAt: new Date().toISOString(),
+  };
+
+  youthData.push(newYouth);
+  persistYouth();
+
+  return res.json({ success: true, youth: newYouth });
+});
+
+app.put("/api/youth/:id", (req, res) => {
+  const youthId = parseInt(req.params.id, 10);
+  const youthIndex = youthData.findIndex((y) => y.id === youthId);
+
+  if (youthIndex === -1) {
+    return res.status(404).json({ success: false, error: "Jovem não encontrado." });
+  }
+
+  const existingYouth = youthData[youthIndex];
+  const {
+    name,
+    role,
+    phone,
+    email,
+    cellName,
+    address,
+    neighborhood,
+    city,
+    maritalStatus,
+    baptismDate,
+    birthDate,
+    visitDate,
+    referredBy,
+    status,
+    notes,
+    photoUrl,
+  } = req.body;
+
+  const finalName = name ?? existingYouth.name;
+  const finalPhone = phone ?? existingYouth.phone;
+
+  if (!finalName || !finalPhone) {
+    return res.status(400).json({ success: false, error: "Nome e telefone são obrigatórios." });
+  }
+
+  const updatedYouth = {
+    ...existingYouth,
+    name: String(finalName).trim(),
+    role: String(role ?? existingYouth.role ?? "Jovem").trim(),
+    phone: String(finalPhone).trim(),
+    email: String(email ?? existingYouth.email ?? "").trim(),
+    cellName: String(cellName ?? existingYouth.cellName ?? "").trim(),
+    address: String(address ?? existingYouth.address ?? "").trim(),
+    neighborhood: String(neighborhood ?? existingYouth.neighborhood ?? "").trim(),
+    city: String(city ?? existingYouth.city ?? "").trim(),
+    maritalStatus: String(maritalStatus ?? existingYouth.maritalStatus ?? "").trim(),
+    baptismDate: String(baptismDate ?? existingYouth.baptismDate ?? "").trim(),
+    birthDate: String(birthDate ?? existingYouth.birthDate ?? "").trim(),
+    visitDate: String(visitDate ?? existingYouth.visitDate ?? "").trim(),
+    referredBy: String(referredBy ?? existingYouth.referredBy ?? "").trim(),
+    status: String(status ?? existingYouth.status ?? "Ativo").trim(),
+    notes: String(notes ?? existingYouth.notes ?? "").trim(),
+    photoUrl: photoUrl ? String(photoUrl).trim() : existingYouth.photoUrl,
+  };
+
+  youthData[youthIndex] = updatedYouth;
+  persistYouth();
+
+  return res.json({ success: true, youth: updatedYouth });
+});
+
+app.delete("/api/youth/:id", (req, res) => {
+  const youthId = parseInt(req.params.id, 10);
+  const youthIndex = youthData.findIndex((y) => y.id === youthId);
+
+  if (youthIndex === -1) {
+    return res.status(404).json({ success: false, error: "Jovem não encontrado." });
+  }
+
+  const deletedYouth = youthData[youthIndex];
+  youthData.splice(youthIndex, 1);
+  persistYouth();
+
+  return res.json({ success: true, message: "Jovem deletado com sucesso.", youth: deletedYouth });
+});
+
 app.post("/api/messages/birthday", async (req, res) => {
   const { phone, memberName, pastorName } = req.body;
 
@@ -1023,7 +1313,7 @@ app.post("/api/messages/birthday", async (req, res) => {
     const response = await axios.post(`https://graph.facebook.com/v20.0/${PHONE_ID}/messages`, payload, {
       headers: { Authorization: `Bearer ${WHATSAPP_TOKEN}`, "Content-Type": "application/json" },
     });
-    console.log(`✅ WhatsApp de aniversário enviado para ${memberName} (${formattedPhone})`, response.data);
+    devLog(`✅ WhatsApp de aniversário enviado para ${memberName} (${formattedPhone})`, response.data);
     return res.status(200).json({ success: true, message: "Enviado com sucesso!", data: response.data });
   } catch (err) {
     console.error("⚠️ Erro WhatsApp (Aniversário):", err.response?.data || err.message);
@@ -1064,13 +1354,13 @@ app.post("/api/messages/send-whatsapp", async (req, res) => {
         if (apiKey) {
           apiUrl += apiUrl.includes("?") ? `&token=${encodeURIComponent(apiKey)}` : `?token=${encodeURIComponent(apiKey)}`;
         }
-        console.log(`DEBUG UltraMSG IMAGE request: ${apiUrl}`);
-        console.log(`DEBUG UltraMSG IMAGE body: ${formBody.toString()}`);
+        devLog(`DEBUG UltraMSG IMAGE request: ${apiUrl}`);
+        devLog(`DEBUG UltraMSG IMAGE body: ${formBody.toString()}`);
 
         const response = await axios.post(apiUrl, formBody.toString(), {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         });
-        console.log(`🚀 Disparo UltraMSG (IMAGE) realizado para ${finalPhoneWithPlus}`);
+        devLog(`🚀 Disparo UltraMSG (IMAGE) realizado para ${finalPhoneWithPlus}`);
         return res.json({ success: true, data: response.data });
       }
 
@@ -1085,15 +1375,15 @@ app.post("/api/messages/send-whatsapp", async (req, res) => {
       if (apiKey) {
         apiUrl += apiUrl.includes("?") ? `&token=${encodeURIComponent(apiKey)}` : `?token=${encodeURIComponent(apiKey)}`;
       }
-      console.log(`DEBUG UltraMSG request: ${apiUrl}`);
-      console.log(`DEBUG UltraMSG body: ${formBody.toString()}`);
+      devLog(`DEBUG UltraMSG request: ${apiUrl}`);
+      devLog(`DEBUG UltraMSG body: ${formBody.toString()}`);
 
       const response = await axios.post(apiUrl, formBody.toString(), {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-      console.log(`🚀 Disparo UltraMSG realizado para ${finalPhoneWithPlus}`);
+      devLog(`🚀 Disparo UltraMSG realizado para ${finalPhoneWithPlus}`);
       return res.json({ success: true, data: response.data });
     }
 
@@ -1105,7 +1395,7 @@ app.post("/api/messages/send-whatsapp", async (req, res) => {
           apikey: apiKey,
         },
       });
-      console.log(`🚀 Disparo Evolution/WPPConnect realizado para ${finalPhone}`);
+      devLog(`🚀 Disparo Evolution/WPPConnect realizado para ${finalPhone}`);
       return res.json({ success: true, data: response.data });
     }
 
@@ -1119,7 +1409,7 @@ app.post("/api/messages/send-whatsapp", async (req, res) => {
     const response = await axios.post(apiUrl, payload, {
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     });
-    console.log(`🚀 Disparo Meta Cloud API realizado para ${finalPhone}`);
+    devLog(`🚀 Disparo Meta Cloud API realizado para ${finalPhone}`);
     return res.json({ success: true, data: response.data });
   } catch (err) {
     console.error("❌ Erro no disparo de WhatsApp Backend:", err.response?.data || err.message);
@@ -1132,9 +1422,9 @@ app.post("/api/scheduler/status", (req, res) => {
   try {
     const { enabled, dispatchTime } = req.body;
 
-    console.log(`⚙️  Scheduler Status Updated:`);
-    console.log(`   Enabled: ${enabled}`);
-    console.log(`   Dispatch Time: ${dispatchTime}`);
+    devLog(`⚙️  Scheduler Status Updated:`);
+    devLog(`   Enabled: ${enabled}`);
+    devLog(`   Dispatch Time: ${dispatchTime}`);
 
     // Store in environment or could persist to file if needed
     process.env.BIRTHDAY_SCHEDULER_ENABLED = String(enabled);
@@ -1217,7 +1507,7 @@ async function sendWhatsApp(toPhone, otpCode) {
 
 const PORT = 3001;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor de Autenticação rodando na porta ${PORT}`);
+  devLog(`🚀 Servidor de Autenticação rodando na porta ${PORT}`);
   // Start birthday message scheduler
   startScheduler();
 });
