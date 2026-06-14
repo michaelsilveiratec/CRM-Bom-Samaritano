@@ -12,6 +12,13 @@ const MEMBERS_FILE = path.join(__dirname, "members.json");
 const LAST_SENT_FILE = path.join(__dirname, ".birthday-sent.json");
 const ULTRAMSG_INSTANCE = process.env.ULTRAMSG_INSTANCE || "";
 const ULTRAMSG_TOKEN = process.env.ULTRAMSG_TOKEN || "";
+
+function devLog(...args) {
+  if (process.env.NODE_ENV !== "production") {
+    console.info(...args);
+  }
+}
+
 function isSchedulerEnabled() {
   return String(process.env.BIRTHDAY_SCHEDULER_ENABLED || "true").toLowerCase() !== "false";
 }
@@ -28,7 +35,7 @@ function getLastSentData() {
       return JSON.parse(data);
     }
   } catch (err) {
-    console.log("Note: .birthday-sent.json not found or invalid, will create new one");
+    devLog("Note: .birthday-sent.json not found or invalid, will create new one");
   }
   return { date: null, sentMembers: [] };
 }
@@ -103,7 +110,7 @@ async function sendBirthdayMessage(member) {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 
-      console.log(`✅ Parabéns COM FOTO enviado para ${name} (${finalPhoneWithPlus}) - ID: ${response.data.id}`);
+      devLog(`✅ Parabéns COM FOTO enviado para ${name} (${finalPhoneWithPlus}) - ID: ${response.data.id}`);
       return { success: true, id: response.data.id };
     } else {
       // Send as text only
@@ -115,7 +122,7 @@ async function sendBirthdayMessage(member) {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 
-      console.log(`✅ Parabéns ENVIADO para ${name} (${finalPhoneWithPlus}) - ID: ${response.data.id}`);
+      devLog(`✅ Parabéns ENVIADO para ${name} (${finalPhoneWithPlus}) - ID: ${response.data.id}`);
       return { success: true, id: response.data.id };
     }
   } catch (err) {
@@ -159,8 +166,8 @@ async function checkAndSendBirthdays() {
       return;
     }
 
-    console.log(`\n🎂 BIRTHDAY DISPATCH - ${new Date().toLocaleString("pt-BR")}`);
-    console.log(`Found ${birthdayMembers.length} birthday(ies) today`);
+    devLog(`\n🎂 BIRTHDAY DISPATCH - ${new Date().toLocaleString("pt-BR")}`);
+    devLog(`Found ${birthdayMembers.length} birthday(ies) today`);
 
     const sentMembers = [];
     for (const member of birthdayMembers) {
@@ -174,7 +181,7 @@ async function checkAndSendBirthdays() {
 
     // Save that we sent today
     saveLastSentData({ date: today, sentMembers });
-    console.log(`✅ All birthday messages sent and logged!\n`);
+    devLog(`✅ All birthday messages sent and logged!\n`);
   } catch (err) {
     console.error("❌ Error in birthday scheduler:", err.message);
   }
@@ -182,10 +189,10 @@ async function checkAndSendBirthdays() {
 
 // Start scheduler
 function startScheduler() {
-  console.log(`🎂 Birthday Scheduler started`);
-  console.log(`⏰ Scheduled time: ${getScheduledTime()}`);
-  console.log(`📱 UltraMsg Instance: ${ULTRAMSG_INSTANCE || "not configured"}`);
-  console.log(`🔄 Checking every minute...\n`);
+  devLog(`🎂 Birthday Scheduler started`);
+  devLog(`⏰ Scheduled time: ${getScheduledTime()}`);
+  devLog(`📱 UltraMsg Instance: ${ULTRAMSG_INSTANCE || "not configured"}`);
+  devLog(`🔄 Checking every minute...\n`);
 
   // Check immediately on startup
   checkAndSendBirthdays();

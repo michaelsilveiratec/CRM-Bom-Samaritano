@@ -35,8 +35,7 @@ interface BirthdaySchedule {
   error?: string;
 }
 
-const STORAGE_KEY = "birthday_schedules";
-
+const STORAGE_KEY = "birthday_schedules";const AUTO_CLEANUP_DAYS = 30; // Remove scheduled items older than 30 days
 const defaultMessage = `Graca e paz, {nome}!
 
 Hoje a {igreja} celebra sua vida com muita alegria.
@@ -84,10 +83,30 @@ function normalizeStoredSchedules(value: string | null): BirthdaySchedule[] {
   }
 }
 
+function cleanupOldSchedules(schedules: BirthdaySchedule[]): BirthdaySchedule[] {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - AUTO_CLEANUP_DAYS);
+  
+  return schedules.filter((schedule) => {
+    // Keep: pending items, recent items, or items with errors that might need retry
+    if (schedule.status === "pendente") return true;
+    if (schedule.status === "erro") return true;
+    
+    // Remove: old sent items (older than 30 days)
+    if (schedule.status === "enviado" && schedule.sentAt) {
+      const sentDate = new Date(schedule.sentAt);
+      return sentDate > thirtyDaysAgo;
+    }
+    
+    return true;
+  });
+}
+
 export default function BirthdayScheduler() {
-  const [schedules, setSchedules] = useState<BirthdaySchedule[]>(() =>
-    normalizeStoredSchedules(localStorage.getItem(STORAGE_KEY))
-  );
+  const [schedules, setSchedules] = useState<BirthdaySchedule[]>(() => {
+    const loaded = normalizeStoredSchedules(localStorage.getItem(STORAGE_KEY));
+    return cleanupOldSchedules(loaded);
+  });
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -150,8 +169,16 @@ export default function BirthdayScheduler() {
         maxHeight: 1280,
         initialQuality: 0.85,
       });
+      const sizeKB = Math.round(dataUrlSize(base64) / 1024);
       setPhotoPreview(base64);
       setFormData((prev) => ({ ...prev, photoUrl: base64, photoName: file.name }));
+      
+      // Check if storage is getting full
+      const currentStorageSize = JSON.stringify(schedules).length;
+      const totalEstimate = currentStorageSize + dataUrlSize(base64);
+      if (totalEstimate > 9 * 1024 * 1024) {
+        showAlert(`⚠️ Armazenamento quase cheio! Foto: ${sizeKB}KB. Considere remover agendamentos antigos.`);
+      }
     } catch (err: any) {
       showAlert(`Nao foi possivel processar a imagem: ${err.message}`);
     } finally {
@@ -213,7 +240,7 @@ export default function BirthdayScheduler() {
       setSchedules((prev) =>
         prev.map((item) =>
           item.id === schedule.id
-            ? { ...item, status: "enviado", sentAt: new Date().toISOString(), error: undefined }
+            ? { ...item, status: "enviado", sentAt: new Date().toISOString(), error: undefined, photoUrl: null }
             : item
         )
       );
@@ -254,6 +281,37 @@ export default function BirthdayScheduler() {
     const interval = window.setInterval(processDueSchedules, 30 * 1000);
     return () => window.clearInterval(interval);
   }, [schedules]);
+
+  // Automatic cleanup of old sent schedules (daily) and space management
+  useEffect(() => {
+    const performCleanup = () => {
+      setSchedules((prev) => {
+        const cleaned = cleanupOldSchedules(prev);
+        
+        // Also remove photos from pending schedules to save space if needed
+        const storageSize = JSON.stringify(prev).length;
+        if (storageSize > 8 * 1024 * 1024) { // If over 8MB, remove photos from old pending items
+          return cleaned.map((item) => {
+            if (item.status === "pendente" && item.photoUrl) {
+              const createdDate = new Date(item.createdAt);
+              const daysSinceCreation = Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+              if (daysSinceCreation > 3) { // Remove photos older than 3 days
+                return { ...item, photoUrl: null };
+              }
+            }
+            return item;
+          });
+        }
+        
+        return cleaned;
+      });
+    };
+
+    // Run cleanup on mount and daily
+    performCleanup();
+    const dailyInterval = window.setInterval(performCleanup, 24 * 60 * 60 * 1000);
+    return () => window.clearInterval(dailyInterval);
+  }, []);
 
   const getStatusStyle = (status: ScheduleStatus) => {
     switch (status) {

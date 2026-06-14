@@ -9,6 +9,7 @@ import {
   Wallet,
   MessageSquare,
   FileText,
+  Gift,
   Settings,
   LogOut
 } from "lucide-react";
@@ -58,10 +59,13 @@ export default function Sidebar() {
     { icon: LayoutDashboard, label: "Dashboard", path: "/app/dashboard" },
     { icon: UserPlus, label: "Visitantes", path: "/app/visitors" },
     { icon: Users, label: "Membros", path: "/app/members" },
+    { icon: UserPlus, label: "Crianças", path: "/app/children" },
+    { icon: UserPlus, label: "Jovens", path: "/app/youth" },
     { icon: Heart, label: "Discipulado", path: "/app/discipleship" },
     { icon: Droplets, label: "Batismo", path: "/app/baptism" },
     { icon: Wallet, label: "Financeiro", path: "/app/financial" },
     { icon: MessageSquare, label: "Mensagens", path: "/app/messages" },
+    { icon: Gift, label: "Aniversariantes", path: "/app/birthdays" },
     { icon: FileText, label: "Certificados", path: "/app/certificates" },
     { icon: Settings, label: "Configurações", path: "/app/settings" },
   ];

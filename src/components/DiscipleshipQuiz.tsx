@@ -221,15 +221,18 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, journeyId, 
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
+          /* certificate inside the A4 page: fixed 640x480 landscape for digital export/preview */
           .certificate-container {
-            width: 297mm;
-            height: 210mm;
+            width: 640px;
+            height: 480px;
             background: #ffffff;
             position: relative;
             box-sizing: border-box;
-            padding: 20mm;
+            padding: 24px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             overflow: hidden;
+            margin: auto; /* center inside the page */
+            transform-origin: center center;
           }
           .bg-pattern {
             position: absolute;
@@ -242,15 +245,17 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, journeyId, 
           }
           .border-outer {
             position: absolute;
-            top: 10mm; left: 10mm; right: 10mm; bottom: 10mm;
+            top: 16px; left: 16px; right: 16px; bottom: 16px;
             border: 2px solid #1e3a8a;
             z-index: 2;
+            box-sizing: border-box;
           }
           .border-inner {
             position: absolute;
-            top: 11.5mm; left: 11.5mm; right: 11.5mm; bottom: 11.5mm;
+            top: 26px; left: 26px; right: 26px; bottom: 26px;
             border: 1px solid #b45309;
             z-index: 2;
+            box-sizing: border-box;
           }
           .content {
             position: relative;
@@ -337,7 +342,7 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, journeyId, 
           }
           .seal-container {
             position: absolute;
-            bottom: 25mm;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -361,8 +366,8 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, journeyId, 
           }
           .cert-number {
             position: absolute;
-            bottom: 15mm;
-            right: 15mm;
+            bottom: 18px;
+            right: 18px;
             font-family: 'Montserrat', sans-serif;
             font-size: 10px;
             color: #94a3b8;
@@ -370,8 +375,8 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, journeyId, 
           }
           .date-box {
             position: absolute;
-            bottom: 15mm;
-            left: 15mm;
+            bottom: 18px;
+            left: 18px;
             font-family: 'Montserrat', sans-serif;
             font-size: 10px;
             color: #94a3b8;
@@ -380,6 +385,8 @@ export default function DiscipleshipQuiz({ discipleName, mentorName, journeyId, 
           @media print {
             body { background: white; }
             .certificate-container { box-shadow: none; }
+            /* Keep the 640x480 certificate centered on A4 landscape when printing */
+            .certificate-container { margin: 0; position: relative; left: 50%; transform: translateX(-50%); }
           }
         </style>
       </head>

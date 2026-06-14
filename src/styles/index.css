@@ -462,6 +462,49 @@ html[data-theme="professional"] main input[type="checkbox"] {
   accent-color: #00A884;
 }
 
+html[data-theme="professional"] .birthdays-page .text-rose-100,
+html[data-theme="professional"] .birthdays-page .text-rose-200,
+html[data-theme="professional"] .birthdays-page .text-rose-300,
+html[data-theme="professional"] .birthdays-page .text-rose-400,
+html[data-theme="professional"] .birthdays-page .text-emerald-100,
+html[data-theme="professional"] .birthdays-page .text-emerald-200,
+html[data-theme="professional"] .birthdays-page .text-emerald-300,
+html[data-theme="professional"] .birthdays-page .text-amber-100,
+html[data-theme="professional"] .birthdays-page .text-amber-200,
+html[data-theme="professional"] .birthdays-page .text-amber-300 {
+  color: #017561 !important;
+}
+
+html[data-theme="professional"] .birthdays-page .bg-rose-500\/10,
+html[data-theme="professional"] .birthdays-page .bg-rose-500\/15,
+html[data-theme="professional"] .birthdays-page .bg-rose-500\/20,
+html[data-theme="professional"] .birthdays-page .bg-amber-500\/10,
+html[data-theme="professional"] .birthdays-page .bg-amber-500\/15 {
+  background-color: rgba(0, 168, 132, 0.12) !important;
+}
+
+html[data-theme="professional"] .birthdays-page .border-rose-500\/20,
+html[data-theme="professional"] .birthdays-page .border-rose-500\/30,
+html[data-theme="professional"] .birthdays-page .border-rose-500\/40,
+html[data-theme="professional"] .birthdays-page .border-amber-500\/20,
+html[data-theme="professional"] .birthdays-page .border-amber-500\/30,
+html[data-theme="professional"] .birthdays-page .border-amber-500\/40 {
+  border-color: rgba(0, 168, 132, 0.3) !important;
+}
+
+html[data-theme="professional"] .birthdays-page .bg-amber-500 {
+  background-color: #00A884 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="professional"] .birthdays-page .hover\:bg-amber-400:hover {
+  background-color: #017561 !important;
+}
+
+html[data-theme="professional"] .birthdays-page .focus\:border-rose-500:focus {
+  border-color: #00A884 !important;
+}
+
 .landing-whatsapp {
   --primary: #00A884;
   --primary-dark: #017561;

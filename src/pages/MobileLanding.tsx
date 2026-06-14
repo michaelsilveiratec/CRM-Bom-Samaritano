@@ -1,12 +1,19 @@
-import { ArrowRight, Info, Users, UserPlus } from "lucide-react";
+import { ArrowRight, Download, Info, Users, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchServerSettings } from "../services/crm.service";
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+}
 
 export default function MobileLanding() {
   const [churchName, setChurchName] = useState("Bom Samaritano");
   const [pastorName, setPastorName] = useState("Pastor");
   const [pastorPhoto, setPastorPhoto] = useState("");
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstalled, setIsInstalled] = useState(() => window.matchMedia?.("(display-mode: standalone)").matches || false);
 
   useEffect(() => {
     let isMounted = true;
@@ -27,6 +34,36 @@ export default function MobileLanding() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+
+    const handleInstalled = () => {
+      setInstallPrompt(null);
+      setIsInstalled(true);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleInstalled);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleInstalled);
+    };
+  }, []);
+
+  const handleInstallApp = async () => {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+    if (choice.outcome === "accepted") {
+      setIsInstalled(true);
+    }
+    setInstallPrompt(null);
+  };
+
   return (
     <div className="space-y-5 pb-10">
       <div className="rounded-[2rem] border border-violet-500/30 bg-white/5 p-5 shadow-[0_24px_80px_-40px_rgba(84,73,210,0.25)] backdrop-blur-xl">
@@ -45,6 +82,17 @@ export default function MobileLanding() {
           </div>
         </div>
       </div>
+
+      {!isInstalled && installPrompt ? (
+        <button
+          type="button"
+          onClick={handleInstallApp}
+          className="flex w-full items-center justify-center gap-3 rounded-[1.6rem] border border-emerald-400/30 bg-emerald-500 px-5 py-4 text-sm font-black text-white shadow-lg shadow-emerald-500/20 transition active:scale-[0.98]"
+        >
+          <Download size={18} />
+          Instalar aplicativo
+        </button>
+      ) : null}
 
       <div className="text-xs uppercase tracking-[0.35em] text-zinc-400">O que voce deseja fazer?</div>
 
@@ -76,6 +124,38 @@ export default function MobileLanding() {
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-white">Cadastrar Visitante</h3>
               <p className="mt-1 text-sm text-zinc-300">Adicione um novo visitante a igreja.</p>
+            </div>
+            <ArrowRight size={20} className="text-zinc-300 transition group-hover:text-white" />
+          </div>
+        </Link>
+
+        <Link
+          to="children"
+          className="group block rounded-[2rem] border border-fuchsia-500/20 bg-gradient-to-r from-fuchsia-500/12 to-fuchsia-500/6 p-5 shadow-[0_24px_80px_-55px_rgba(192,38,211,0.35)] transition hover:border-fuchsia-400/40 hover:from-fuchsia-500/22 hover:to-fuchsia-500/12"
+        >
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-fuchsia-500 text-white shadow-lg shadow-fuchsia-500/20">
+              <UserPlus size={22} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white">Cadastrar Criança</h3>
+              <p className="mt-1 text-sm text-zinc-300">Registre uma criança no sistema.</p>
+            </div>
+            <ArrowRight size={20} className="text-zinc-300 transition group-hover:text-white" />
+          </div>
+        </Link>
+
+        <Link
+          to="youth"
+          className="group block rounded-[2rem] border border-orange-500/20 bg-gradient-to-r from-orange-500/12 to-orange-500/6 p-5 shadow-[0_24px_80px_-55px_rgba(251,146,60,0.35)] transition hover:border-orange-400/40 hover:from-orange-500/22 hover:to-orange-500/12"
+        >
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-orange-500 text-white shadow-lg shadow-orange-500/20">
+              <Users size={22} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white">Cadastrar Jovem</h3>
+              <p className="mt-1 text-sm text-zinc-300">Registre um jovem no sistema.</p>
             </div>
             <ArrowRight size={20} className="text-zinc-300 transition group-hover:text-white" />
           </div>

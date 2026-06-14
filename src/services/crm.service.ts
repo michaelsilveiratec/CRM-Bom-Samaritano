@@ -25,6 +25,7 @@ export interface ContactPayload {
 
 export type MemberPayload = ContactPayload;
 export type VisitorPayload = ContactPayload;
+export type StoredContactPayload = ContactPayload & { id: number };
 
 export interface SettingsPayload {
   churchName: string;
@@ -121,6 +122,54 @@ export async function updateServerVisitor(id: number, visitor: Partial<VisitorPa
 
 export async function deleteServerVisitor(id: number) {
   return apiFetch<{ success: boolean; message: string; visitor: VisitorPayload }>(`/api/visitors/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export async function fetchServerChildren() {
+  return apiFetch<{ success: boolean; children: StoredContactPayload[] }>("/api/children");
+}
+
+export async function createServerChild(child: ContactPayload) {
+  return apiFetch<{ success: boolean; child: StoredContactPayload }>("/api/children", {
+    method: "POST",
+    body: JSON.stringify(child),
+  });
+}
+
+export async function updateServerChild(id: number, child: Partial<ContactPayload>) {
+  return apiFetch<{ success: boolean; child: StoredContactPayload }>(`/api/children/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(child),
+  });
+}
+
+export async function deleteServerChild(id: number) {
+  return apiFetch<{ success: boolean; message: string; child: StoredContactPayload }>(`/api/children/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export async function fetchServerYouth() {
+  return apiFetch<{ success: boolean; youth: StoredContactPayload[] }>("/api/youth");
+}
+
+export async function createServerYouth(youth: ContactPayload) {
+  return apiFetch<{ success: boolean; youth: StoredContactPayload }>("/api/youth", {
+    method: "POST",
+    body: JSON.stringify(youth),
+  });
+}
+
+export async function updateServerYouth(id: number, youth: Partial<ContactPayload>) {
+  return apiFetch<{ success: boolean; youth: StoredContactPayload }>(`/api/youth/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(youth),
+  });
+}
+
+export async function deleteServerYouth(id: number) {
+  return apiFetch<{ success: boolean; message: string; youth: StoredContactPayload }>(`/api/youth/${id}`, {
     method: "DELETE",
   });
 }

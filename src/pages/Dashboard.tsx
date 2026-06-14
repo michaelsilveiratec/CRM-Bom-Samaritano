@@ -22,6 +22,7 @@ import {
 import { API_BASE } from "../services/api";
 import { fetchServerMembers, fetchServerSettings, fetchServerVisitors, saveServerSettings } from "../services/crm.service";
 import { createQrCodeDataUrl } from "../utils/qrcode";
+import { cacheRecordsWithoutEmbeddedPhotos } from "../utils/localCache";
 
 interface BirthdayAlert {
   id: number | string;
@@ -31,6 +32,84 @@ interface BirthdayAlert {
   birthDate: string;
 }
 
+type ChartRange = "year" | "last6";
+
+interface ChartPointBreakdown {
+  members: number;
+  visitors: number;
+}
+
+const chartMonthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+function readCachedArray(key: string) {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function getRecordTimestamp(record: any) {
+  const rawDate = record?.createdAt || record?.registrationDate || record?.visitDate || record?.id || "";
+  const parsedDate =
+    typeof rawDate === "number"
+      ? rawDate
+      : new Date(String(rawDate).includes("T") ? String(rawDate) : `${rawDate}T00:00:00`).getTime();
+  const idDate = typeof record?.id === "number" ? record.id : Number(record?.id || 0);
+
+  return Number.isFinite(parsedDate) && parsedDate > 0 ? parsedDate : Number.isFinite(idDate) ? idDate : 0;
+}
+
+function getChartBuckets(range: ChartRange) {
+  const now = new Date();
+
+  if (range === "year") {
+    return chartMonthNames.map((label, month) => ({ label, month, year: now.getFullYear() }));
+  }
+
+  return Array.from({ length: 6 }, (_, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - 5 + index, 1);
+    return {
+      label: chartMonthNames[date.getMonth()],
+      month: date.getMonth(),
+      year: date.getFullYear(),
+    };
+  });
+}
+
+function buildFrequencyChart(members: any[], visitors: any[], range: ChartRange) {
+  const buckets = getChartBuckets(range);
+  const monthlyBreakdown = buckets.map<ChartPointBreakdown>(() => ({ members: 0, visitors: 0 }));
+
+  const addRecord = (record: any, type: keyof ChartPointBreakdown) => {
+    const timestamp = getRecordTimestamp(record);
+    if (!timestamp) return;
+
+    const date = new Date(timestamp);
+    const bucketIndex = buckets.findIndex(
+      (bucket) => bucket.month === date.getMonth() && bucket.year === date.getFullYear()
+    );
+
+    if (bucketIndex >= 0) {
+      monthlyBreakdown[bucketIndex][type] += 1;
+    }
+  };
+
+  members.forEach((member) => addRecord(member, "members"));
+  visitors.forEach((visitor) => addRecord(visitor, "visitors"));
+
+  const totals = monthlyBreakdown.reduce<number[]>((acc, value, index) => {
+    acc[index] = value.members + value.visitors + (acc[index - 1] || 0);
+    return acc;
+  }, []);
+
+  return {
+    totals,
+    breakdown: monthlyBreakdown,
+  };
+}
 export default function Dashboard() {
   const navigate = useNavigate();
   const defaultPastorNames = new Set(["Pr. Anderson Silva", "Pr. Anderson Silva (Google)", "Anderson Silva"]);
@@ -276,7 +355,7 @@ export default function Dashboard() {
             await fetchWeatherByCoords(latitude, longitude);
           },
           async (error) => {
-            console.log("Geolocalização negada, usando fallback de IP:", error.message);
+            console.warn("Geolocalização negada, usando fallback de IP:", error.message);
             try {
               const geoRes = await fetch("https://ipapi.co/json/");
               const geoData = await geoRes.json();
@@ -349,6 +428,9 @@ export default function Dashboard() {
   // Dynamic Recent Activities and Stats
   const [dynamicRecentActivities, setDynamicRecentActivities] = useState<any[]>([]);
   const [chartData, setChartData] = useState<number[]>(Array(12).fill(0));
+  const [chartBreakdown, setChartBreakdown] = useState<ChartPointBreakdown[]>(Array(12).fill(null).map(() => ({ members: 0, visitors: 0 })));
+  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(null);
+  const [chartRange, setChartRange] = useState<ChartRange>("year");
   const [dynamicStats, setDynamicStats] = useState({
     members: 0,
     visitors: 0,
@@ -465,8 +547,6 @@ export default function Dashboard() {
       for (let i = 1; i < 12; i++) {
         monthlyGrowth[i] += monthlyGrowth[i - 1];
       }
-      setChartData(monthlyGrowth);
-
       financeParsed.forEach((f: any) => {
         allActivities.push({
           id: f.id, timestamp: f.id, user: "Tesouraria", type: "financeiro",
@@ -497,13 +577,82 @@ export default function Dashboard() {
     }
   }, [todayMonthDay]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const applyDashboardRecords = (members: any[], visitors: any[]) => {
+      if (!isMounted) return;
+
+      setDynamicStats((current) => ({
+        ...current,
+        members: members.filter((member) => member.status === "Ativo").length,
+        visitors: visitors.length,
+      }));
+      const chart = buildFrequencyChart(members, visitors, chartRange);
+      setChartData(chart.totals);
+      setChartBreakdown(chart.breakdown);
+    };
+
+    const loadCachedDashboardRecords = () => {
+      applyDashboardRecords(readCachedArray("members_data"), readCachedArray("visitors_data"));
+    };
+
+    const loadServerDashboardRecords = async () => {
+      try {
+        const [membersResponse, visitorsResponse] = await Promise.all([
+          fetchServerMembers(),
+          fetchServerVisitors(),
+        ]);
+        const serverMembers = membersResponse?.members || [];
+        const serverVisitors = visitorsResponse?.visitors || [];
+
+        cacheRecordsWithoutEmbeddedPhotos("members_data", serverMembers);
+        cacheRecordsWithoutEmbeddedPhotos("visitors_data", serverVisitors);
+        applyDashboardRecords(serverMembers, serverVisitors);
+      } catch (error) {
+        console.warn("Nao foi possivel atualizar o grafico do dashboard:", error);
+        loadCachedDashboardRecords();
+      }
+    };
+
+    loadCachedDashboardRecords();
+    loadServerDashboardRecords();
+
+    const interval = window.setInterval(() => {
+      loadCachedDashboardRecords();
+      loadServerDashboardRecords();
+    }, 15000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(interval);
+    };
+  }, [chartRange]);
+
   // Calculate SVG Chart Paths based on chartData
   const maxChartVal = Math.max(...chartData, 10);
-  const xCoords = [25, 75, 125, 175, 225, 275, 325, 375, 425, 475, 525, 575];
+  const chartLabels = getChartBuckets(chartRange).map((bucket) => bucket.label);
+  const xCoords = chartData.map((_, i) => {
+    const steps = Math.max(chartData.length - 1, 1);
+    return 25 + (550 / steps) * i;
+  });
   const yCoords = chartData.map(val => 180 - (val / maxChartVal) * 140);
   
   const linePath = xCoords.map((x, i) => `${i === 0 ? 'M' : 'L'} ${x} ${yCoords[i]}`).join(" ");
-  const fillPath = `${linePath} L 575 200 L 25 200 Z`;
+  const firstChartX = xCoords[0] || 25;
+  const lastChartX = xCoords[xCoords.length - 1] || 575;
+  const fillPath = `${linePath} L ${lastChartX} 200 L ${firstChartX} 200 Z`;
+  const hoveredChartPoint =
+    hoveredChartIndex === null
+      ? null
+      : {
+          label: chartLabels[hoveredChartIndex],
+          x: xCoords[hoveredChartIndex] || 0,
+          y: yCoords[hoveredChartIndex] || 0,
+          total: chartData[hoveredChartIndex] || 0,
+          members: chartBreakdown[hoveredChartIndex]?.members || 0,
+          visitors: chartBreakdown[hoveredChartIndex]?.visitors || 0,
+        };
 
   // Dynamically populated stats
   const stats = [
@@ -646,11 +795,17 @@ export default function Dashboard() {
                 <TrendingUp size={18} className="text-purple-400" />
                 Frequência e Crescimento de Culto
               </h4>
-              <p className="text-xs text-zinc-400">Dados consolidados de frequência (Janeiro a Dezembro)</p>
+              <p className="text-xs text-zinc-400">
+                Dados consolidados por cadastro ({chartRange === "year" ? "Janeiro a Dezembro" : "últimos 6 meses"})
+              </p>
             </div>
-            <select className="bg-zinc-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-purple-500">
-              <option>Ano Inteiro</option>
-              <option>Últimos 6 meses</option>
+            <select
+              value={chartRange}
+              onChange={(event) => setChartRange(event.target.value as ChartRange)}
+              className="bg-zinc-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-purple-500"
+            >
+              <option value="year">Ano Inteiro</option>
+              <option value="last6">Últimos 6 meses</option>
             </select>
           </div>
 
@@ -664,7 +819,12 @@ export default function Dashboard() {
             </div>
 
             {/* Custom SVG line with glow */}
-            <svg viewBox="0 0 600 200" className="absolute inset-0 w-full h-full p-2 overflow-visible" preserveAspectRatio="none">
+            <svg
+              viewBox="0 0 600 200"
+              className="absolute inset-0 w-full h-full p-2 overflow-visible"
+              preserveAspectRatio="none"
+              onMouseLeave={() => setHoveredChartIndex(null)}
+            >
               <defs>
                 <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="rgb(139, 92, 246)" stopOpacity="0.4" />
@@ -694,31 +854,51 @@ export default function Dashboard() {
               />
               {/* Dot Markers */}
               {xCoords.map((x, i) => (
-                <circle 
-                  key={i} 
-                  cx={x} 
-                  cy={yCoords[i]} 
-                  r="4" 
-                  fill={i < 4 ? "#818CF8" : i < 8 ? "#9333EA" : "#F472B6"} 
-                  className="transition-all duration-500"
-                />
+                <g key={i} onMouseEnter={() => setHoveredChartIndex(i)} className="cursor-pointer">
+                  <circle cx={x} cy={yCoords[i]} r="14" fill="transparent" />
+                  <circle
+                    cx={x}
+                    cy={yCoords[i]}
+                    r={hoveredChartIndex === i ? "6" : "4"}
+                    fill={i < 4 ? "#818CF8" : i < 8 ? "#9333EA" : "#F472B6"}
+                    className="transition-all duration-200"
+                  />
+                </g>
               ))}
             </svg>
 
+            {hoveredChartPoint && (
+              <div
+                className="pointer-events-none absolute z-20 w-48 -translate-x-1/2 -translate-y-[calc(100%+12px)] rounded-xl border border-white/10 bg-zinc-950/95 p-3 text-xs shadow-2xl shadow-black/30 backdrop-blur-xl"
+                style={{
+                  left: `${(hoveredChartPoint.x / 600) * 100}%`,
+                  top: `${(hoveredChartPoint.y / 200) * 100}%`,
+                }}
+              >
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="font-bold text-white">{hoveredChartPoint.label}</span>
+                  <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-bold text-zinc-400">
+                    Total {hoveredChartPoint.total}
+                  </span>
+                </div>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-400">Membros</span>
+                    <strong className="text-purple-300">{hoveredChartPoint.members}</strong>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-400">Visitantes</span>
+                    <strong className="text-blue-300">{hoveredChartPoint.visitors}</strong>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Labels overlay */}
             <div className="absolute inset-x-0 bottom-[-24px] flex justify-between px-2 text-[10px] font-semibold text-zinc-500">
-              <span>Jan</span>
-              <span>Fev</span>
-              <span>Mar</span>
-              <span>Abr</span>
-              <span>Mai</span>
-              <span>Jun</span>
-              <span>Jul</span>
-              <span>Ago</span>
-              <span>Set</span>
-              <span>Out</span>
-              <span>Nov</span>
-              <span>Dez</span>
+              {chartLabels.map((label) => (
+                <span key={label}>{label}</span>
+              ))}
             </div>
           </div>
         </div>
