@@ -151,7 +151,7 @@ export default function Dashboard() {
         }
       })
       .catch((error) => {
-        console.warn("Nao foi possivel carregar configuracoes do backend local:", error);
+        console.warn("Não foi possível carregar configurações do backend local:", error);
       });
   }, []);
 
@@ -225,7 +225,7 @@ export default function Dashboard() {
         ];
         setBirthdayAlerts(applyBirthdayFilter(serverRecords));
       } catch (error) {
-        console.warn("Nao foi possivel carregar aniversariantes do servidor:", error);
+        console.warn("Não foi possível carregar aniversariantes do servidor:", error);
       }
     };
 
@@ -266,7 +266,7 @@ export default function Dashboard() {
       waAutoDispatch,
       waApiUrl,
     }).catch((error) => {
-      console.warn("Nao foi possivel sincronizar configuracoes com o backend local:", error);
+      console.warn("Não foi possível sincronizar configurações com o backend local:", error);
     });
   }, [pastorName, waAutoDispatch, waApiUrl]);
 
@@ -610,7 +610,7 @@ export default function Dashboard() {
         cacheRecordsWithoutEmbeddedPhotos("visitors_data", serverVisitors);
         applyDashboardRecords(serverMembers, serverVisitors);
       } catch (error) {
-        console.warn("Nao foi possivel atualizar o grafico do dashboard:", error);
+        console.warn("Não foi possível atualizar o grafico do dashboard:", error);
         loadCachedDashboardRecords();
       }
     };
@@ -724,7 +724,7 @@ export default function Dashboard() {
                   Aniversario amanha ({tomorrowBirthdayLabel}): {birthdayAlerts.length} pessoa(s)
                 </h3>
                 <p className="mt-1 text-sm text-amber-100/80">
-                  Programe a mensagem de aniversario para nao deixar passar.
+                  Programe a mensagem de aniversário para não deixar passar.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {birthdayAlerts.slice(0, 6).map((person) => (
@@ -1061,7 +1061,7 @@ export default function Dashboard() {
             <div className="flex h-72 w-72 items-center justify-center rounded-2xl border border-white/10 bg-white p-3">
               {mobileQrError ? (
                 <div className="px-4 text-center text-sm font-semibold text-zinc-900">
-                  Nao foi possivel carregar a imagem do QR. Use o link abaixo.
+                  Não foi possível carregar a imagem do QR. Use o link abaixo.
                 </div>
               ) : (
                 <img
@@ -1085,7 +1085,7 @@ export default function Dashboard() {
                     await navigator.clipboard.writeText(mobileLink);
                     setMobileCopyMsg("Link copiado.");
                   } catch {
-                    setMobileCopyMsg("Nao foi possivel copiar. Selecione o link acima.");
+                    setMobileCopyMsg("Não foi possível copiar. Selecione o link acima.");
                   }
                 }}
                 className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-500"

@@ -14,7 +14,7 @@ export function cacheRecordsWithoutEmbeddedPhotos<T extends PhotoRecord>(key: st
   try {
     localStorage.setItem(key, JSON.stringify(records.map(withoutEmbeddedPhoto)));
   } catch (error) {
-    console.warn(`Nao foi possivel salvar ${key} no cache local:`, error);
+    console.warn(`Não foi possível salvar ${key} no cache local:`, error);
     try {
       localStorage.removeItem(key);
     } catch {

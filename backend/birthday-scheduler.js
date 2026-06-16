@@ -88,7 +88,7 @@ async function sendBirthdayMessage(member) {
 
   try {
     if (!ULTRAMSG_INSTANCE || !ULTRAMSG_TOKEN) {
-      throw new Error("Configure ULTRAMSG_INSTANCE e ULTRAMSG_TOKEN no backend/.env antes do envio automatico.");
+      throw new Error("Configure ULTRAMSG_INSTANCE e ULTRAMSG_TOKEN no backend/.env antes do envio automático.");
     }
 
     const cleanPhone = phone.replace(/\D/g, "");

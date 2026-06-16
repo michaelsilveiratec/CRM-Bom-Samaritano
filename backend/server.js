@@ -197,11 +197,11 @@ function buildLessonEvaluation(lesson = {}) {
   return [
     {
       id: "lesson-theme",
-      question: `Qual alternativa representa melhor a licao "${lesson.title || "enviada"}"?`,
+      question: `Qual alternativa representa melhor a lição "${lesson.title || "enviada"}"?`,
       options: [
         String(firstApplication),
         "Apenas um aviso administrativo",
-        "Um conteudo que nao precisa ser praticado",
+        "Um conteúdo que não precisa ser praticado",
       ],
       correct: 0,
     },
@@ -714,7 +714,7 @@ app.post("/api/discipleship/enrollments", (req, res) => {
 app.get("/api/discipleship/course/:token", (req, res) => {
   const enrollment = discipleshipData.enrollments.find((item) => item.token === req.params.token);
   if (!enrollment) {
-    return res.status(404).json({ success: false, error: "Curso nao encontrado." });
+    return res.status(404).json({ success: false, error: "Curso não encontrado." });
   }
 
   if (["Preparado", "Agendado", "Enviado"].includes(enrollment.status)) {
@@ -730,7 +730,7 @@ app.get("/api/discipleship/course/:token", (req, res) => {
 app.post("/api/discipleship/course/:token/complete", (req, res) => {
   const enrollment = discipleshipData.enrollments.find((item) => item.token === req.params.token);
   if (!enrollment) {
-    return res.status(404).json({ success: false, error: "Curso nao encontrado." });
+    return res.status(404).json({ success: false, error: "Curso não encontrado." });
   }
 
   const lesson = findDiscipleshipLesson(enrollment.journeyId, enrollment.lessonNum);

@@ -185,7 +185,7 @@ export default function Visitors() {
         ));
       } catch (error) {
         console.warn("Falha ao atualizar visitante no backend:", error);
-        alert("Nao foi possivel salvar o visitante no servidor. Verifique se o backend esta rodando na porta 3001.");
+        alert("Não foi possível salvar o visitante no servidor. Verifique se o backend está rodando na porta 3001.");
         return;
       }
     } else {
@@ -231,7 +231,7 @@ export default function Visitors() {
         setVisitors([normalizeVisitor(response.visitor), ...visitors]);
       } catch (error) {
         console.warn("Falha ao salvar visitante no backend:", error);
-        alert("Nao foi possivel salvar o visitante no servidor. Verifique se o backend esta rodando na porta 3001.");
+        alert("Não foi possível salvar o visitante no servidor. Verifique se o backend está rodando na porta 3001.");
         return;
       }
     }
@@ -272,7 +272,7 @@ export default function Visitors() {
     } catch (error) {
       console.warn("Falha ao salvar foto do visitante no backend:", error);
       setVisitors((current) => current.map((v) => (v.id === id ? visitor : v)));
-      alert("Nao foi possivel salvar a foto no servidor. Verifique se o backend esta rodando na porta 3001.");
+      alert("Não foi possível salvar a foto no servidor. Verifique se o backend está rodando na porta 3001.");
     }
   };
 
@@ -281,7 +281,7 @@ export default function Visitors() {
       await deleteServerVisitor(id);
     } catch (error) {
       console.warn("Falha ao deletar visitante no backend:", error);
-      alert("Nao foi possivel deletar o visitante no servidor. Verifique se o backend esta rodando na porta 3001.");
+      alert("Não foi possível deletar o visitante no servidor. Verifique se o backend está rodando na porta 3001.");
       return;
     }
     setVisitors(visitors.filter((v) => v.id !== id));
@@ -312,7 +312,7 @@ export default function Visitors() {
       );
     } catch (error) {
       console.warn("Falha ao atualizar status no backend:", error);
-      alert("Nao foi possivel atualizar o status no servidor. Verifique se o backend esta rodando na porta 3001.");
+      alert("Não foi possível atualizar o status no servidor. Verifique se o backend está rodando na porta 3001.");
       return;
     }
   };
@@ -359,7 +359,7 @@ export default function Visitors() {
                     foto: v.photoUrl || "",
                     nome: v.name,
                     telefone: v.phone,
-                    endereco: v.address || "",
+                    endereço: v.address || "",
                     bairro: v.neighborhood || "",
                     cidade: v.city || "",
                     estado_civil: v.maritalStatus || "",
@@ -376,7 +376,7 @@ export default function Visitors() {
                       { key: "foto", label: "Foto" },
                       { key: "nome", label: "Nome" },
                       { key: "telefone", label: "Telefone" },
-                      { key: "endereco", label: "Endereco" },
+                      { key: "endereço", label: "Endereco" },
                       { key: "bairro", label: "Bairro" },
                       { key: "cidade", label: "Cidade" },
                       { key: "estado_civil", label: "Estado Civil" },
@@ -401,7 +401,7 @@ export default function Visitors() {
                     foto: v.photoUrl || "",
                     nome: v.name,
                     telefone: v.phone,
-                    endereco: v.address || "",
+                    endereço: v.address || "",
                     bairro: v.neighborhood || "",
                     cidade: v.city || "",
                     estado_civil: v.maritalStatus || "",
@@ -418,7 +418,7 @@ export default function Visitors() {
                       { key: "foto", label: "Foto" },
                       { key: "nome", label: "Nome" },
                       { key: "telefone", label: "Telefone" },
-                      { key: "endereco", label: "Endereco" },
+                      { key: "endereço", label: "Endereco" },
                       { key: "bairro", label: "Bairro" },
                       { key: "cidade", label: "Cidade" },
                       { key: "estado_civil", label: "Estado Civil" },

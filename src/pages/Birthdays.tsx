@@ -88,7 +88,7 @@ export default function Birthdays() {
         setMembers(backendMembers);
         cacheRecordsWithoutEmbeddedPhotos("members_data", backendMembers);
       } catch (error) {
-        console.warn("Nao foi possivel carregar aniversariantes do servidor:", error);
+        console.warn("Não foi possível carregar aniversariantes do servidor:", error);
       }
     };
 

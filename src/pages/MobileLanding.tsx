@@ -26,7 +26,7 @@ export default function MobileLanding() {
         setPastorPhoto(response.settings.pastorPhoto || "");
       })
       .catch((error) => {
-        console.warn("Nao foi possivel carregar configuracoes no mobile:", error);
+        console.warn("Não foi possível carregar configurações no mobile:", error);
       });
 
     return () => {
@@ -77,7 +77,7 @@ export default function MobileLanding() {
           </div>
           <div>
             <p className="text-sm font-semibold text-white">{churchName}</p>
-            <p className="text-sm text-zinc-300">Pastor responsavel: {pastorName}</p>
+            <p className="text-sm text-zinc-300">Pastor responsável: {pastorName}</p>
             <p className="mt-1 text-xs text-zinc-400">Cadastros enviados para o sistema principal.</p>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default function MobileLanding() {
           </div>
           <div>
             <p className="text-sm font-semibold text-white">Importante</p>
-            <p className="mt-2 text-sm text-zinc-300">Todos os cadastros feitos aqui serao enviados automaticamente para o sistema principal.</p>
+            <p className="mt-2 text-sm text-zinc-300">Todos os cadastros feitos aqui serão enviados automaticamente para o sistema principal.</p>
           </div>
         </div>
       </div>

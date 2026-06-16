@@ -36,7 +36,7 @@ interface BirthdaySchedule {
 }
 
 const STORAGE_KEY = "birthday_schedules";const AUTO_CLEANUP_DAYS = 30; // Remove scheduled items older than 30 days
-const defaultMessage = `Graca e paz, {nome}!
+const defaultMessage = `Graça e paz, {nome}!
 
 Hoje a {igreja} celebra sua vida com muita alegria.
 Que Deus abencoe seu novo ciclo, fortaleca sua familia e conduza seus passos.
@@ -180,7 +180,7 @@ export default function BirthdayScheduler() {
         showAlert(`⚠️ Armazenamento quase cheio! Foto: ${sizeKB}KB. Considere remover agendamentos antigos.`);
       }
     } catch (err: any) {
-      showAlert(`Nao foi possivel processar a imagem: ${err.message}`);
+      showAlert(`Não foi possível processar a imagem: ${err.message}`);
     } finally {
       setSaving(false);
     }
@@ -198,7 +198,7 @@ export default function BirthdayScheduler() {
     }
 
     if (!formData.message.trim()) {
-      showAlert("Escreva a mensagem que sera enviada.");
+      showAlert("Escreva a mensagem que será enviada.");
       return;
     }
 
@@ -414,7 +414,7 @@ export default function BirthdayScheduler() {
       {alertMessage && (
         <div
           className={`mb-4 p-3 rounded-lg text-sm font-semibold border ${
-            alertMessage.toLowerCase().includes("erro") || alertMessage.toLowerCase().includes("nao")
+            alertMessage.toLowerCase().includes("erro") || alertMessage.toLowerCase().includes("não")
               ? "bg-rose-500/10 text-rose-300 border-rose-500/20"
               : "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
           }`}
@@ -512,7 +512,7 @@ export default function BirthdayScheduler() {
           <div className="w-full max-w-5xl bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl my-8 overflow-hidden">
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-white">Novo disparo de aniversario</h2>
+                <h2 className="text-xl font-bold text-white">Novo disparo de aniversário</h2>
                 <p className="text-xs text-zinc-400 mt-1">
                   Configure o envio com mensagem personalizada e imagem opcional.
                 </p>
@@ -590,7 +590,7 @@ export default function BirthdayScheduler() {
                     value={formData.message}
                     onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
                     rows={8}
-                    placeholder="Escreva a mensagem de aniversario..."
+                    placeholder="Escreva a mensagem de aniversário..."
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-rose-500 resize-none leading-relaxed"
                   />
                   <div className="flex flex-wrap gap-2 mt-2 text-[11px] text-zinc-400">
@@ -655,7 +655,7 @@ export default function BirthdayScheduler() {
                       <MessageSquare size={16} className="text-rose-400" />
                       Preview do WhatsApp
                     </h3>
-                    <p className="text-xs text-zinc-500 mt-1">Assim a mensagem sera montada no envio.</p>
+                    <p className="text-xs text-zinc-500 mt-1">Assim a mensagem será montada no envio.</p>
                   </div>
 
                   <div className="rounded-xl border border-white/10 bg-zinc-900/90 p-4 space-y-3">
@@ -683,7 +683,7 @@ export default function BirthdayScheduler() {
                       <Phone size={14} className="text-emerald-300 mb-2" />
                       <p className="text-zinc-500">Destino</p>
                       <p className="text-zinc-200 font-semibold mt-1 truncate">
-                        {formData.phone || "Nao informado"}
+                        {formData.phone || "Não informado"}
                       </p>
                     </div>
                   </div>
