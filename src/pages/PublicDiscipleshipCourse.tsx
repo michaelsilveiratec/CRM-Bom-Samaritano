@@ -22,7 +22,7 @@ export default function PublicDiscipleshipCourse() {
         setCourse(response);
         setAnswers(Array(response.evaluation?.length || 0).fill(-1));
       } catch (err: any) {
-        setError(err.message || "Nao foi possivel abrir este curso.");
+        setError(err.message || "Não foi possível abrir este curso.");
       } finally {
         setLoading(false);
       }
@@ -40,7 +40,7 @@ export default function PublicDiscipleshipCourse() {
       const response = await completePublicDiscipleshipCourse(token, answers);
       setResult(response);
     } catch (err: any) {
-      setError(err.message || "Nao foi possivel enviar a avaliacao.");
+      setError(err.message || "Não foi possível enviar a avaliação.");
     } finally {
       setSending(false);
     }
@@ -188,12 +188,12 @@ export default function PublicDiscipleshipCourse() {
               <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5 text-center">
                 <Award className="mx-auto mb-3 text-emerald-300" size={40} />
                 <h2 className="text-xl font-bold text-emerald-100">
-                  {canShowDiploma ? "Curso concluido com diploma liberado" : "Licao concluida com presenca validada"}
+                  {canShowDiploma ? "Curso concluido com diploma liberado" : "Lição concluida com presenca validada"}
                 </h2>
                 <p className="mt-2 text-sm text-emerald-100/80">
                   {canShowDiploma
                     ? "Sua conclusao foi registrada no acompanhamento espiritual."
-                    : "Sua resposta foi enviada ao pastor. Aguarde o envio da proxima licao."}
+                    : "Sua resposta foi enviada ao pastor. Aguarde o envio da próxima lição."}
                 </p>
                 {canShowDiploma && (
                   <button
@@ -256,7 +256,7 @@ export default function PublicDiscipleshipCourse() {
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Send size={16} />
-                  <span>{sending ? "Enviando..." : "Enviar avaliacao"}</span>
+                  <span>{sending ? "Enviando..." : "Enviar avaliação"}</span>
                 </button>
               </form>
             )}

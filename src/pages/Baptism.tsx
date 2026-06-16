@@ -194,7 +194,7 @@ export default function Baptism() {
       updateField("photoUrl", compressed);
     } catch (error) {
       console.error(error);
-      alert("Nao foi possivel processar a foto.");
+      alert("Não foi possível processar a foto.");
     } finally {
       event.target.value = "";
     }
@@ -278,7 +278,7 @@ export default function Baptism() {
         visitDate: candidate.createdAt.slice(0, 10),
         referredBy: "Modulo Batismo",
         status: "Ativo",
-        notes: `Convertido automaticamente apos batismo. Pastor responsavel: ${candidate.responsiblePastor}. ${candidate.pastoralNotes || ""}`,
+        notes: `Convertido automaticamente apos batismo. Pastor responsável: ${candidate.responsiblePastor}. ${candidate.pastoralNotes || ""}`,
         photoUrl: candidate.photoUrl || undefined,
         source: "baptism",
       };
@@ -288,7 +288,7 @@ export default function Baptism() {
       setMessage(`${candidate.fullName} foi convertido em membro.`);
       window.setTimeout(() => setMessage(""), 3500);
     } catch (error: any) {
-      alert(error.message || "Nao foi possivel converter em membro.");
+      alert(error.message || "Não foi possível converter em membro.");
     }
   };
 
@@ -747,7 +747,7 @@ export default function Baptism() {
 
               <div class="verse">
                 <span class="book"></span>
-                <span>&ldquo;Quem crer e for batizado sera salvo;&rdquo;<small>Marcos 16:16</small></span>
+                <span>&ldquo;Quem crer e for batizado será salvo;&rdquo;<small>Marcos 16:16</small></span>
               </div>
 
               <div class="info-row">
@@ -900,7 +900,7 @@ export default function Baptism() {
                   <>
                     <UploadCloud size={34} className="text-teal-300" />
                     <span className="mt-3 text-sm font-bold text-zinc-300">Upload da foto</span>
-                    <span className="mt-1 text-xs text-zinc-500">PNG ou JPG com preview automatico</span>
+                    <span className="mt-1 text-xs text-zinc-500">PNG ou JPG com preview automático</span>
                   </>
                 )}
                 <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handlePhotoUpload} className="hidden" />
@@ -950,13 +950,13 @@ export default function Baptism() {
               <TextInput label="Endereco" value={form.address} onChange={(value) => updateField("address", value)} />
               <TextInput label="Bairro" value={form.neighborhood} onChange={(value) => updateField("neighborhood", value)} />
               <TextInput label="Cidade" value={form.city} onChange={(value) => updateField("city", value)} />
-              <SelectInput label="Ja congrega?" value={form.congregates ? "Sim" : "Nao"} options={["Sim", "Nao"]} onChange={(value) => updateField("congregates", value === "Sim")} />
+              <SelectInput label="Já congrega?" value={form.congregates ? "Sim" : "Não"} options={["Sim", "Não"]} onChange={(value) => updateField("congregates", value === "Sim")} />
               <TextInput label="Frequenta ha quanto tempo?" value={form.attendanceTime} onChange={(value) => updateField("attendanceTime", value)} />
-              <SelectInput label="Ja fez discipulado?" value={form.didDiscipleship ? "Sim" : "Nao"} options={["Sim", "Nao"]} onChange={(value) => updateField("didDiscipleship", value === "Sim")} />
-              <SelectInput label="Curso de Batismo concluido?" value={form.baptismCourseDone ? "Sim" : "Nao"} options={["Sim", "Nao"]} onChange={(value) => updateField("baptismCourseDone", value === "Sim")} />
+              <SelectInput label="Já fez discipulado?" value={form.didDiscipleship ? "Sim" : "Não"} options={["Sim", "Não"]} onChange={(value) => updateField("didDiscipleship", value === "Sim")} />
+              <SelectInput label="Curso de Batismo concluído?" value={form.baptismCourseDone ? "Sim" : "Não"} options={["Sim", "Não"]} onChange={(value) => updateField("baptismCourseDone", value === "Sim")} />
               <DateInput label="Data prevista do Batismo" value={form.plannedBaptismDate} onChange={(value) => updateField("plannedBaptismDate", value)} />
               <TextInput label="Local do Batismo" value={form.baptismLocation} onChange={(value) => updateField("baptismLocation", value)} />
-              <TextInput label="Pastor responsavel" value={form.responsiblePastor} onChange={(value) => updateField("responsiblePastor", value)} />
+              <TextInput label="Pastor responsável" value={form.responsiblePastor} onChange={(value) => updateField("responsiblePastor", value)} />
               <SelectInput label="Status do Batizante" value={form.status} options={STATUS_OPTIONS} onChange={(value) => updateField("status", value as BaptismStatus)} />
               {form.status === "Batizado" ? (
                 <DateInput label="Data realizada do Batismo" value={form.baptizedAt || ""} onChange={(value) => updateField("baptizedAt", value)} />
@@ -1113,7 +1113,7 @@ function CandidateList({
                 </span>
               </div>
               <p className="mt-1 text-xs text-zinc-400">
-                {candidate.phone} - {candidate.city || "Cidade nao informada"} - Pastor: {candidate.responsiblePastor || "-"}
+                {candidate.phone} - {candidate.city || "Cidade não informada"} - Pastor: {candidate.responsiblePastor || "-"}
               </p>
               <div className="mt-3 grid gap-2 sm:grid-cols-5">
                 {["Conversao", "Discipulado", "Curso", "Aprovacao", "Batismo"].map((step, index) => {
@@ -1167,7 +1167,7 @@ function Agenda({ candidates, onStatus }: { candidates: BaptismCandidate[]; onSt
       <div className="mb-5 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-extrabold text-white">Agenda de Batismo</h3>
-          <p className="text-sm text-zinc-400">Organize data, local, pastor responsavel e candidatos.</p>
+          <p className="text-sm text-zinc-400">Organize data, local, pastor responsável e candidatos.</p>
         </div>
         <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-zinc-300">
           <Printer size={15} /> Imprimir

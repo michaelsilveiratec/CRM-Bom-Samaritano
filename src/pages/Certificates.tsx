@@ -241,7 +241,7 @@ export default function Certificates() {
         }));
       })
       .catch((error) => {
-        console.warn("Nao foi possivel carregar configuracoes para certificados:", error);
+        console.warn("Não foi possível carregar configurações para certificados:", error);
       });
 
     return () => window.removeEventListener("crm-settings-updated", applyLocalSettings);
@@ -721,7 +721,7 @@ export default function Certificates() {
 
     const printWindow = window.open("", "_blank", "width=1000,height=900");
     if (!printWindow) {
-      alert("Nao foi possivel abrir a janela de impressao. Verifique o bloqueador de pop-ups.");
+      alert("Não foi possível abrir a janela de impressão. Verifique o bloqueador de pop-ups.");
       return;
     }
 
@@ -735,7 +735,7 @@ export default function Certificates() {
   const generateSavedCertificate = (certificate: SavedCertificate) => {
     const printWindow = window.open("", "_blank", "width=1000,height=900");
     if (!printWindow) {
-      alert("Nao foi possivel abrir a janela de impressao. Verifique o bloqueador de pop-ups.");
+      alert("Não foi possível abrir a janela de impressão. Verifique o bloqueador de pop-ups.");
       return;
     }
 
@@ -750,11 +750,11 @@ export default function Certificates() {
         <div className="flex items-center gap-2 text-sm text-zinc-500">
           <span>Certificados</span>
           <span>&gt;</span>
-          <span className="text-zinc-300">Gerar certificado de apresentacao de bebe</span>
+          <span className="text-zinc-300">Gerar certificado de apresentação de bebê</span>
         </div>
         <h2 className="text-3xl font-extrabold tracking-tight text-white">Certificados</h2>
         <p className="text-sm text-zinc-400">
-          Gere certificados pastorais com formulario, assinatura e pre-visualizacao.
+          Gere certificados pastorais com formulário, assinatura e pré-visualização.
         </p>
       </div>
 
@@ -766,9 +766,9 @@ export default function Certificates() {
           </div>
           <div>
               <h3 className="text-lg font-extrabold text-purple-100">
-                {editingCertificateId ? "Editando certificado salvo" : "Gerar certificado de apresentacao de bebe"}
+                {editingCertificateId ? "Editando certificado salvo" : "Gerar certificado de apresentação de bebê"}
               </h3>
-              <p className="mt-1 text-sm text-zinc-400">Preencha as informacoes abaixo para gerar e salvar o certificado.</p>
+              <p className="mt-1 text-sm text-zinc-400">Preencha as informações abaixo para gerar e salvar o certificado.</p>
             </div>
           </div>
           <button
@@ -810,7 +810,7 @@ export default function Certificates() {
                 </button>
               </div>
               <DateInput label="Data de nascimento" required value={form.birthDate} onChange={(value) => updateField("birthDate", value)} />
-              <DateInput label="Data da apresentacao" required value={form.presentationDate} onChange={(value) => updateField("presentationDate", value)} />
+              <DateInput label="Data da apresentação" required value={form.presentationDate} onChange={(value) => updateField("presentationDate", value)} />
               <TextInput label="Versiculo biblico opcional" value={form.bibleVerse} onChange={(value) => updateField("bibleVerse", value)} />
             </div>
           </div>
@@ -915,7 +915,7 @@ export default function Certificates() {
           <div className="glass-card p-5">
             <div className="mb-5 flex items-center gap-2">
               <Award size={18} className="text-purple-400" />
-              <h3 className="text-sm font-extrabold text-zinc-200">Pre-visualizacao</h3>
+              <h3 className="text-sm font-extrabold text-zinc-200">Pré-visualização</h3>
             </div>
             <PremiumCertificatePreview form={form} qrCodeDataUrl={qrCodeDataUrl} />
           </div>
@@ -926,7 +926,7 @@ export default function Certificates() {
               <h3 className="text-sm font-extrabold text-zinc-200">Validacao digital</h3>
             </div>
             <div className="flex items-center gap-4">
-              <img src={qrCodeDataUrl} alt="QR Code de validacao" className="h-20 w-20 rounded-lg bg-white p-2" />
+              <img src={qrCodeDataUrl} alt="QR Code de validação" className="h-20 w-20 rounded-lg bg-white p-2" />
               <div>
                 <p className="text-xs font-bold text-zinc-300">Codigo: {form.certificateNumber}</p>
                 <p className="mt-1 text-xs leading-5 text-zinc-500">O QR Code e impresso no certificado para conferencia e arquivamento.</p>
@@ -940,9 +940,9 @@ export default function Certificates() {
               <h3 className="text-sm font-extrabold text-zinc-200">Dicas</h3>
             </div>
             <ul className="space-y-2 text-xs leading-6 text-zinc-400">
-              <li>Verifique todas as informacoes antes de gerar o certificado.</li>
-              <li>A assinatura do pastor sera exibida no certificado.</li>
-              <li>O certificado gerado pode ser salvo como PDF pela janela de impressao.</li>
+              <li>Verifique todas as informações antes de gerar o certificado.</li>
+              <li>A assinatura do pastor será exibida no certificado.</li>
+              <li>O certificado gerado pode ser salvo como PDF pela janela de impressão.</li>
             </ul>
           </div>
 

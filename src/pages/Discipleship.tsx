@@ -450,7 +450,7 @@ export default function Discipleship() {
       setJourneys(updatedJourneys);
     } catch (error) {
       console.warn("Falha ao salvar estudo de discipulado no backend:", error);
-      alert("Nao foi possivel salvar o estudo no servidor. Verifique se o backend esta rodando na porta 3001.");
+      alert("Não foi possível salvar o estudo no servidor. Verifique se o backend está rodando na porta 3001.");
       return;
     }
     setIsNewStudyModalOpen(false);
@@ -569,7 +569,7 @@ export default function Discipleship() {
 
         await persistDiscipleshipState(journeys, pairs, activeJourneyId);
       } catch (error) {
-        console.warn("Nao foi possivel carregar discipulado do servidor:", error);
+        console.warn("Não foi possível carregar discipulado do servidor:", error);
       }
     };
 
@@ -643,7 +643,7 @@ export default function Discipleship() {
         }
       })
       .catch((error) => {
-        console.warn("Nao foi possivel carregar o link de rede para o curso:", error);
+        console.warn("Não foi possível carregar o link de rede para o curso:", error);
       });
 
     return () => {
@@ -670,7 +670,7 @@ export default function Discipleship() {
         return `${nextBase}/course/${token}`;
       }
     } catch (error) {
-      console.warn("Nao foi possivel confirmar o link de rede para o curso:", error);
+      console.warn("Não foi possível confirmar o link de rede para o curso:", error);
     }
 
     return buildCourseLink(token);
@@ -687,7 +687,7 @@ export default function Discipleship() {
     }
   };
 
-  const defaultCourseMessage = `Graca e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteudo com atencao e responda a pergunta ao final. Sua resposta sera registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]`;
+  const defaultCourseMessage = `Graça e paz, [NOME]!\n\nEstou enviando a sua aula do discipulado: [CURSO] - [AULA].\n\nLeia o conteúdo com atenção e responda a pergunta ao final. Sua resposta será registrada no acompanhamento do seu crescimento espiritual.\n\nAcesse aqui:\n[LINK]`;
 
   const normalizeCourseKey = (value?: string) => {
     return String(value || "")
@@ -771,7 +771,7 @@ export default function Discipleship() {
       setBulkCourseContacts(contacts);
       setBulkCourseSelectedIds(contacts.map((contact) => contact.id));
     } catch (error) {
-      console.warn("Nao foi possivel carregar lista para envio de curso:", error);
+      console.warn("Não foi possível carregar lista para envio de curso:", error);
       const cached = readCachedBulkContacts(target);
       setBulkCourseContacts(cached);
       setBulkCourseSelectedIds(cached.map((contact) => contact.id));
@@ -839,7 +839,7 @@ export default function Discipleship() {
     return template
       .replace(/\[NOME\]/g, enrollment.memberName)
       .replace(/\[CURSO\]/g, enrollment.journeyName)
-      .replace(/\[AULA\]/g, `Licao ${enrollment.lessonNum}: ${enrollment.lessonTitle}`)
+      .replace(/\[AULA\]/g, `Lição ${enrollment.lessonNum}: ${enrollment.lessonTitle}`)
       .replace(/\[LINK\]/g, courseLink) + imageLine;
   };
 
@@ -880,7 +880,7 @@ export default function Discipleship() {
         throw new Error(result.error || "Falha no envio pela API. WhatsApp Web foi aberto sem imagem.");
       }
 
-      const errorMessage = result.error || "Falha no envio automatico do curso.";
+      const errorMessage = result.error || "Falha no envio automático do curso.";
       const nextEnrollments = enrollments.map((item) =>
         item.id === enrollment.id ? { ...item, status: "Erro no envio", error: errorMessage } : item
       );
@@ -934,7 +934,7 @@ export default function Discipleship() {
     );
 
     if (existingEnrollment) {
-      alert("Este aluno ja possui este curso e esta mesma licao cadastrados. Para continuar, escolha a proxima licao do curso.");
+      alert("Este aluno já possui este curso e esta mesma lição cadastrados. Para continuar, escolha a próxima lição do curso.");
       return;
     }
 
@@ -994,7 +994,7 @@ export default function Discipleship() {
       closeCourseModal();
     } catch (error: any) {
       console.warn("Falha ao enviar curso de discipulado:", error);
-      alert(error.message || "Nao foi possivel enviar o curso.");
+      alert(error.message || "Não foi possível enviar o curso.");
     } finally {
       setCourseSending(false);
     }
@@ -1051,9 +1051,9 @@ export default function Discipleship() {
       }
 
       if (createdEnrollments.length === 0) {
-        setCourseRefreshMessage("Nenhum curso novo foi preparado. Todos os selecionados ja tinham esta licao.");
+        setCourseRefreshMessage("Nenhum curso novo foi preparado. Todos os selecionados já tinham esta lição.");
         window.setTimeout(() => setCourseRefreshMessage(""), 4000);
-        alert("Nenhum curso novo foi criado, porque todos os selecionados ja possuem este curso e esta mesma licao.");
+        alert("Nenhum curso novo foi criado, porque todos os selecionados já possuem este curso e esta mesma lição.");
         return;
       }
 
@@ -1062,14 +1062,14 @@ export default function Discipleship() {
       localStorage.setItem("discipleship_course_enrollments", JSON.stringify(nextEnrollments));
       await persistDiscipleshipState(journeys, pairs, activeJourneyId, nextEnrollments);
       const duplicateMessage = skippedDuplicates > 0
-        ? ` ${skippedDuplicates} ignorado(s) porque ja tinham esta licao.`
+        ? ` ${skippedDuplicates} ignorado(s) porque já tinham esta lição.`
         : "";
       setCourseRefreshMessage(`${createdEnrollments.length} curso(s) preparados para ${bulkCourseTarget === "members" ? "membros" : "visitantes"}.${duplicateMessage}`);
       window.setTimeout(() => setCourseRefreshMessage(""), 3500);
       closeBulkCourseModal();
     } catch (error: any) {
       console.warn("Falha ao criar cursos em lote:", error);
-      alert(error.message || "Nao foi possivel criar os cursos para a lista.");
+      alert(error.message || "Não foi possível criar os cursos para a lista.");
     } finally {
       setBulkCourseSaving(false);
     }
@@ -1093,7 +1093,7 @@ export default function Discipleship() {
     } catch (error) {
       console.warn("Falha ao atualizar respostas dos cursos:", error);
       if (!silent) {
-        setCourseRefreshMessage("Nao foi possivel atualizar agora.");
+        setCourseRefreshMessage("Não foi possível atualizar agora.");
         window.setTimeout(() => setCourseRefreshMessage(""), 3000);
       }
     }
@@ -1124,7 +1124,7 @@ export default function Discipleship() {
       await persistDiscipleshipState(journeys, pairs, activeJourneyId, nextEnrollments);
     } catch (error) {
       console.warn("Falha ao excluir curso enviado no servidor:", error);
-      alert("Curso removido localmente, mas nao foi possivel sincronizar com o servidor.");
+      alert("Curso removido localmente, mas não foi possível sincronizar com o servidor.");
     }
   };
 
@@ -1223,7 +1223,7 @@ export default function Discipleship() {
 
       return {
         lessonNum,
-        title: lesson?.title || `Licao ${lessonNum}`,
+        title: lesson?.title || `Lição ${lessonNum}`,
         completed,
       };
     });
@@ -1260,11 +1260,11 @@ export default function Discipleship() {
       setEnrollments(nextEnrollments);
       localStorage.setItem("discipleship_course_enrollments", JSON.stringify(nextEnrollments));
       await persistDiscipleshipState(journeys, pairs, activeJourneyId, nextEnrollments);
-      setCourseRefreshMessage(`Proxima licao preparada para ${enrollment.memberName}.`);
+      setCourseRefreshMessage(`Próxima lição preparada para ${enrollment.memberName}.`);
       window.setTimeout(() => setCourseRefreshMessage(""), 3000);
     } catch (error: any) {
-      console.warn("Falha ao preparar proxima licao:", error);
-      alert(error.message || "Nao foi possivel preparar a proxima licao.");
+      console.warn("Falha ao preparar próxima lição:", error);
+      alert(error.message || "Não foi possível preparar a próxima lição.");
     }
   };
 
@@ -1320,7 +1320,7 @@ export default function Discipleship() {
       setCourseImageUrl(image);
     } catch (error) {
       console.error(error);
-      alert("Nao foi possivel processar a imagem do curso.");
+      alert("Não foi possível processar a imagem do curso.");
     } finally {
       event.target.value = "";
     }
@@ -1382,7 +1382,7 @@ export default function Discipleship() {
         setPairs(updatedPairs);
       } catch (error) {
         console.warn("Falha ao atualizar dupla de discipulado no backend:", error);
-        alert("Nao foi possivel salvar a dupla no servidor. Verifique se o backend esta rodando na porta 3001.");
+        alert("Não foi possível salvar a dupla no servidor. Verifique se o backend está rodando na porta 3001.");
         return;
       }
     } else {
@@ -1402,7 +1402,7 @@ export default function Discipleship() {
         setPairs(updatedPairs);
       } catch (error) {
         console.warn("Falha ao salvar dupla de discipulado no backend:", error);
-        alert("Nao foi possivel salvar a dupla no servidor. Verifique se o backend esta rodando na porta 3001.");
+        alert("Não foi possível salvar a dupla no servidor. Verifique se o backend está rodando na porta 3001.");
         return;
       }
     }
@@ -1428,7 +1428,7 @@ export default function Discipleship() {
       setPairs(updatedPairs);
     } catch (error) {
       console.warn("Falha ao deletar dupla de discipulado no backend:", error);
-      alert("Nao foi possivel deletar a dupla no servidor. Verifique se o backend esta rodando na porta 3001.");
+      alert("Não foi possível deletar a dupla no servidor. Verifique se o backend está rodando na porta 3001.");
     }
   };
 
@@ -1446,7 +1446,7 @@ export default function Discipleship() {
       alert(`Encontro pastoral registrado com sucesso para hoje (${new Date().toLocaleDateString("pt-BR")})!`);
     } catch (error) {
       console.warn("Falha ao salvar encontro de discipulado no backend:", error);
-      alert("Nao foi possivel salvar o encontro no servidor. Verifique se o backend esta rodando na porta 3001.");
+      alert("Não foi possível salvar o encontro no servidor. Verifique se o backend está rodando na porta 3001.");
     }
   };
 
@@ -1469,8 +1469,8 @@ export default function Discipleship() {
       await persistDiscipleshipState(journeys, updatedPairs, activeJourneyId);
       setPairs(updatedPairs);
     } catch (error) {
-      console.warn("Falha ao atualizar licao de discipulado no backend:", error);
-      alert("Nao foi possivel salvar o progresso no servidor. Verifique se o backend esta rodando na porta 3001.");
+      console.warn("Falha ao atualizar lição de discipulado no backend:", error);
+      alert("Não foi possível salvar o progresso no servidor. Verifique se o backend está rodando na porta 3001.");
     }
   };
 
@@ -1597,7 +1597,7 @@ export default function Discipleship() {
                   setActiveJourneyId(j.id);
                 } catch (error) {
                   console.warn("Falha ao salvar jornada ativa no backend:", error);
-                  alert("Nao foi possivel salvar a jornada ativa no servidor. Verifique se o backend esta rodando na porta 3001.");
+                  alert("Não foi possível salvar a jornada ativa no servidor. Verifique se o backend está rodando na porta 3001.");
                 }
               }}
               className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all active:scale-95 cursor-pointer ${
@@ -1758,7 +1758,7 @@ export default function Discipleship() {
                     <p className="mt-1 text-[11px] text-zinc-500">
                       Enviado em {new Date(enrollment.createdAt).toLocaleString("pt-BR")}
                       {enrollment.completedAt ? ` - respondido em ${new Date(enrollment.completedAt).toLocaleString("pt-BR")}` : ""}
-                      {Number(enrollment.totalQuestions) > 0 ? ` - avaliacao ${enrollment.score}/${enrollment.totalQuestions}` : ""}
+                      {Number(enrollment.totalQuestions) > 0 ? ` - avaliação ${enrollment.score}/${enrollment.totalQuestions}` : ""}
                       {Number(enrollment.spiritualGrowth) > 0 ? ` - crescimento espiritual ${enrollment.spiritualGrowth}%` : ""}
                       {enrollment.dispatchDate && enrollment.dispatchTime ? ` - envio programado ${new Date(`${enrollment.dispatchDate}T${enrollment.dispatchTime}:00`).toLocaleString("pt-BR")}` : ""}
                       {enrollment.sentAt ? ` - enviado em ${new Date(enrollment.sentAt).toLocaleString("pt-BR")}` : ""}
@@ -1775,7 +1775,7 @@ export default function Discipleship() {
                           }`}
                           title={lesson.title}
                         >
-                          Licao {lesson.lessonNum} {lesson.completed ? "Concluida" : "Pendente"}
+                          Lição {lesson.lessonNum} {lesson.completed ? "Concluida" : "Pendente"}
                         </div>
                       ))}
                     </div>
@@ -1789,7 +1789,7 @@ export default function Discipleship() {
                         className="inline-flex items-center justify-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-3 py-2 text-xs font-bold text-purple-200 transition hover:bg-purple-500/20"
                       >
                         <BookOpen size={13} />
-                        <span>Preparar proxima</span>
+                        <span>Preparar próxima</span>
                       </button>
                     )}
                     {enrollment.status !== "Concluido" && (
@@ -1811,7 +1811,7 @@ export default function Discipleship() {
                             setCourseRefreshMessage("Curso enviado.");
                             window.setTimeout(() => setCourseRefreshMessage(""), 2500);
                           } catch (error: any) {
-                            alert(error.message || "Nao foi possivel enviar o curso.");
+                            alert(error.message || "Não foi possível enviar o curso.");
                           }
                         }}
                         className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-200 transition hover:bg-emerald-500/20"
@@ -2144,7 +2144,7 @@ export default function Discipleship() {
                       value={courseMessage}
                       onChange={(e) => setCourseMessage(e.target.value)}
                       rows={6}
-                      placeholder="Escreva a mensagem que sera enviada junto com o link..."
+                      placeholder="Escreva a mensagem que será enviada junto com o link..."
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-zinc-200 focus:outline-none focus:border-purple-500 resize-none leading-relaxed"
                     />
                     <p className="mt-2 text-xs text-zinc-500">
@@ -2368,7 +2368,7 @@ export default function Discipleship() {
                   value={courseMessage}
                   onChange={(e) => setCourseMessage(e.target.value)}
                   rows={6}
-                  placeholder="Escreva a mensagem que sera enviada junto com o link..."
+                  placeholder="Escreva a mensagem que será enviada junto com o link..."
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-zinc-200 focus:outline-none focus:border-purple-500 resize-none leading-relaxed"
                 />
                 <p className="mt-2 text-xs text-zinc-500">
@@ -2415,7 +2415,7 @@ export default function Discipleship() {
                   </button>
                 )}
                 <p className="mt-2 text-xs text-zinc-500">
-                  Foto escolhida no computador aparece na pagina do curso. Para a imagem chegar como anexo no WhatsApp, use uma URL publica da imagem e o Disparo Automatico/API.
+                  Foto escolhida no computador aparece na página do curso. Para a imagem chegar como anexo no WhatsApp, use uma URL pública da imagem e o Disparo Automático/API.
                 </p>
               </div>
               {lastCourseLink && (
@@ -2586,7 +2586,7 @@ export default function Discipleship() {
                   <span className="absolute inset-y-0 left-2 w-px bg-white/25" />
                   <span className="absolute inset-y-0 right-2 w-px bg-black/30" />
                   <span className="relative text-[10px] font-black uppercase tracking-wider text-amber-100/90">
-                    Licao {lesson.num}
+                    Lição {lesson.num}
                   </span>
                   <span
                     className="relative mx-auto max-h-[82px] max-w-full overflow-hidden text-center text-[11px] font-extrabold leading-tight text-white"
@@ -2614,7 +2614,7 @@ export default function Discipleship() {
                 <span className="text-2xl">{selectedLibraryLesson.icon}</span>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Licao 0{selectedLibraryLesson.num}</span>
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Lição 0{selectedLibraryLesson.num}</span>
                   </div>
                   <h4 className="text-base font-extrabold text-white">{selectedLibraryLesson.title} <span className="text-zinc-400 font-medium text-sm">- {selectedLibraryLesson.subtitle}</span></h4>
                   <p className="text-xs text-zinc-400 mt-0.5 italic">{selectedLibraryLesson.baseText} ({selectedLibraryLesson.base})</p>
@@ -2625,7 +2625,7 @@ export default function Discipleship() {
 
             <div className="p-6 space-y-6 border-t border-white/10">
               <div className="bg-white/5 border border-white/5 rounded-xl p-4">
-                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Objetivo da Licao</p>
+                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Objetivo da Lição</p>
                 <p className="text-sm text-zinc-200 font-medium">{selectedLibraryLesson.objective}</p>
               </div>
 

@@ -6,18 +6,18 @@ import "./styles/index.css";
 
 refreshStaleClientCache();
 clearBrowserRuntimeCaches().catch((error) => {
-  console.warn("Nao foi possivel limpar caches do navegador:", error);
+  console.warn("Não foi possível limpar caches do navegador:", error);
 });
 
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/sw.js").catch((error) => {
-      console.warn("Nao foi possivel registrar o aplicativo mobile:", error);
+      console.warn("Não foi possível registrar o aplicativo mobile:", error);
     });
   });
 } else {
   unregisterServiceWorkers().catch((error) => {
-    console.warn("Nao foi possivel remover service workers no modo dev:", error);
+    console.warn("Não foi possível remover service workers no modo dev:", error);
   });
 }
 

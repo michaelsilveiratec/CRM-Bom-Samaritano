@@ -12,8 +12,45 @@ import {
   Bell,
   MessageSquare,
   Key,
-  Link2
+  Link2,
+  ShieldCheck,
+  FileText,
+  UserX,
+  History,
+  Download,
+  ExternalLink,
+  ClipboardCheck
 } from "lucide-react";
+
+const LGPD_REQUESTS_KEY = "lgpd_requests";
+
+type LgpdRequestType = "exclusao" | "revogacao" | "anonimizacao" | "bloqueio_contato";
+
+type LgpdRequest = {
+  id: string;
+  type: LgpdRequestType;
+  label: string;
+  createdAt: string;
+  responsible: string;
+  status: "registrada";
+};
+
+const lgpdRequestLabels: Record<LgpdRequestType, string> = {
+  exclusao: "Solicitação de exclusão",
+  revogacao: "Revogação de consentimento",
+  anonimizacao: "Anonimização de registros",
+  bloqueio_contato: "Bloqueio de contato",
+};
+
+function readLgpdRequests(): LgpdRequest[] {
+  try {
+    const stored = localStorage.getItem(LGPD_REQUESTS_KEY);
+    const parsed = stored ? JSON.parse(stored) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 export default function Settings() {
   const defaultPastorNames = new Set(["Pr. Anderson Silva", "Pr. Anderson Silva (Google)", "Anderson Silva"]);
@@ -48,6 +85,7 @@ export default function Settings() {
   const [pastorPhoto, setPastorPhoto] = useState<string | null>(
     () => localStorage.getItem("settings_pastor_photo") || null
   );
+  const [lgpdRequests, setLgpdRequests] = useState<LgpdRequest[]>(readLgpdRequests);
 
   useEffect(() => {
     let isMounted = true;
@@ -96,7 +134,7 @@ export default function Settings() {
         window.dispatchEvent(new Event("crm-settings-updated"));
       })
       .catch((error) => {
-        console.warn("Nao foi possivel carregar configuracoes do backend:", error);
+        console.warn("Não foi possível carregar configurações do backend:", error);
       });
 
     return () => {
@@ -121,7 +159,7 @@ export default function Settings() {
       waApiUrl,
       financialPassword,
     }).catch((error) => {
-      console.warn("Nao foi possivel salvar a foto do pastor no backend local:", error);
+      console.warn("Não foi possível salvar a foto do pastor no backend local:", error);
     });
     window.dispatchEvent(new Event("crm-settings-updated"));
   };
@@ -164,7 +202,7 @@ export default function Settings() {
         financialPassword: financialPassword || "1234",
       });
     } catch (error) {
-      console.warn("Nao foi possivel salvar configuracoes no backend local:", error);
+      console.warn("Não foi possível salvar configurações no backend local:", error);
     }
     // Notify all listening components (Sidebar, Dashboard, etc.) of the change
     window.dispatchEvent(new Event("crm-settings-updated"));
@@ -183,6 +221,93 @@ export default function Settings() {
     setShowClearConfirm(false);
     alert("Todos os dados do CRM foram apagados. A página será recarregada.");
     window.location.reload();
+  };
+
+  const getResponsibleUser = () => {
+    try {
+      const savedUser = localStorage.getItem("crm_user");
+      const parsedUser = savedUser ? JSON.parse(savedUser) : null;
+      return parsedUser?.name || pastorName || "Usuário do sistema";
+    } catch {
+      return pastorName || "Usuário do sistema";
+    }
+  };
+
+  const registerLgpdRequest = (type: LgpdRequestType) => {
+    const request: LgpdRequest = {
+      id: `lgpd-${Date.now()}`,
+      type,
+      label: lgpdRequestLabels[type],
+      createdAt: new Date().toISOString(),
+      responsible: getResponsibleUser(),
+      status: "registrada",
+    };
+    const nextRequests = [request, ...lgpdRequests].slice(0, 100);
+    localStorage.setItem(LGPD_REQUESTS_KEY, JSON.stringify(nextRequests));
+    setLgpdRequests(nextRequests);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const downloadTextFile = (fileName: string, content: string, type = "text/plain;charset=utf-8") => {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadConsentTerm = () => {
+    downloadTextFile(
+      "termo_consentimento_bom_samaritano.txt",
+      [
+        "TERMO DE CONSENTIMENTO - SISTEMA BOM SAMARITANO",
+        "",
+        "Declaro que autorizo o tratamento dos meus dados pessoais pelo Sistema Bom Samaritano - CRM Pastoral, para fins de cadastro pastoral, acompanhamento ministerial, comunicação institucional, discipulado, batismo e emissão de certificados.",
+        "",
+        "Titular dos dados: ____________________________________",
+        "Responsável legal, quando aplicável: __________________",
+        "Origem do consentimento: ______________________________",
+        "Data e hora: __________________________________________",
+        "Usuário responsável: __________________________________",
+        "",
+        "O consentimento poderá ser revogado a qualquer momento, mediante solicitação ao administrador responsável.",
+      ].join("\n")
+    );
+  };
+
+  const openPrivacyPolicy = () => {
+    const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+    window.open(`${basePath}/privacidade`, "_blank", "noopener,noreferrer");
+  };
+
+  const exportLgpdAudit = () => {
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      system: "Bom Samaritano - CRM Pastoral",
+      responsible: "Pastor Michael Ramos",
+      church: churchName,
+      requests: lgpdRequests,
+      documents: [
+        "docs/LGPD.md",
+        "docs/POLITICA_PRIVACIDADE.md",
+        "docs/TERMO_CONSENTIMENTO.md",
+        "docs/RETENCAO_DADOS.md",
+        "docs/CONTROLE_ACESSO.md",
+        "docs/AUDITORIA.md",
+      ],
+      protectedDataPolicy:
+        "Banco real, planilhas, backups, arquivos .env, uploads e dados pessoais não devem ser enviados ao GitHub.",
+    };
+    downloadTextFile(
+      "lgpd_auditoria_bom_samaritano.json",
+      JSON.stringify(payload, null, 2),
+      "application/json;charset=utf-8"
+    );
   };
 
   return (
@@ -373,7 +498,7 @@ export default function Settings() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500"
               />
               <p className="mt-2 text-xs text-zinc-500">
-                Esta senha sera solicitada antes de abrir o painel financeiro.
+                Esta senha será solicitada antes de abrir o painel financeiro.
               </p>
             </div>
           </div>
@@ -400,6 +525,140 @@ export default function Settings() {
                 }`}
               />
             </button>
+          </div>
+        </div>
+
+        {/* LGPD and privacy */}
+        <div className="glass-card p-6 bg-gradient-to-br from-zinc-900/60 to-zinc-950 border border-emerald-500/20 shadow-lg shadow-emerald-500/5">
+          <div className="flex flex-col gap-2 mb-6 md:flex-row md:items-center md:justify-between">
+            <h3 className="text-base font-bold text-zinc-200 flex items-center gap-2">
+              <ShieldCheck className="text-emerald-400" size={18} />
+              <span>LGPD e Privacidade</span>
+            </h3>
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300">
+              <ClipboardCheck size={12} />
+              Base documental ativa
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={openPrivacyPolicy}
+              className="group flex min-h-[112px] items-start gap-3 rounded-lg border border-white/10 bg-white/5 p-4 text-left transition-all hover:border-purple-400/40 hover:bg-white/10 active:scale-[0.99]"
+            >
+              <FileText className="mt-0.5 shrink-0 text-purple-400" size={20} />
+              <span>
+                <span className="flex items-center gap-2 text-sm font-bold text-zinc-100">
+                  Política de Privacidade
+                  <ExternalLink size={14} className="text-zinc-500 group-hover:text-purple-300" />
+                </span>
+                <span className="mt-1 block text-xs leading-relaxed text-zinc-400">
+                  Abre a página pública /privacidade para apresentação da política.
+                </span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={downloadConsentTerm}
+              className="flex min-h-[112px] items-start gap-3 rounded-lg border border-white/10 bg-white/5 p-4 text-left transition-all hover:border-emerald-400/40 hover:bg-white/10 active:scale-[0.99]"
+            >
+              <ClipboardCheck className="mt-0.5 shrink-0 text-emerald-400" size={20} />
+              <span>
+                <span className="text-sm font-bold text-zinc-100">Termo de Consentimento</span>
+                <span className="mt-1 block text-xs leading-relaxed text-zinc-400">
+                  Baixa um modelo simples para coleta de autorização do titular ou responsável.
+                </span>
+              </span>
+            </button>
+
+            <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+              <div className="flex items-start gap-3">
+                <UserX className="mt-0.5 shrink-0 text-rose-400" size={20} />
+                <div>
+                  <p className="text-sm font-bold text-zinc-100">Solicitações de Exclusão</p>
+                  <p className="mt-1 text-xs leading-relaxed text-zinc-400">
+                    Registre pedidos de exclusão, anonimização, revogação ou bloqueio de contato.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => registerLgpdRequest("exclusao")}
+                  className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-200 transition hover:bg-rose-500/20"
+                >
+                  Exclusão
+                </button>
+                <button
+                  type="button"
+                  onClick={() => registerLgpdRequest("anonimizacao")}
+                  className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-xs font-bold text-amber-200 transition hover:bg-amber-500/20"
+                >
+                  Anonimizar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => registerLgpdRequest("revogacao")}
+                  className="rounded-lg border border-purple-500/20 bg-purple-500/10 px-3 py-2 text-xs font-bold text-purple-200 transition hover:bg-purple-500/20"
+                >
+                  Revogar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => registerLgpdRequest("bloqueio_contato")}
+                  className="rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-xs font-bold text-blue-200 transition hover:bg-blue-500/20"
+                >
+                  Bloquear
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <History className="mt-0.5 shrink-0 text-blue-400" size={20} />
+                  <div>
+                    <p className="text-sm font-bold text-zinc-100">Auditoria LGPD</p>
+                    <p className="mt-1 text-xs leading-relaxed text-zinc-400">
+                      {lgpdRequests.length} registro(s) local(is) de solicitações LGPD.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={exportLgpdAudit}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-200 transition hover:bg-emerald-500/20"
+                >
+                  <Download size={14} />
+                  Exportar
+                </button>
+              </div>
+              <div className="mt-4 space-y-2">
+                {lgpdRequests.slice(0, 3).map((request) => (
+                  <div key={request.id} className="rounded-lg border border-white/5 bg-black/20 px-3 py-2">
+                    <p className="text-xs font-bold text-zinc-200">{request.label}</p>
+                    <p className="mt-0.5 text-[11px] text-zinc-500">
+                      {new Date(request.createdAt).toLocaleString("pt-BR")} por {request.responsible}
+                    </p>
+                  </div>
+                ))}
+                {lgpdRequests.length === 0 && (
+                  <p className="rounded-lg border border-white/5 bg-black/20 px-3 py-3 text-xs text-zinc-500">
+                    Nenhuma solicitação LGPD registrada neste navegador.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-4">
+            <p className="text-xs leading-relaxed text-zinc-400">
+              Exportação de Dados: use o arquivo de auditoria apenas para controle interno.
+              Bancos reais, planilhas, backups, arquivos .env, uploads e dados pessoais
+              devem permanecer fora do GitHub.
+            </p>
           </div>
         </div>
 

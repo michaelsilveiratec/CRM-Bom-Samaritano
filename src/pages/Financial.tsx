@@ -65,11 +65,11 @@ const DEFAULT_FINANCIAL_RECORDS = [
   {
     id: 1,
     contributor: "Lucas Rocha",
-    category: "DÃ­zimo",
+    category: "Dízimo",
     value: 350.0,
     date: "2026-05-15",
     paymentMethod: "Pix",
-    notes: "Referente ao mÃªs de maio",
+    notes: "Referente ao mês de maio",
   },
   {
     id: 2,
@@ -83,27 +83,27 @@ const DEFAULT_FINANCIAL_RECORDS = [
   {
     id: 3,
     contributor: "Anderson Silva",
-    category: "DÃ­zimo",
+    category: "Dízimo",
     value: 800.0,
     date: "2026-05-10",
     paymentMethod: "Pix",
   },
   {
     id: 4,
-    contributor: "Membro AnÃ´nimo",
-    category: "MissÃµes",
+    contributor: "Membro Anônimo",
+    category: "Missões",
     value: 200.0,
     date: "2026-05-08",
     paymentMethod: "Pix",
-    notes: "Oferta para campo missionÃ¡rio na Ãfrica",
+    notes: "Oferta para campo missionário na África",
   },
   {
     id: 5,
     contributor: "Renata Fagundes",
-    category: "ConstruÃ§Ã£o",
+    category: "Construção",
     value: 500.0,
     date: "2026-05-01",
-    paymentMethod: "DÃ©bito",
+    paymentMethod: "Débito",
     notes: "Campanha do novo templo",
   },
 ];
@@ -188,7 +188,7 @@ export default function Financial() {
     return {
       id: record.id ?? Date.now(),
       contributor: record.contributor || "",
-      category: (record.category || "DÃ­zimo") as FinanceRecord["category"],
+      category: (record.category || "Dízimo") as FinanceRecord["category"],
       value: Number(record.value || 0),
       date: record.date || new Date().toISOString().split("T")[0],
       paymentMethod: (record.paymentMethod || "Pix") as FinanceRecord["paymentMethod"],
@@ -265,7 +265,7 @@ export default function Financial() {
           localStorage.setItem("financial_records_data", JSON.stringify(syncedRecords));
         }
       } catch (error) {
-        console.warn("Nao foi possivel carregar financeiro do servidor:", error);
+        console.warn("Não foi possível carregar financeiro do servidor:", error);
       }
     };
 
@@ -394,8 +394,8 @@ export default function Financial() {
       setQuickEntry(null);
       setQuickValue("");
     } catch (error) {
-      console.warn("Falha ao salvar lancamento financeiro no backend:", error);
-      alert("Nao foi possivel salvar o lancamento no servidor. Verifique se o backend esta rodando na porta 3001.");
+      console.warn("Falha ao salvar lançamento financeiro no backend:", error);
+      alert("Não foi possível salvar o lançamento no servidor. Verifique se o backend está rodando na porta 3001.");
     }
   };
 
@@ -417,8 +417,8 @@ export default function Financial() {
           r.id === editingId ? normalizeRecord(response.record) : r
         ));
       } catch (error) {
-        console.warn("Falha ao atualizar lancamento financeiro no backend:", error);
-        alert("Nao foi possivel salvar o lancamento no servidor. Verifique se o backend esta rodando na porta 3001.");
+        console.warn("Falha ao atualizar lançamento financeiro no backend:", error);
+        alert("Não foi possível salvar o lançamento no servidor. Verifique se o backend está rodando na porta 3001.");
         return;
       }
     } else {
@@ -433,8 +433,8 @@ export default function Financial() {
         });
         setRecords([normalizeRecord(response.record), ...records]);
       } catch (error) {
-        console.warn("Falha ao salvar lancamento financeiro no backend:", error);
-        alert("Nao foi possivel salvar o lancamento no servidor. Verifique se o backend esta rodando na porta 3001.");
+        console.warn("Falha ao salvar lançamento financeiro no backend:", error);
+        alert("Não foi possível salvar o lançamento no servidor. Verifique se o backend está rodando na porta 3001.");
         return;
       }
     }
@@ -691,7 +691,7 @@ export default function Financial() {
 
     const printWindow = window.open("", "_blank", "width=1000,height=800");
     if (!printWindow) {
-      alert("Nao foi possivel abrir o relatorio. Verifique se o navegador bloqueou pop-ups.");
+      alert("Não foi possível abrir o relatório. Verifique se o navegador bloqueou pop-ups.");
       return;
     }
 
@@ -1059,7 +1059,7 @@ export default function Financial() {
                 quickEntry.label === "Boleta" ? "bg-purple-600 hover:bg-purple-500" : "bg-blue-600 hover:bg-blue-500"
               }`}
             >
-              {quickEntry.recordId ? "Salvar alteracao" : "Salvar"}
+              {quickEntry.recordId ? "Salvar alteração" : "Salvar"}
             </button>
           </form>
         </div>

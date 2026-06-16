@@ -50,7 +50,7 @@ function getSourceLabel(record: RegistrationRecord) {
 }
 
 function formatNotificationDate(timestamp: number) {
-  if (!timestamp) return "Data nao informada";
+  if (!timestamp) return "Data não informada";
 
   return new Date(timestamp).toLocaleString("pt-BR", {
     day: "2-digit",
@@ -147,7 +147,7 @@ export default function Header() {
         cacheRecordsWithoutEmbeddedPhotos("visitors_data", serverVisitors);
         setNotifications(buildRegistrationNotifications(serverMembers, serverVisitors));
       } catch (error) {
-        console.warn("Nao foi possivel carregar alertas de cadastro do servidor:", error);
+        console.warn("Não foi possível carregar alertas de cadastro do servidor:", error);
         loadCachedNotifications();
       }
     };

@@ -27,7 +27,7 @@ import {
 interface Member {
   id: number;
   name: string;
-  role: "Pastor" | "DiÃ¡cono" | "Obreiro" | "LÃ­der de CÃ©lula" | "Membro";
+  role: "Pastor" | "Diácono" | "Obreiro" | "Líder de Célula" | "Membro";
   phone: string;
   email: string;
   cellName: string;
@@ -38,7 +38,7 @@ interface Member {
   registrationDate?: string;
   baptismDate: string;
   birthDate: string;
-  status: "Ativo" | "Inativo" | "LicenÃ§a";
+  status: "Ativo" | "Inativo" | "Licença";
   photoUrl?: string;
   source?: string;
   createdByMobile?: boolean;
@@ -78,7 +78,7 @@ export default function Members() {
         setMembers(backendMembers);
         cacheRecordsWithoutEmbeddedPhotos("members_data", backendMembers);
       } catch (error) {
-        console.warn("NÃ£o foi possÃ­vel carregar membros do servidor:", error);
+        console.warn("Não foi possível carregar membros do servidor:", error);
       }
     };
 
@@ -134,7 +134,7 @@ export default function Members() {
       formatStoredDate(member.registrationDate) ||
       formatStoredDate(member.createdAt) ||
       formatStoredDate(member.id > 1000000000000 ? member.id : undefined) ||
-      "NÃ£o informado"
+      "Não informado"
     );
   };
 
@@ -197,7 +197,7 @@ export default function Members() {
         ));
       } catch (error) {
         console.warn("Falha ao atualizar membro no backend:", error);
-        alert("Nao foi possivel salvar o membro no servidor. Verifique se o backend esta rodando na porta 3001.");
+        alert("Não foi possível salvar o membro no servidor. Verifique se o backend está rodando na porta 3001.");
         return;
       }
     } else {
@@ -207,7 +207,7 @@ export default function Members() {
         role: newRole,
         phone: newPhone,
         email: newEmail || `${newName.toLowerCase().replace(/\s+/g, ".")}@example.com`,
-        cellName: newCellName || "NÃ£o Associado",
+        cellName: newCellName || "Não Associado",
         address: newAddress,
         neighborhood: newNeighborhood,
         city: newCity,
@@ -244,7 +244,7 @@ export default function Members() {
         setMembers([normalizeMember(response.member), ...members]);
       } catch (error) {
         console.warn("Falha ao salvar membro no backend:", error);
-        alert("Nao foi possivel salvar o membro no servidor. Verifique se o backend esta rodando na porta 3001.");
+        alert("Não foi possível salvar o membro no servidor. Verifique se o backend está rodando na porta 3001.");
         return;
       }
     }
@@ -286,7 +286,7 @@ export default function Members() {
     } catch (error) {
       console.warn("Falha ao salvar foto do membro no backend:", error);
       setMembers((current) => current.map((m) => (m.id === id ? member : m)));
-      alert("Nao foi possivel salvar a foto no servidor. Verifique se o backend esta rodando na porta 3001.");
+      alert("Não foi possível salvar a foto no servidor. Verifique se o backend está rodando na porta 3001.");
     }
   };
 
@@ -295,7 +295,7 @@ export default function Members() {
       await deleteServerMember(id);
     } catch (error) {
       console.warn("Falha ao deletar membro no backend:", error);
-      alert("Nao foi possivel deletar o membro no servidor. Verifique se o backend esta rodando na porta 3001.");
+      alert("Não foi possível deletar o membro no servidor. Verifique se o backend está rodando na porta 3001.");
       return;
     }
     setMembers(members.filter((m) => m.id !== id));
@@ -305,7 +305,7 @@ export default function Members() {
     const member = members.find((m) => m.id === id);
     if (!member) return;
 
-    const statuses: Member["status"][] = ["Ativo", "Inativo", "LicenÃ§a"];
+    const statuses: Member["status"][] = ["Ativo", "Inativo", "Licença"];
     const nextIdx = (statuses.indexOf(member.status) + 1) % statuses.length;
     const newStatus = statuses[nextIdx];
 
@@ -321,7 +321,7 @@ export default function Members() {
       );
     } catch (error) {
       console.warn("Falha ao atualizar status no backend:", error);
-      alert("Nao foi possivel atualizar o status no servidor. Verifique se o backend esta rodando na porta 3001.");
+      alert("Não foi possível atualizar o status no servidor. Verifique se o backend está rodando na porta 3001.");
       return;
     }
   };
@@ -338,7 +338,7 @@ export default function Members() {
 
   const handleSendBirthday = async (member: Member) => {
     if (!member.phone) {
-      alert("Telefone do membro nÃ£o disponÃ­vel!");
+      alert("Telefone do membro não disponível!");
       return;
     }
 
@@ -351,7 +351,7 @@ export default function Members() {
       if (result.success) {
         setBirthdayMessages((prev) => [
           ...prev,
-          { memberId: member.id, success: true, message: `âœ… ParabÃ©ns enviado para ${member.name}!` },
+          { memberId: member.id, success: true, message: `✅ Parabéns enviado para ${member.name}!` },
         ]);
         setTimeout(() => {
           setBirthdayMessages((prev) => prev.filter((msg) => msg.memberId !== member.id));
@@ -359,13 +359,13 @@ export default function Members() {
       } else {
         setBirthdayMessages((prev) => [
           ...prev,
-          { memberId: member.id, success: false, message: `âŒ Erro: ${result.error || "Falha ao enviar"}` },
+          { memberId: member.id, success: false, message: `❌ Erro: ${result.error || "Falha ao enviar"}` },
         ]);
       }
     } catch (error: any) {
       setBirthdayMessages((prev) => [
         ...prev,
-        { memberId: member.id, success: false, message: `âŒ Erro ao enviar: ${error.message}` },
+        { memberId: member.id, success: false, message: `❌ Erro ao enviar: ${error.message}` },
       ]);
     } finally {
       setSendingBirthdayId(null);
@@ -390,11 +390,11 @@ export default function Members() {
     switch (role) {
       case "Pastor":
         return "bg-purple-500/15 text-purple-400 border border-purple-500/20";
-      case "DiÃ¡cono":
+      case "Diácono":
         return "bg-blue-500/15 text-blue-400 border border-blue-500/20";
       case "Obreiro":
         return "bg-amber-500/15 text-amber-400 border border-amber-500/20";
-      case "LÃ­der de CÃ©lula":
+      case "Líder de Célula":
         return "bg-rose-500/15 text-rose-400 border border-rose-500/20";
       case "Membro":
         return "bg-zinc-500/15 text-zinc-300 border border-white/5";
@@ -403,7 +403,7 @@ export default function Members() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* NotificaÃ§Ãµes de AniversÃ¡rio */}
+      {/* Notificações de Aniversário */}
       {birthdayMessages.length > 0 && (
         <div className="fixed top-4 right-4 z-50 space-y-2">
           {birthdayMessages.map((msg) => (
@@ -425,7 +425,7 @@ export default function Members() {
         <div>
           <h2 className="text-3xl font-extrabold tracking-tight text-white">Membros</h2>
           <p className="text-sm text-zinc-400 mt-1">
-            Cadastro de obreiros, lÃ­deres de cÃ©lula e membros batizados
+            Cadastro de obreiros, líderes de célula e membros batizados
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -446,7 +446,7 @@ export default function Members() {
                     telefone: m.phone,
                     email: m.email,
                     celula: m.cellName,
-                    endereco: m.address || "",
+                    endereço: m.address || "",
                     bairro: m.neighborhood || "",
                     cidade: m.city || "",
                     estadoCivil: m.maritalStatus || "",
@@ -463,8 +463,8 @@ export default function Members() {
                       { key: "cargo", label: "Cargo" },
                       { key: "telefone", label: "Telefone" },
                       { key: "email", label: "E-mail" },
-                      { key: "celula", label: "CÃ©lula" },
-                      { key: "endereco", label: "EndereÃ§o" },
+                      { key: "celula", label: "Célula" },
+                      { key: "endereço", label: "Endereço" },
                       { key: "bairro", label: "Bairro" },
                       { key: "cidade", label: "Cidade" },
                       { key: "estadoCivil", label: "Estado Civil" },
@@ -490,7 +490,7 @@ export default function Members() {
                     telefone: m.phone,
                     email: m.email,
                     celula: m.cellName,
-                    endereco: m.address || "",
+                    endereço: m.address || "",
                     bairro: m.neighborhood || "",
                     cidade: m.city || "",
                     estadoCivil: m.maritalStatus || "",
@@ -507,8 +507,8 @@ export default function Members() {
                       { key: "cargo", label: "Cargo" },
                       { key: "telefone", label: "Telefone" },
                       { key: "email", label: "E-mail" },
-                      { key: "celula", label: "CÃ©lula" },
-                      { key: "endereco", label: "EndereÃ§o" },
+                      { key: "celula", label: "Célula" },
+                      { key: "endereço", label: "Endereço" },
                       { key: "bairro", label: "Bairro" },
                       { key: "cidade", label: "Cidade" },
                       { key: "estadoCivil", label: "Estado Civil" },
@@ -517,14 +517,14 @@ export default function Members() {
                       { key: "batismo", label: "Batismo" },
                       { key: "status", label: "Status" },
                     ],
-                    "RelatÃ³rio de Membros",
+                    "Relatório de Membros",
                     "membros_eclesia_crm"
                   );
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-zinc-300 hover:bg-purple-500/10 hover:text-purple-400 transition-all border-t border-white/5"
               >
                 <FileText size={16} />
-                <span>Baixar PDF (ImpressÃ£o)</span>
+                <span>Baixar PDF (Impressão)</span>
               </button>
             </div>
           </div>
@@ -556,9 +556,9 @@ export default function Members() {
             <Heart size={24} />
           </div>
           <div>
-            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">LÃ­deres de CÃ©lula</p>
+            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Líderes de Célula</p>
             <h4 className="text-2xl font-bold text-white mt-1">
-              {members.filter((m) => m.role === "LÃ­der de CÃ©lula").length}
+              {members.filter((m) => m.role === "Líder de Célula").length}
             </h4>
           </div>
         </div>
@@ -582,7 +582,7 @@ export default function Members() {
           <Search className="absolute left-3 top-3.5 w-4 h-4 text-zinc-500" />
           <input
             type="text"
-            placeholder="Buscar membros por nome, cÃ©lula, telefone, bairro, cidade..."
+            placeholder="Buscar membros por nome, célula, telefone, bairro, cidade..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-purple-500 transition-all"
@@ -596,9 +596,9 @@ export default function Members() {
           >
             <option value="All" className="bg-zinc-900">Todos Cargos</option>
             <option value="Pastor" className="bg-zinc-900">Pastores</option>
-            <option value="DiÃ¡cono" className="bg-zinc-900">DiÃ¡conos</option>
+            <option value="Diácono" className="bg-zinc-900">Diáconos</option>
             <option value="Obreiro" className="bg-zinc-900">Obreiros</option>
-            <option value="LÃ­der de CÃ©lula" className="bg-zinc-900">LÃ­deres de CÃ©lula</option>
+            <option value="Líder de Célula" className="bg-zinc-900">Líderes de Célula</option>
             <option value="Membro" className="bg-zinc-900">Membros</option>
           </select>
           <select
@@ -609,7 +609,7 @@ export default function Members() {
             <option value="All" className="bg-zinc-900">Todos Status</option>
             <option value="Ativo" className="bg-zinc-900">Ativo</option>
             <option value="Inativo" className="bg-zinc-900">Inativo</option>
-            <option value="LicenÃ§a" className="bg-zinc-900">LicenÃ§a</option>
+            <option value="Licença" className="bg-zinc-900">Licença</option>
           </select>
         </div>
       </div>
@@ -621,12 +621,12 @@ export default function Members() {
             <thead>
               <tr className="border-b border-white/10 bg-white/5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
                 <th className="px-6 py-4">Membro / Cargo</th>
-                <th className="px-6 py-4">CÃ©lula / MinistÃ©rio</th>
-                <th className="px-6 py-4">EndereÃ§o</th>
+                <th className="px-6 py-4">Célula / Ministério</th>
+                <th className="px-6 py-4">Endereço</th>
                 <th className="px-6 py-4">Contato</th>
                 <th className="px-6 py-4">Datas</th>
                 <th className="px-6 py-4">Status (Clique p/ Alternar)</th>
-                <th className="px-6 py-4 text-center">AÃ§Ãµes</th>
+                <th className="px-6 py-4 text-center">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -665,10 +665,10 @@ export default function Members() {
                     </td>
                     <td className="px-6 py-4 space-y-1">
                       <div className="text-xs text-zinc-300 font-medium">
-                        {member.address || "NÃ£o informado"}
+                        {member.address || "Não informado"}
                       </div>
                       <div className="text-[11px] text-zinc-500">
-                        {[member.neighborhood, member.city].filter(Boolean).join(" - ") || "Bairro/Cidade nÃ£o informado"}
+                        {[member.neighborhood, member.city].filter(Boolean).join(" - ") || "Bairro/Cidade não informado"}
                       </div>
                       {member.maritalStatus && (
                         <div className="text-[10px] text-zinc-500">
@@ -720,7 +720,7 @@ export default function Members() {
                           <button
                             onClick={() => handleSendBirthday(member)}
                             disabled={sendingBirthdayId === member.id}
-                            title="Enviar parabÃ©ns automÃ¡tico via WhatsApp"
+                            title="Enviar parabéns automático via WhatsApp"
                             className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all shadow-md active:scale-90 disabled:opacity-50 disabled:cursor-wait"
                           >
                             <Send size={14} />
@@ -787,7 +787,7 @@ export default function Members() {
                   size="lg"
                   onPhotoChange={(base64) => setNewPhoto(base64)}
                 />
-                <p className="text-[10px] text-zinc-500">Clique para adicionar foto (opcional, mÃ¡x. 3MB)</p>
+                <p className="text-[10px] text-zinc-500">Clique para adicionar foto (opcional, máx. 3MB)</p>
               </div>
               <div>
                 <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Nome Completo</label>
@@ -814,16 +814,16 @@ export default function Members() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Cargo / FunÃ§Ã£o</label>
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Cargo / Função</label>
                   <select
                     value={newRole}
                     onChange={(e) => setNewRole(e.target.value as Member["role"])}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-purple-500 cursor-pointer"
                   >
                     <option value="Membro" className="bg-zinc-900">Membro</option>
-                    <option value="LÃ­der de CÃ©lula" className="bg-zinc-900">LÃ­der de CÃ©lula</option>
+                    <option value="Líder de Célula" className="bg-zinc-900">Líder de Célula</option>
                     <option value="Obreiro" className="bg-zinc-900">Obreiro</option>
-                    <option value="DiÃ¡cono" className="bg-zinc-900">DiÃ¡cono</option>
+                    <option value="Diácono" className="bg-zinc-900">Diácono</option>
                     <option value="Pastor" className="bg-zinc-900">Pastor</option>
                   </select>
                 </div>
@@ -831,12 +831,12 @@ export default function Members() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">CÃ©lula / MinistÃ©rio</label>
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Célula / Ministério</label>
                   <input
                     type="text"
                     value={newCellName}
                     onChange={(e) => setNewCellName(e.target.value)}
-                    placeholder="Ex: CÃ©lula Resgatar"
+                    placeholder="Ex: Célula Resgatar"
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500"
                   />
                 </div>
@@ -853,7 +853,7 @@ export default function Members() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">EndereÃ§o</label>
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Endereço</label>
                 <input
                   type="text"
                   value={newAddress}
@@ -891,12 +891,12 @@ export default function Members() {
                     onChange={(e) => setNewMaritalStatus(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-purple-500 cursor-pointer"
                   >
-                    <option value="" className="bg-zinc-900">NÃ£o informado</option>
+                    <option value="" className="bg-zinc-900">Não informado</option>
                     <option value="Solteiro(a)" className="bg-zinc-900">Solteiro(a)</option>
                     <option value="Casado(a)" className="bg-zinc-900">Casado(a)</option>
                     <option value="Divorciado(a)" className="bg-zinc-900">Divorciado(a)</option>
-                    <option value="ViÃºvo(a)" className="bg-zinc-900">ViÃºvo(a)</option>
-                    <option value="UniÃ£o EstÃ¡vel" className="bg-zinc-900">UniÃ£o EstÃ¡vel</option>
+                    <option value="Viúvo(a)" className="bg-zinc-900">Viúvo(a)</option>
+                    <option value="União Estável" className="bg-zinc-900">União Estável</option>
                   </select>
                 </div>
               </div>
@@ -932,7 +932,7 @@ export default function Members() {
                 >
                   <option value="Ativo" className="bg-zinc-900">Ativo</option>
                   <option value="Inativo" className="bg-zinc-900">Inativo</option>
-                  <option value="LicenÃ§a" className="bg-zinc-900">LicenÃ§a</option>
+                  <option value="Licença" className="bg-zinc-900">Licença</option>
                 </select>
               </div>
 
@@ -951,7 +951,7 @@ export default function Members() {
                   type="submit"
                   className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-sm font-semibold shadow-lg hover:shadow-purple-500/20 active:scale-95 transition-all"
                 >
-                  {editingId ? "Salvar AlteraÃ§Ãµes" : "Salvar Membro"}
+                  {editingId ? "Salvar Alterações" : "Salvar Membro"}
                 </button>
               </div>
             </form>

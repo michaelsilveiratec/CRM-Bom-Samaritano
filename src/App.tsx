@@ -20,6 +20,13 @@ const ChurchSettings = lazy(() => import("./modules/igrejas"));
 const Login = lazy(() => import("./pages/Login"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
+const PlansPage = lazy(() => import("./pages/PlansPage"));
+const TestimonialsPage = lazy(() => import("./pages/TestimonialsPage"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+const ScheduleDemoPage = lazy(() => import("./pages/ScheduleDemoPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 const MobileLanding = lazy(() => import("./pages/MobileLanding"));
 const MobileMembers = lazy(() => import("./pages/MobileMembers"));
 const MobileVisitors = lazy(() => import("./pages/MobileVisitors"));
@@ -42,10 +49,17 @@ export default function App() {
         <Routes>
           {/* Public Landing Page */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/planos" element={<PlansPage />} />
+          <Route path="/depoimentos" element={<TestimonialsPage />} />
+          <Route path="/sobre" element={<AboutPage />} />
+          <Route path="/contato" element={<ContactPage />} />
+          <Route path="/agendar-demonstracao" element={<ScheduleDemoPage />} />
+          <Route path="/termos-de-uso" element={<TermsPage />} />
 
         {/* Direct access route for login */}
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/privacidade" element={<Privacy />} />
         <Route path="/course/:token" element={<PublicDiscipleshipCourse />} />
 
         {/* Application Routes */}

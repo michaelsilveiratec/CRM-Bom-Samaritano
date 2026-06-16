@@ -147,7 +147,7 @@ export default function Messages() {
         setMemberContacts(normalizeContacts(membersResponse?.members || []));
         setVisitorContacts(normalizeContacts(visitorsResponse?.visitors || []));
       } catch (error) {
-        console.warn("Nao foi possivel carregar contatos para disparo em massa:", error);
+        console.warn("Não foi possível carregar contatos para disparo em massa:", error);
       }
     };
 
@@ -238,7 +238,7 @@ export default function Messages() {
       if (!autoDispatch) {
         setToastNotification({
           type: "error",
-          message: "Para disparo em massa, ative o Disparo Automatico nas configuracoes."
+          message: "Para disparo em massa, ative o Disparo Automático nas configurações."
         });
         setTimeout(() => setToastNotification(null), 5000);
         return;
