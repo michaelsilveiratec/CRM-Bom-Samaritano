@@ -4,7 +4,8 @@ import {
   createServerFinancialRecord,
   deleteServerFinancialRecord,
   fetchServerFinancialRecords,
-  updateServerFinancialRecord
+  saveServerFinancialRecords,
+  updateServerFinancialRecord,
 } from "../services/crm.service";
 import {
   Wallet,
@@ -156,8 +157,18 @@ export default function Financial() {
         const response = await fetchServerFinancialRecords();
         const serverRecords = (response?.records || []).map(normalizeRecord);
 
-        setRecords(serverRecords);
-        localStorage.setItem("financial_records_data", JSON.stringify(serverRecords));
+        if (serverRecords.length > 0) {
+          setRecords(serverRecords);
+          localStorage.setItem("financial_records_data", JSON.stringify(serverRecords));
+          return;
+        }
+
+        if (records.length > 0) {
+          const syncResponse = await saveServerFinancialRecords(records);
+          const syncedRecords = (syncResponse?.records || []).map(normalizeRecord);
+          setRecords(syncedRecords);
+          localStorage.setItem("financial_records_data", JSON.stringify(syncedRecords));
+        }
       } catch (error) {
         console.warn("Não foi possível carregar financeiro do servidor:", error);
       }
