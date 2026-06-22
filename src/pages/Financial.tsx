@@ -4,7 +4,6 @@ import {
   createServerFinancialRecord,
   deleteServerFinancialRecord,
   fetchServerFinancialRecords,
-  saveServerFinancialRecords,
   updateServerFinancialRecord
 } from "../services/crm.service";
 import {
@@ -60,53 +59,6 @@ interface YearMonthComparison {
   percentage: number | null;
   status: "growth" | "drop" | "same" | "empty";
 }
-
-const DEFAULT_FINANCIAL_RECORDS = [
-  {
-    id: 1,
-    contributor: "Lucas Rocha",
-    category: "Dízimo",
-    value: 350.0,
-    date: "2026-05-15",
-    paymentMethod: "Pix",
-    notes: "Referente ao mês de maio",
-  },
-  {
-    id: 2,
-    contributor: "Sandra Regina",
-    category: "Oferta Geral",
-    value: 120.0,
-    date: "2026-05-14",
-    paymentMethod: "Dinheiro",
-    notes: "Culto de Quinta-feira",
-  },
-  {
-    id: 3,
-    contributor: "Anderson Silva",
-    category: "Dízimo",
-    value: 800.0,
-    date: "2026-05-10",
-    paymentMethod: "Pix",
-  },
-  {
-    id: 4,
-    contributor: "Membro Anônimo",
-    category: "Missões",
-    value: 200.0,
-    date: "2026-05-08",
-    paymentMethod: "Pix",
-    notes: "Oferta para campo missionário na África",
-  },
-  {
-    id: 5,
-    contributor: "Renata Fagundes",
-    category: "Construção",
-    value: 500.0,
-    date: "2026-05-01",
-    paymentMethod: "Débito",
-    notes: "Campanha do novo templo",
-  },
-];
 
 const MONTH_NAMES = [
   "Janeiro",
@@ -196,55 +148,7 @@ export default function Financial() {
     };
   }
 
-  const [records, setRecords] = useState<FinanceRecord[]>(() => {
-    const saved = localStorage.getItem("financial_records_data");
-    return saved ? JSON.parse(saved).map(normalizeRecord) : DEFAULT_FINANCIAL_RECORDS.map(normalizeRecord); /*
-      {
-        id: 1,
-        contributor: "Lucas Rocha",
-        category: "Dízimo",
-        value: 350.0,
-        date: "2026-05-15",
-        paymentMethod: "Pix",
-        notes: "Referente ao mês de maio",
-      },
-      {
-        id: 2,
-        contributor: "Sandra Regina",
-        category: "Oferta Geral",
-        value: 120.0,
-        date: "2026-05-14",
-        paymentMethod: "Dinheiro",
-        notes: "Culto de Quinta-feira",
-      },
-      {
-        id: 3,
-        contributor: "Anderson Silva",
-        category: "Dízimo",
-        value: 800.0,
-        date: "2026-05-10",
-        paymentMethod: "Pix",
-      },
-      {
-        id: 4,
-        contributor: "Membro Anônimo",
-        category: "Missões",
-        value: 200.0,
-        date: "2026-05-08",
-        paymentMethod: "Pix",
-        notes: "Oferta para campo missionário na África",
-      },
-      {
-        id: 5,
-        contributor: "Renata Fagundes",
-        category: "Construção",
-        value: 500.0,
-        date: "2026-05-01",
-        paymentMethod: "Débito",
-        notes: "Campanha do novo templo",
-      },
-    ]; */
-  });
+  const [records, setRecords] = useState<FinanceRecord[]>([]);
 
   useEffect(() => {
     const loadRemoteRecords = async () => {
@@ -252,18 +156,8 @@ export default function Financial() {
         const response = await fetchServerFinancialRecords();
         const serverRecords = (response?.records || []).map(normalizeRecord);
 
-        if (serverRecords.length > 0) {
-          setRecords(serverRecords);
-          localStorage.setItem("financial_records_data", JSON.stringify(serverRecords));
-          return;
-        }
-
-        if (records.length > 0) {
-          const syncResponse = await saveServerFinancialRecords(records);
-          const syncedRecords = (syncResponse?.records || []).map(normalizeRecord);
-          setRecords(syncedRecords);
-          localStorage.setItem("financial_records_data", JSON.stringify(syncedRecords));
-        }
+        setRecords(serverRecords);
+        localStorage.setItem("financial_records_data", JSON.stringify(serverRecords));
       } catch (error) {
         console.warn("Não foi possível carregar financeiro do servidor:", error);
       }

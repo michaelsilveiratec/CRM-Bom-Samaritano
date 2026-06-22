@@ -1,4 +1,4 @@
-const APP_CACHE_VERSION = "crm-bom-samaritano-2026-05-24-v3";
+const APP_CACHE_VERSION = "crm-bom-samaritano-2026-06-22-v4";
 const APP_CACHE_VERSION_KEY = "crm_app_cache_version";
 
 const SERVER_MIRROR_KEYS = [

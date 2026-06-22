@@ -7,6 +7,7 @@ import FinancialAccessGate from "./components/FinancialAccessGate";
 const Dashboard = lazy(() => import("./modules/dashboard"));
 const Visitors = lazy(() => import("./modules/visitantes"));
 const Members = lazy(() => import("./modules/membros"));
+const Attendance = lazy(() => import("./modules/presenca"));
 const Children = lazy(() => import("./modules/criancas"));
 const Youth = lazy(() => import("./modules/jovens"));
 const Discipleship = lazy(() => import("./modules/discipulado"));
@@ -68,6 +69,7 @@ export default function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="visitors" element={<Visitors />} />
           <Route path="members" element={<Members />} />
+          <Route path="attendance" element={<Attendance />} />
           <Route path="children" element={<Children />} />
           <Route path="youth" element={<Youth />} />
           <Route path="discipleship" element={<Discipleship />} />
@@ -93,6 +95,7 @@ export default function App() {
         <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
         <Route path="/visitors" element={<Navigate to="/app/visitors" replace />} />
         <Route path="/members" element={<Navigate to="/app/members" replace />} />
+        <Route path="/attendance" element={<Navigate to="/app/attendance" replace />} />
         <Route path="/children" element={<Navigate to="/app/children" replace />} />
         <Route path="/youth" element={<Navigate to="/app/youth" replace />} />
         <Route path="/discipleship" element={<Navigate to="/app/discipleship" replace />} />
