@@ -12,7 +12,7 @@ import {
   FileText,
   Gift,
   Settings,
-  LogOut
+  LogOut,
 } from "lucide-react";
 
 function readUser() {
@@ -35,6 +35,7 @@ function readUser() {
     base.name = "Pastor";
     base.avatar = "P";
   }
+
   return base;
 }
 
@@ -52,6 +53,7 @@ export default function Sidebar() {
       setUser(readUser());
       setPastorPhoto(readPastorPhoto());
     };
+
     window.addEventListener("crm-settings-updated", handleSettingsUpdate);
     return () => window.removeEventListener("crm-settings-updated", handleSettingsUpdate);
   }, []);
@@ -93,6 +95,7 @@ export default function Sidebar() {
               className="theme-logo-professional w-16 h-16 object-contain rounded-xl"
             />
           </div>
+
           <div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
               Bom Samaritano
@@ -117,10 +120,10 @@ export default function Sidebar() {
               {({ isActive }) => (
                 <>
                   <item.icon
-                     size={20}
-                     className={`transition-transform duration-200 group-hover:scale-110 ${
-                       isActive ? "text-purple-400" : "text-zinc-400 group-hover:text-zinc-200"
-                     }`}
+                    size={20}
+                    className={`transition-transform duration-200 group-hover:scale-110 ${
+                      isActive ? "text-purple-400" : "text-zinc-400 group-hover:text-zinc-200"
+                    }`}
                   />
                   <span className="font-medium text-sm">{item.label}</span>
                 </>
@@ -130,24 +133,24 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* User profile bottom card with built-in logout trigger */}
       <div className="p-4 border-t border-white/10 bg-zinc-950/50 flex items-center justify-between gap-2">
         <div className="flex items-center gap-3 overflow-hidden">
-          {/* Pastor photo or initials */}
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/10 shrink-0 shadow-lg">
             {pastorPhoto ? (
               <img src={pastorPhoto} alt={user.name} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center font-bold text-white text-sm">
-                {user.avatar || "AS"}
+                {user.avatar || "P"}
               </div>
             )}
           </div>
+
           <div className="overflow-hidden">
             <h4 className="text-sm font-semibold text-zinc-200 truncate">{user.name}</h4>
             <p className="text-xs text-zinc-500 truncate">{user.role}</p>
           </div>
         </div>
+
         <button
           onClick={handleLogout}
           title="Sair do Sistema"
